@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "website:build": "vuepress build ./"
+  }
+}
