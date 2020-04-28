@@ -7,7 +7,7 @@
     <meta name="generator" content="VuePress 1.4.1">
     
     <meta name="description" content="">
-    <link rel="preload" href="/magpurify2/assets/css/0.styles.29bf9d1c.css" as="style"><link rel="preload" href="/magpurify2/assets/js/app.5b42f44e.js" as="script"><link rel="preload" href="/magpurify2/assets/js/2.8a1014c8.js" as="script"><link rel="preload" href="/magpurify2/assets/js/7.2ba323df.js" as="script"><link rel="prefetch" href="/magpurify2/assets/js/3.595b5f25.js"><link rel="prefetch" href="/magpurify2/assets/js/4.0d8bdc15.js"><link rel="prefetch" href="/magpurify2/assets/js/5.54235ca2.js"><link rel="prefetch" href="/magpurify2/assets/js/6.c555f9f0.js"><link rel="prefetch" href="/magpurify2/assets/js/8.81c4fddd.js"><link rel="prefetch" href="/magpurify2/assets/js/9.7ab8ee95.js">
+    <link rel="preload" href="/magpurify2/assets/css/0.styles.29bf9d1c.css" as="style"><link rel="preload" href="/magpurify2/assets/js/app.f8ec80cc.js" as="script"><link rel="preload" href="/magpurify2/assets/js/2.8a1014c8.js" as="script"><link rel="preload" href="/magpurify2/assets/js/7.716a684b.js" as="script"><link rel="prefetch" href="/magpurify2/assets/js/3.595b5f25.js"><link rel="prefetch" href="/magpurify2/assets/js/4.0d8bdc15.js"><link rel="prefetch" href="/magpurify2/assets/js/5.54235ca2.js"><link rel="prefetch" href="/magpurify2/assets/js/6.c555f9f0.js"><link rel="prefetch" href="/magpurify2/assets/js/8.81c4fddd.js"><link rel="prefetch" href="/magpurify2/assets/js/9.7ab8ee95.js">
     <link rel="stylesheet" href="/magpurify2/assets/css/0.styles.29bf9d1c.css">
   </head>
   <body>
@@ -23,11 +23,13 @@ pip <span class="token function">install</span> magpurify2-0.1.0-cp38-cp38-manyl
 <span class="token function">curl</span> -sc /tmp/cookie <span class="token string">&quot;https://drive.google.com/uc?export=download&amp;id=<span class="token variable">${fileId}</span>&quot;</span> <span class="token operator">&gt;</span> /dev/null
 <span class="token assign-left variable">code</span><span class="token operator">=</span><span class="token string">&quot;<span class="token variable"><span class="token variable">$(</span><span class="token function">awk</span> <span class="token string">'/_warning_/ {print <span class="token variable">$NF</span>}'</span> /tmp/cookie<span class="token variable">)</span></span>&quot;</span>
 <span class="token function">curl</span> -Lb /tmp/cookie <span class="token string">&quot;https://drive.google.com/uc?export=download&amp;confirm=<span class="token variable">${code}</span>&amp;id=<span class="token variable">${fileId}</span>&quot;</span> -o <span class="token variable">${fileName}</span>
+<span class="token function">tar</span> zxfv magpurify2_test_data.tar.gz
 </code></pre></div><ul><li>Download database:</li></ul> <div class="language-bash extra-class"><pre class="language-bash"><code><span class="token assign-left variable">fileId</span><span class="token operator">=</span><span class="token string">&quot;14qAK-4NJNu0sOPldnZhO8vcAFpb1BcrB&quot;</span>
 <span class="token assign-left variable">fileName</span><span class="token operator">=</span><span class="token string">&quot;magpurify2DB.v1.0.tar.gz&quot;</span>
 <span class="token function">curl</span> -sc /tmp/cookie <span class="token string">&quot;https://drive.google.com/uc?export=download&amp;id=<span class="token variable">${fileId}</span>&quot;</span> <span class="token operator">&gt;</span> /dev/null
 <span class="token assign-left variable">code</span><span class="token operator">=</span><span class="token string">&quot;<span class="token variable"><span class="token variable">$(</span><span class="token function">awk</span> <span class="token string">'/_warning_/ {print <span class="token variable">$NF</span>}'</span> /tmp/cookie<span class="token variable">)</span></span>&quot;</span>
 <span class="token function">curl</span> -Lb /tmp/cookie <span class="token string">&quot;https://drive.google.com/uc?export=download&amp;confirm=<span class="token variable">${code}</span>&amp;id=<span class="token variable">${fileId}</span>&quot;</span> -o <span class="token variable">${fileName}</span>
+<span class="token function">tar</span> zxfv magpurify2DB.v1.0.tar.gz
 </code></pre></div><h2 id="external-dependencies"><a href="#external-dependencies" class="header-anchor">#</a> External dependencies</h2> <p>CheckV depends on…</p> <p>If you installed MAGpurify2 via Conda the dependencies should have been installed automatically.</p></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
       ←
       <a href="/magpurify2/docs/" class="prev router-link-active">
@@ -37,6 +39,6 @@ pip <span class="token function">install</span> magpurify2-0.1.0-cp38-cp38-manyl
       </a>
       →
     </span></p></div> </main></div><div class="global-ui"></div></div>
-    <script src="/magpurify2/assets/js/app.5b42f44e.js" defer></script><script src="/magpurify2/assets/js/2.8a1014c8.js" defer></script><script src="/magpurify2/assets/js/7.2ba323df.js" defer></script>
+    <script src="/magpurify2/assets/js/app.f8ec80cc.js" defer></script><script src="/magpurify2/assets/js/2.8a1014c8.js" defer></script><script src="/magpurify2/assets/js/7.716a684b.js" defer></script>
   </body>
 </html>
