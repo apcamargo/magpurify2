@@ -5,7 +5,7 @@
 ```bash
 conda create -n magpurify2 -c conda-forge -c bioconda python=3.8 prodigal mmseqs2
 conda activate magpurify2
-pip install magpurify2-0.1.0-cp38-cp38-manylinux2014_x86_64.whl
+pip install magpurify2-0.1.0-cp38-cp38-manylinux2010_x86_64.whl
 ```
 
 ## Download test data and database

@@ -43,6 +43,7 @@ setup(
         "numpy",
         "scikit-learn",
         "taxopy",
+        "tbb",
         "umap-learn",
     ],
     python_requires=">=3.6",

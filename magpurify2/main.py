@@ -43,10 +43,10 @@ def composition_module(args):
         mag.genome: tools.get_tnf(mag.sequences, threads=args.threads) for mag in mag_list
     }
     logger.info("Identifying putative contaminants.")
-    mag_composition_list = [
-        Composition(mag, composition_dict, args.strictness, args.threads)
+    mag_composition_list = Parallel(n_jobs=args.threads)(
+        delayed(Composition)(mag, composition_dict, args.strictness, args.threads)
         for mag in mag_list
-    ]
+    )
     for mag_composition in mag_composition_list:
         logger.info(
             f"{mag_composition.genome}: {sum(mag_composition.contaminants)}/"
@@ -69,9 +69,10 @@ def coverage_module(args):
     logger.info(f"Computing contig coverages from {len(args.bam_files)} BAM files.")
     coverage_dict = tools.get_coverages(args.bam_files, threads=args.threads)
     logger.info("Identifying putative contaminants.")
-    mag_coverage_list = [
-        Coverage(mag, coverage_dict, args.strictness, args.threads) for mag in mag_list
-    ]
+    mag_coverage_list = Parallel(n_jobs=args.threads)(
+        delayed(Coverage)(mag, coverage_dict, args.strictness, args.threads)
+        for mag in mag_list
+    )
     for mag_coverage in mag_coverage_list:
         logger.info(
             f"{mag_coverage.genome}: {sum(mag_coverage.contaminants)}/"
@@ -141,11 +142,10 @@ def taxonomy_module(args):
     )
     logger.info(f"Reading MMSeqs2 output file.")
     taxonomy_dict = tools.get_taxonomy_dict(mmseqs2_output_file, taxdb, 0.75)
-
     logger.info("Identifying putative contaminants.")
-    mag_taxonomy_list = [
-        Taxonomy(mag, taxonomy_dict, args.strictness, taxdb) for mag in mag_list
-    ]
+    mag_taxonomy_list = Parallel(n_jobs=args.threads)(
+        delayed(Taxonomy)(mag, taxonomy_dict, args.strictness, taxdb) for mag in mag_list
+    )
     for mag_taxonomy in mag_taxonomy_list:
         logger.info(
             f"{mag_taxonomy.genome}: {sum(mag_taxonomy.contaminants)}/"
