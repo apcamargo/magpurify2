@@ -7,6 +7,6 @@ case "$(uname -s)" in
     *)
 esac
 
-curl https://sh.rustup.rs -sSf | sh -s -- -y
+curl https://sh.rustup.rs -sSf | sh -s -- -y --profile=minimal
 rustup default nightly
 pip install setuptools-rust
