@@ -71,7 +71,6 @@ class Composition:
             base_bandwidth=7,
             lengths=self.lengths,
             strictness=self.strictness,
-            threads=self.threads,
         )
         return embedding, contaminants
 
@@ -106,7 +105,6 @@ class Coverage:
             base_bandwidth=5.5,
             lengths=self.lengths,
             strictness=self.strictness,
-            threads=self.threads,
         )
         return embedding, contaminants
 
