@@ -1,9 +1,10 @@
 name: build wheels
 
-on:
-  push:
-    tags:
-      - "v*"
+on: [push]
+# on:
+#   push:
+#     tags:
+#       - "v*"
 
 jobs:
   build-wheels:
