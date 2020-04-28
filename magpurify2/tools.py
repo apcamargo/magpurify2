@@ -342,7 +342,6 @@ def create_embedding(
         Embedding of the training data in low-dimensional space.
     """
     os.environ["NUMBA_NUM_THREADS"] = "1"
-    os.environ["THREADING_LAYER"] = "tbb"
     reducer = umap.UMAP(
         n_components=2,
         metric=metric,
@@ -380,7 +379,9 @@ def write_mmseqs2_input(output_directory):
                 fout.write(f"{textwrap.fill(sequence, 70)}\n")
 
 
-def identify_contaminant_clusters(embedding, base_bandwidth, lengths, strictness):
+def identify_contaminant_clusters(
+    embedding, base_bandwidth, lengths, strictness, threads=1
+):
     """
     Clusters the input data using the `MeanShift` algorithm and finds the main
     cluster using contigs lengths as weights. The reimaining clusters are
@@ -399,6 +400,8 @@ def identify_contaminant_clusters(embedding, base_bandwidth, lengths, strictness
         the following formula:
         `bandwidth = base_bandwidth + (strictness - 0.5) * 4`
         Accepts values ranging from 0 (more clusters) and 1 (less clusters).
+    threads : int, default 1
+        Number of threads to use for the computation.
 
     Returns
     -------
@@ -407,7 +410,7 @@ def identify_contaminant_clusters(embedding, base_bandwidth, lengths, strictness
         represents contigs contained in the main cluster.
     """
     bandwidth = base_bandwidth + (strictness - 0.5) * 4
-    clusters = MeanShift(bandwidth=bandwidth, n_jobs=1).fit(embedding).labels_
+    clusters = MeanShift(bandwidth=bandwidth, n_jobs=threads).fit(embedding).labels_
     weights = defaultdict(int)
     for cluster, lenght in zip(clusters, lengths):
         weights[cluster] += lenght
