@@ -21,6 +21,7 @@
 import argparse
 import multiprocessing
 import sys
+from pathlib import Path
 
 from biolib.logger import logger_setup
 
@@ -28,8 +29,8 @@ import magpurify2
 from magpurify2.main import (
     composition_module,
     coverage_module,
-    taxonomy_module,
     filter_module,
+    taxonomy_module,
 )
 
 
@@ -97,9 +98,11 @@ def cli():
 
 def composition_parser(parser):
     parser.set_defaults(func=composition_module)
-    parser.add_argument("genomes", nargs="+", help="Input genomes in the FASTA format.")
     parser.add_argument(
-        "output_directory", help="Directory to write the output files to.",
+        "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
+    )
+    parser.add_argument(
+        "output_directory", help="Directory to write the output files to.", type=Path,
     )
     parser.add_argument(
         "-s",
@@ -123,12 +126,18 @@ def composition_parser(parser):
 
 def coverage_parser(parser):
     parser.set_defaults(func=coverage_module)
-    parser.add_argument("genomes", nargs="+", help="Input genomes in the FASTA format.")
     parser.add_argument(
-        "output_directory", help="Directory to write the output files to.",
+        "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
     parser.add_argument(
-        "--bam_files", required=True, nargs="+", help="Input sorted BAM files."
+        "output_directory", help="Directory to write the output files to.", type=Path,
+    )
+    parser.add_argument(
+        "--bam_files",
+        required=True,
+        nargs="+",
+        help="Input sorted BAM files.",
+        type=Path,
     )
     parser.add_argument(
         "-s",
@@ -152,11 +161,15 @@ def coverage_parser(parser):
 
 def taxonomy_parser(parser):
     parser.set_defaults(func=taxonomy_module)
-    parser.add_argument("genomes", nargs="+", help="Input genomes in the FASTA format.")
     parser.add_argument(
-        "output_directory", help="Directory to write the output files to.",
+        "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
-    parser.add_argument("database", help="Path to MAGpurify2's database directory.")
+    parser.add_argument(
+        "output_directory", help="Directory to write the output files to.", type=Path,
+    )
+    parser.add_argument(
+        "database", help="Path to MAGpurify2's database directory.", type=Path,
+    )
     parser.add_argument(
         "-s",
         "--strictness",
@@ -179,14 +192,18 @@ def taxonomy_parser(parser):
 
 def filter_parser(parser):
     parser.set_defaults(func=filter_module)
-    parser.add_argument("genomes", nargs="+", help="Input genomes in the FASTA format.")
+    parser.add_argument(
+        "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
+    )
     parser.add_argument(
         "output_directory",
         help="Directory with the outputs of the contaminant identification modules.",
+        type=Path,
     )
     parser.add_argument(
         "filtered_output_directory",
         help="Directory where the filtered MAGs will be written to.",
+        type=Path,
     )
     parser.add_argument(
         "-f",

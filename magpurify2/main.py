@@ -18,9 +18,7 @@
 #
 # Contact: antoniop.camargo@gmail.com
 
-import glob
 import logging
-import os
 import shutil
 import sys
 from collections import defaultdict
@@ -52,8 +50,8 @@ def composition_module(args):
             f"{mag_composition.genome}: {sum(mag_composition.contaminants)}/"
             f"{len(mag_composition)} contigs flagged as contaminants."
         )
-    composition_output_file = os.path.join(
-        args.output_directory, "contaminants_composition.tsv"
+    composition_output_file = args.output_directory.joinpath(
+        "contaminants_composition.tsv"
     )
     logger.info(f"Writing output to: '{composition_output_file}'.")
     tools.write_contamination_output(mag_composition_list, composition_output_file)
@@ -67,7 +65,9 @@ def coverage_module(args):
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome, store_sequences=False) for genome in args.genomes]
     logger.info(f"Computing contig coverages from {len(args.bam_files)} BAM files.")
-    coverage_dict = tools.get_coverages(args.bam_files, threads=args.threads)
+    coverage_dict = tools.get_coverages(
+        [str(filepath) for filepath in args.bam_files], threads=args.threads
+    )
     logger.info("Identifying putative contaminants.")
     mag_coverage_list = Parallel(n_jobs=args.threads)(
         delayed(Coverage)(mag, coverage_dict, args.strictness, args.threads)
@@ -78,9 +78,7 @@ def coverage_module(args):
             f"{mag_coverage.genome}: {sum(mag_coverage.contaminants)}/"
             f"{len(mag_coverage)} contigs flagged as contaminants."
         )
-    coverage_output_file = os.path.join(
-        args.output_directory, "contaminants_coverage.tsv"
-    )
+    coverage_output_file = args.output_directory.joinpath("contaminants_coverage.tsv")
     logger.info(f"Writing output to: '{coverage_output_file}'.")
     tools.write_contamination_output(mag_coverage_list, coverage_output_file)
 
@@ -106,15 +104,15 @@ def taxonomy_module(args):
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome, store_sequences=False) for genome in args.genomes]
 
-    mmseqs2_output_directory = os.path.join(args.output_directory, "mmseqs2")
-    mmseqs2_input_file = os.path.join(mmseqs2_output_directory, "mmseqs2_input.faa")
-    mmseqs2_output_file = os.path.join(mmseqs2_output_directory, "mmseqs2_output.tsv")
+    mmseqs2_output_directory = args.output_directory.joinpath("mmseqs2")
+    mmseqs2_input_file = mmseqs2_output_directory.joinpath("mmseqs2_input.faa")
+    mmseqs2_output_file = mmseqs2_output_directory.joinpath("mmseqs2_output.tsv")
 
     # Check if MMSeqs2 needs to be executed again. To do that, we check if a MMSeqs2
     # output file exists. If it does, we check if all the input genomes are in it.
     skip_mmseqs = False
-    if os.path.exists(mmseqs2_output_directory):
-        if os.path.exists(mmseqs2_output_file):
+    if mmseqs2_output_directory.is_dir():
+        if mmseqs2_output_file.exists():
             with open(mmseqs2_output_file) as fin:
                 searched_genomes = {line.split("~")[0] for line in fin}
             if {mag.genome for mag in mag_list}.issubset(searched_genomes):
@@ -122,12 +120,12 @@ def taxonomy_module(args):
                 skip_mmseqs = True
             else:
                 shutil.rmtree(mmseqs2_output_directory)
-                os.mkdir(mmseqs2_output_directory)
+                mmseqs2_output_directory.mkdir()
         else:
             shutil.rmtree(mmseqs2_output_directory)
-            os.mkdir(mmseqs2_output_directory)
+            mmseqs2_output_directory.mkdir()
     else:
-        os.mkdir(mmseqs2_output_directory)
+        mmseqs2_output_directory.mkdir()
 
     if not skip_mmseqs:
         external.prodigal(args.genomes, args.output_directory, logger, args.threads)
@@ -151,9 +149,7 @@ def taxonomy_module(args):
             f"{mag_taxonomy.genome}: {sum(mag_taxonomy.contaminants)}/"
             f"{len(mag_taxonomy)} contigs flagged as contaminants."
         )
-    taxonomy_output_file = os.path.join(
-        args.output_directory, "contaminants_taxonomy.tsv"
-    )
+    taxonomy_output_file = args.output_directory.joinpath("contaminants_taxonomy.tsv")
     logger.info(f"Writing output to: '{taxonomy_output_file}'.")
     tools.write_contamination_output(mag_taxonomy_list, taxonomy_output_file)
 
@@ -163,14 +159,13 @@ def filter_module(args):
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome) for genome in args.genomes]
     input_genomes = {mag.genome for mag in mag_list}
-    contamination_file_list = os.path.join(args.output_directory, "contaminants*.tsv")
-    contamination_file_list = glob.glob(contamination_file_list)
+    contamination_file_list = args.output_directory.glob("contaminants*.tsv")
     mags_contaminants = defaultdict(lambda: defaultdict(list))
-    if not os.path.isdir(args.filtered_output_directory):
+    if not args.filtered_output_directory.is_dir():
         logger.warning(
             "Output directory for the filtered genomes does not exist. Creating it now."
         )
-        os.mkdir(args.filtered_output_directory)
+        args.filtered_output_directory.mkdir()
     for contamination_file in contamination_file_list:
         logger.info(f"Reading '{contamination_file}'.")
         with open(contamination_file) as fin:

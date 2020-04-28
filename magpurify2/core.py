@@ -27,7 +27,7 @@ from magpurify2 import tools
 
 class Mag:
     def __init__(self, filepath, store_sequences=True):
-        self.genome = tools.get_genome_name(filepath)
+        self.genome = filepath.stem
         self.contigs = []
         self.descriptions = []
         self.sequences = []

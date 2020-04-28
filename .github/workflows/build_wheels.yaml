@@ -35,5 +35,5 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: build-artifact
+        name: wheels-artifact
         path: wheelhouse

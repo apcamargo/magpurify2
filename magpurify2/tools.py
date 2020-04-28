@@ -19,7 +19,6 @@
 # Contact: antoniop.camargo@gmail.com
 
 import bz2
-import glob
 import gzip
 import lzma
 import os
@@ -27,6 +26,7 @@ import sys
 import textwrap
 from collections import defaultdict
 from enum import Enum, auto
+from pathlib import Path
 
 import taxopy
 import umap
@@ -79,14 +79,14 @@ def check_output_directory(output_directory, logger):
 
     Parameters
     ----------
-    output_directory : str
-        Path to the output directory of the program.
+    output_directory : Path
+        Path object pointing to the output directory of the program.
     logger : Logger
         The logger of the program.
     """
-    if not os.path.isdir(output_directory):
+    if not output_directory.is_dir():
         logger.warning("Output directory does not exist. Creating it now.")
-        os.mkdir(output_directory)
+        output_directory.mkdir()
 
 
 def check_executable(executable):
@@ -112,34 +112,14 @@ def check_executable(executable):
     return found
 
 
-def get_genome_name(filepath):
-    """
-    Get the genome name from its path.
-
-    Parameters
-    ----------
-    filepath : str
-        The path to the genome FASTA file.
-
-    Returns
-    -------
-    str
-        Genome name
-    """
-    basename = os.path.basename(filepath)
-    if basename.endswith(".gz"):
-        basename = basename.replace(".gz", "")
-    return os.path.splitext(basename)[0]
-
-
 def is_compressed(filepath):
     """
     Checks if a file is compressed (gzip, bzip2 or xz).
 
     Parameters
     ----------
-    filepath : str
-        Path to file.
+    filepath : Path
+        Path object pointing to a file.
 
     Returns
     -------
@@ -165,8 +145,8 @@ def is_sorted_bam(filepath):
 
     Parameters
     ----------
-    filepath : str
-        Path to BAM file.
+    filepath : Path
+        Path object pointing to BAM file.
 
     Returns
     -------
@@ -187,11 +167,11 @@ def check_bam_files(bam_files, logger):
     Parameters
     ----------
     bam_files : list
-        List with the paths to the inpit BAM files.
+        List with the Path objects pointing to the input BAM files.
     logger : Logger
         The logger of the program.
     """
-    if not all(os.path.exists(filepath) for filepath in bam_files):
+    if not all(filepath.exists() for filepath in bam_files):
         logger.error("At least one of the supplied BAM files does not exist.")
         sys.exit(1)
     if not all(is_sorted_bam(filepath) for filepath in bam_files):
@@ -209,8 +189,8 @@ def read_fasta(filepath):
 
     Parameters
     ----------
-    filepath : str
-        Path to FASTA file.
+    filepath : Path
+        Path object pointing to a FASTA file.
 
     Yields
     -------
@@ -243,9 +223,9 @@ def check_prediction(genome_list, output_directory):
     Parameters
     ----------
     genome_list : list
-        List containing the paths of the input genomes.
-    output_directory : str
-        Directory where the outputs will be written to.
+        List containing the Path objects pointing to the input genomes.
+    output_directory : Path
+        Path object pointing to the output directory of the program.
 
     Returns
     -------
@@ -254,13 +234,13 @@ def check_prediction(genome_list, output_directory):
     list
         List of the genomes for which gene prediction was already performed.
     """
-    prodigal_output_directory = os.path.join(output_directory, "prodigal")
+    prodigal_output_directory = output_directory.joinpath("prodigal")
     genomes_with_prediction = []
     genomes_without_prediction = []
     for filepath in genome_list:
-        genome_name = get_genome_name(filepath)
-        genome_faa = os.path.join(prodigal_output_directory, f"{genome_name}_genes.faa")
-        if not os.path.exists(genome_faa):
+        genome_name = filepath.stem
+        genome_faa = prodigal_output_directory.joinpath(f"{genome_name}_genes.faa")
+        if not genome_faa.exists():
             genomes_without_prediction.append(filepath)
         else:
             genomes_with_prediction.append(filepath)
@@ -274,8 +254,8 @@ def get_taxonomy_dict(mmseqs2_output, taxdb, fraction=0.75):
 
     Parameters
     ----------
-    mmseqs2_output : str
-        Path to the MMSeqs2 output.
+    mmseqs2_output : Path
+        Path object pointing to the MMSeqs2 output.
     taxdb : TaxDb
         A TaxDb object.
     fraction : float, default 0.75
@@ -311,6 +291,31 @@ def get_taxonomy_dict(mmseqs2_output, taxdb, fraction=0.75):
                 (majority_vote,) = contig_taxon
             taxonomy_dict[genome][contig] = majority_vote
     return taxonomy_dict
+
+
+def write_mmseqs2_input(output_directory):
+    """
+    Prepare the FASTA input for MMSeqs2 by the concatenation of Prodigal
+    outputs. The header of each record in the FASTA is formatted as
+    ">genome~contig~gene" so that the results for each contig in each genome can
+    be identified in downstream steps.
+
+    Parameters
+    ----------
+    output_directory : Path
+        Path object pointing to the output directory of the program.
+    """
+    mmseqs2_output_directory = output_directory.joinpath("mmseqs2")
+    mmseqs2_input_file = mmseqs2_output_directory.joinpath("mmseqs2_input.faa")
+    with open(mmseqs2_input_file, "w") as fout:
+        prodigal_output_directory = output_directory.joinpath("prodigal")
+        for filepath in prodigal_output_directory.glob("*.faa"):
+            genome = Path(filepath).stem.replace("_genes", "")
+            for name, _, sequence in read_fasta(filepath):
+                contig, gene_number = name.rsplit("_", 1)
+                contig.replace("~", "_")
+                fout.write(f">{genome}~{contig}~{gene_number}\n")
+                fout.write(f"{textwrap.fill(sequence, 70)}\n")
 
 
 def create_embedding(
@@ -352,32 +357,6 @@ def create_embedding(
         random_state=random_state,
     )
     return reducer.fit_transform(data)
-
-
-def write_mmseqs2_input(output_directory):
-    """
-    Prepare the FASTA input for MMSeqs2 by the concatenation of Prodigal
-    outputs. The header of each record in the FASTA is formatted as
-    ">genome~contig~gene" so that the results for each contig in each genome can
-    be identified in downstream steps.
-
-    Parameters
-    ----------
-    output_directory : str
-        Path to the output directory of the program where the FASTA file will be
-        written to.
-    """
-    mmseqs2_output_directory = os.path.join(output_directory, "mmseqs2")
-    mmseqs2_input_file = os.path.join(mmseqs2_output_directory, "mmseqs2_input.faa")
-    with open(mmseqs2_input_file, "w") as fout:
-        prodigal_output_directory = os.path.join(output_directory, "prodigal")
-        for filepath in glob.glob(os.path.join(prodigal_output_directory, "*.faa")):
-            genome = get_genome_name(filepath).replace("_genes", "")
-            for name, _, sequence in read_fasta(filepath):
-                contig, gene_number = name.rsplit("_", 1)
-                contig.replace("~", "_")
-                fout.write(f">{genome}~{contig}~{gene_number}\n")
-                fout.write(f"{textwrap.fill(sequence, 70)}\n")
 
 
 def identify_contaminant_clusters(embedding, base_bandwidth, lengths, strictness):
@@ -424,8 +403,8 @@ def write_contamination_output(mag_contamination_list, contamination_output_file
     ----------
     mag_contamination_list : list
         List of objects of the `Composition`, `Coverage` or `Taxonomy` classes.
-    contamination_output_file : str
-        Path to the output file.
+    contamination_output_file : Path
+        Path object pointing to the output file.
     """
     with open(contamination_output_file, "w") as fout:
         fout.write("genome\tcontig\tcontamination\n")
@@ -453,10 +432,11 @@ def write_filtered_genome(mag, mags_contaminants, filtering, filtered_output_dir
         If `"any"`, the contig will be removed if it was flagged as a
         contaminant by any of the contaminant-detection approaches. If `"all"`,
         the contig will only be removed if it was flagged by all the approaches.
-    filtered_output_directory : str
-        Directory to write the filtered genomes to.
+    filtered_output_directory : Path
+        Path object pointing to the directory where the filtered genome will be
+        written to.
     """
-    output_fasta = os.path.join(filtered_output_directory, mag.genome + ".filtered.fna")
+    output_fasta = filtered_output_directory.joinpath(mag.genome + ".filtered.fna")
     if mag.genome in mags_contaminants:
         with open(output_fasta, "w") as fout:
             for contig, description, sequence in mag:

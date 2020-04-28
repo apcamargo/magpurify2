@@ -19,13 +19,11 @@
 # Contact: antoniop.camargo@gmail.com
 
 import bz2
-import glob
 import gzip
 import lzma
-import os
-import sys
 import shutil
 import subprocess
+import sys
 
 from biolib.external.prodigal import Prodigal
 
@@ -34,7 +32,7 @@ from magpurify2 import tools
 
 class Database:
     def __init__(self, path, logger):
-        if not os.path.isdir(path):
+        if not path.is_dir():
             logger.error("The provided database path does not point to a directory")
             sys.exit(1)
         else:
@@ -54,15 +52,15 @@ class Database:
                 "magpurify2DB_name",
                 "magpurify2DB_version",
             }
-            found_files = set(os.listdir(path))
+            found_files = {filepath.name for filepath in path.iterdir()}
             if expected_files.issubset(found_files):
-                with open(os.path.join(path, "magpurify2DB_version")) as fin:
+                with open(path.joinpath("magpurify2DB_version")) as fin:
                     self.version = fin.read().strip()
-                with open(os.path.join(path, "magpurify2DB_name")) as fin:
+                with open(path.joinpath("magpurify2DB_name")) as fin:
                     self.name = fin.read().strip()
-                self.mmseqs_db = os.path.join(path, self.name)
-                self.nodes_dmp = os.path.join(path, "magpurify2DB_nodes.dmp")
-                self.names_dmp = os.path.join(path, "magpurify2DB_names.dmp")
+                self.mmseqs_db = path.joinpath(self.name)
+                self.nodes_dmp = path.joinpath("magpurify2DB_nodes.dmp")
+                self.names_dmp = path.joinpath("magpurify2DB_names.dmp")
             else:
                 missing_files = expected_files - found_files
                 logger.error(
@@ -73,7 +71,7 @@ class Database:
 
 
 def prodigal(genomes, output_directory, logger, threads):
-    prodigal_output_directory = os.path.join(output_directory, "prodigal")
+    prodigal_output_directory = output_directory.joinpath("prodigal")
     # Identify which of the input genomes already have Prodigal predictions in the
     # output directory. Those genomes won't be analyzed by Prodigal again.
     genomes_without_prediction, genomes_with_prediction = tools.check_prediction(
@@ -90,21 +88,21 @@ def prodigal(genomes, output_directory, logger, threads):
             tools.is_compressed(filepath) != tools.Compression.noncompressed
             for filepath in genomes_without_prediction
         )
-        extracted_genomes_directory = os.path.join(output_directory, "extracted_genomes")
+        extracted_genomes_directory = output_directory.joinpath("extracted_genomes")
         if n_compressed_genomes:
             # If there is any compressed input to Prodigal, a new directory will be
             # created and compressed files will be decompressed into it. Non-compressed
             # inputs will simply be copied into this new directory.
             logger.info(f"Extracting {n_compressed_genomes} compressed genomes")
-            if os.path.isdir(extracted_genomes_directory):
+            if extracted_genomes_directory.is_dir():
                 shutil.rmtree(extracted_genomes_directory)
-            os.mkdir(extracted_genomes_directory)
+            extracted_genomes_directory.mkdir()
             for filepath in genomes_without_prediction:
+                genome = filepath.stem
                 if tools.is_compressed(filepath) != tools.Compression.noncompressed:
                     filepath_compression = tools.is_compressed(filepath)
-                    genome = tools.get_genome_name(filepath)
-                    extraction_output = os.path.join(
-                        extracted_genomes_directory, f"{genome}.fna"
+                    extraction_output = extracted_genomes_directory.joinpath(
+                        f"{genome}.fna"
                     )
                     if filepath_compression == tools.Compression.gzip:
                         fin = gzip.open(filepath, "rt")
@@ -116,56 +114,52 @@ def prodigal(genomes, output_directory, logger, threads):
                         shutil.copyfileobj(fin, fout)
                     fin.close()
                 else:
-                    genome = tools.get_genome_name(filepath)
-                    copy_output = os.path.join(
-                        extracted_genomes_directory, f"{genome}.fna"
-                    )
+                    copy_output = extracted_genomes_directory.joinpath(f"{genome}.fna")
                     shutil.copyfile(filepath, copy_output)
             # Change the path to Prodigal inputs to the new directory containing the
             # decompressed FASTA files.
-            genomes_without_prediction = glob.glob(
-                os.path.join(extracted_genomes_directory, "*.fna")
-            )
+            genomes_without_prediction = list(extracted_genomes_directory.glob("*.fna"))
         # Execute Prodigal for the genomes without predictions.
         logger.info(
             f"Predicting proteins from {len(genomes_without_prediction)} genomes using Prodigal."
         )
         prodigal_runner = Prodigal(threads, verbose=False)
+        # Convert Path objects to strings in order to use biolib's Prodigal wrapper.
+        genomes_without_prediction = [str(filepath) for filepath in genomes_without_prediction]
         prodigal_runner.run(genomes_without_prediction, prodigal_output_directory)
         # If it exists, delete the directory containing decompressed FASTA files.
-        if os.path.isdir(extracted_genomes_directory):
+        if extracted_genomes_directory.is_dir():
             shutil.rmtree(extracted_genomes_directory)
     # Delete the ".fna" and ".gff" generated by Prodigal.
-    fna_gff_files = glob.glob(
-        os.path.join(prodigal_output_directory, "*.fna")
-    ) + glob.glob(os.path.join(prodigal_output_directory, "*.gff"))
-    for filepath in fna_gff_files:
-        os.remove(filepath)
+    for filepath in prodigal_output_directory.glob("*.fna"):
+        filepath.unlink()
+    for filepath in prodigal_output_directory.glob("*.gff"):
+        filepath.unlink()
 
 
 def mmseqs2(output_directory, database, logger, threads):
-    log_file = os.path.join(output_directory, "mmseqs2.log")
-    mmseqs2_output_directory = os.path.join(output_directory, "mmseqs2")
-    mmseqs2_input_file = os.path.join(mmseqs2_output_directory, "mmseqs2_input.faa")
-    mmseqs2_output_file = os.path.join(mmseqs2_output_directory, "mmseqs2_output.tsv")
-    querydb_directory = os.path.join(mmseqs2_output_directory, "querydb")
-    querydb_files = os.path.join(querydb_directory, "querydb")
-    taxonomydb_directory = os.path.join(mmseqs2_output_directory, "taxonomydb")
-    taxonomydb_files = os.path.join(taxonomydb_directory, "taxonomydb")
-    tmp_directory = os.path.join(mmseqs2_output_directory, "tmp")
+    log_file = output_directory.joinpath("mmseqs2.log")
+    mmseqs2_output_directory = output_directory.joinpath("mmseqs2")
+    mmseqs2_input_file = mmseqs2_output_directory.joinpath("mmseqs2_input.faa")
+    mmseqs2_output_file = mmseqs2_output_directory.joinpath("mmseqs2_output.tsv")
+    querydb_directory = mmseqs2_output_directory.joinpath("querydb")
+    querydb_files = querydb_directory.joinpath("querydb")
+    taxonomydb_directory = mmseqs2_output_directory.joinpath("taxonomydb")
+    taxonomydb_files = taxonomydb_directory.joinpath("taxonomydb")
+    tmp_directory = mmseqs2_output_directory.joinpath("tmp")
     # Create intermediate directories.
-    os.mkdir(querydb_directory)
-    os.mkdir(taxonomydb_directory)
-    os.mkdir(tmp_directory)
+    querydb_directory.mkdir()
+    taxonomydb_directory.mkdir()
+    tmp_directory.mkdir()
     # Define the MMSeqs2 commands:
     first_command = ["mmseqs", "createdb", mmseqs2_input_file, querydb_files]
     second_command = [
         "mmseqs",
         "taxonomy",
-        querydb_files,
-        database.mmseqs_db,
-        taxonomydb_files,
-        tmp_directory,
+        str(querydb_files),
+        str(database.mmseqs_db),
+        str(taxonomydb_files),
+        str(tmp_directory),
         "-s",
         "3.5",
         "--lca-mode",
@@ -176,9 +170,9 @@ def mmseqs2(output_directory, database, logger, threads):
     third_command = [
         "mmseqs",
         "createtsv",
-        querydb_files,
-        taxonomydb_files,
-        mmseqs2_output_file,
+        str(querydb_files),
+        str(taxonomydb_files),
+        str(mmseqs2_output_file),
     ]
     with open(log_file, "w") as fout:
         for command in [first_command, second_command, third_command]:
