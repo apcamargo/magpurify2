@@ -125,7 +125,9 @@ def prodigal(genomes, output_directory, logger, threads):
         )
         prodigal_runner = Prodigal(threads, verbose=False)
         # Convert Path objects to strings in order to use biolib's Prodigal wrapper.
-        genomes_without_prediction = [str(filepath) for filepath in genomes_without_prediction]
+        genomes_without_prediction = [
+            str(filepath) for filepath in genomes_without_prediction
+        ]
         prodigal_runner.run(genomes_without_prediction, prodigal_output_directory)
         # If it exists, delete the directory containing decompressed FASTA files.
         if extracted_genomes_directory.is_dir():
@@ -152,8 +154,8 @@ def mmseqs2(output_directory, database, logger, threads):
     taxonomydb_directory.mkdir()
     tmp_directory.mkdir()
     # Define the MMSeqs2 commands:
-    first_command = ["mmseqs", "createdb", mmseqs2_input_file, querydb_files]
-    second_command = [
+    createdb_command = ["mmseqs", "createdb", str(mmseqs2_input_file), str(querydb_files)]
+    taxonomy_command = [
         "mmseqs",
         "taxonomy",
         str(querydb_files),
@@ -167,7 +169,7 @@ def mmseqs2(output_directory, database, logger, threads):
         "--threads",
         str(threads),
     ]
-    third_command = [
+    createtsv_command = [
         "mmseqs",
         "createtsv",
         str(querydb_files),
@@ -175,7 +177,7 @@ def mmseqs2(output_directory, database, logger, threads):
         str(mmseqs2_output_file),
     ]
     with open(log_file, "w") as fout:
-        for command in [first_command, second_command, third_command]:
+        for command in [createdb_command, taxonomy_command, createtsv_command]:
             try:
                 subprocess.run(command, stdout=fout, stderr=fout, check=True)
             except subprocess.CalledProcessError:
