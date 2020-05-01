@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   deploy-website:
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-18.04
       steps:
       - name: Checkout
         uses: actions/checkout@v2.0.0
@@ -14,7 +14,7 @@ jobs:
         shell: bash
         run: bash .github/workflows/build_website.sh
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v3.5.10
         with:
           github_token: ${{ secrets.ACCESS_TOKEN }}
           publish_dir: website/.vuepress/dist

@@ -145,23 +145,23 @@ def mmseqs2(output_directory, database, logger, threads):
     mmseqs2_input_file = mmseqs2_output_directory.joinpath("mmseqs2_input.faa")
     mmseqs2_output_file = mmseqs2_output_directory.joinpath("mmseqs2_output.tsv")
     querydb_directory = mmseqs2_output_directory.joinpath("querydb")
-    querydb_files = querydb_directory.joinpath("querydb")
+    querydb_prefix = querydb_directory.joinpath("querydb")
     taxonomydb_directory = mmseqs2_output_directory.joinpath("taxonomydb")
-    taxonomydb_files = taxonomydb_directory.joinpath("taxonomydb")
+    taxonomydb_prefix = taxonomydb_directory.joinpath("taxonomydb")
     tmp_directory = mmseqs2_output_directory.joinpath("tmp")
     # Create intermediate directories.
     querydb_directory.mkdir()
     taxonomydb_directory.mkdir()
     tmp_directory.mkdir()
     # Define the MMSeqs2 commands:
-    createdb_command = ["mmseqs", "createdb", str(mmseqs2_input_file), str(querydb_files)]
+    createdb_command = ["mmseqs", "createdb", mmseqs2_input_file, querydb_prefix]
     taxonomy_command = [
         "mmseqs",
         "taxonomy",
-        str(querydb_files),
-        str(database.mmseqs_db),
-        str(taxonomydb_files),
-        str(tmp_directory),
+        querydb_prefix,
+        database.mmseqs_db,
+        taxonomydb_prefix,
+        tmp_directory,
         "-s",
         "3.5",
         "--lca-mode",
@@ -172,16 +172,17 @@ def mmseqs2(output_directory, database, logger, threads):
     createtsv_command = [
         "mmseqs",
         "createtsv",
-        str(querydb_files),
-        str(taxonomydb_files),
-        str(mmseqs2_output_file),
+        querydb_prefix,
+        taxonomydb_prefix,
+        mmseqs2_output_file,
     ]
     with open(log_file, "w") as fout:
         for command in [createdb_command, taxonomy_command, createtsv_command]:
             try:
                 subprocess.run(command, stdout=fout, stderr=fout, check=True)
             except subprocess.CalledProcessError:
-                logger.error(f"'{' '.join(command)}' failed.")
+                command_str = ' '.join([str(i) for i in command])
+                logger.error(f"'{command_str}' failed.")
                 sys.exit(1)
     # Remove intermediate directories.
     shutil.rmtree(querydb_directory)
