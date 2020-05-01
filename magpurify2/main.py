@@ -42,8 +42,7 @@ def composition_module(args):
     }
     logger.info("Identifying putative contaminants.")
     mag_composition_list = Parallel(n_jobs=args.threads)(
-        delayed(Composition)(mag, composition_dict, args.strictness, args.threads)
-        for mag in mag_list
+        delayed(Composition)(mag, composition_dict, args.strictness) for mag in mag_list
     )
     for mag_composition in mag_composition_list:
         logger.info(
@@ -70,8 +69,7 @@ def coverage_module(args):
     )
     logger.info("Identifying putative contaminants.")
     mag_coverage_list = Parallel(n_jobs=args.threads)(
-        delayed(Coverage)(mag, coverage_dict, args.strictness, args.threads)
-        for mag in mag_list
+        delayed(Coverage)(mag, coverage_dict, args.strictness) for mag in mag_list
     )
     for mag_coverage in mag_coverage_list:
         logger.info(

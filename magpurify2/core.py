@@ -53,12 +53,11 @@ class Mag:
 
 
 class Composition:
-    def __init__(self, mag, composition_dict, strictness, threads):
+    def __init__(self, mag, composition_dict, strictness):
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
         self.strictness = strictness
-        self.threads = threads
         self.tnf = composition_dict[mag.genome]
         self.embedding, self.contaminants = self.identify_contaminants()
 
@@ -82,12 +81,11 @@ class Composition:
 
 
 class Coverage:
-    def __init__(self, mag, coverage_dict, strictness, threads):
+    def __init__(self, mag, coverage_dict, strictness):
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
         self.strictness = strictness
-        self.threads = threads
         self.coverages = [
             coverage_dict[contig]
             if contig in coverage_dict
