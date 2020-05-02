@@ -139,9 +139,9 @@ def taxonomy_module(args):
     logger.info(f"Reading MMSeqs2 output file.")
     taxonomy_dict = tools.get_taxonomy_dict(mmseqs2_output_file, taxdb, 0.75)
     logger.info("Identifying putative contaminants.")
-    mag_taxonomy_list = Parallel(n_jobs=args.threads)(
-        delayed(Taxonomy)(mag, taxonomy_dict, args.strictness, taxdb) for mag in mag_list
-    )
+    mag_taxonomy_list = [
+        Taxonomy(mag, taxonomy_dict, args.strictness, taxdb) for mag in mag_list
+    ]
     for mag_taxonomy in mag_taxonomy_list:
         logger.info(
             f"{mag_taxonomy.genome}: {sum(mag_taxonomy.contaminants)}/"
