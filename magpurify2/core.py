@@ -129,7 +129,7 @@ class Taxonomy:
 
     def get_genome_taxonomy(self):
         selected_taxon = "1"
-        threshold = (self.strictness + 0.75) / 2 * sum(self.lengths)
+        threshold = (0.75 + (self.strictness - 0.5) * 0.4) * sum(self.lengths)
         taxa_weights = defaultdict(lambda: defaultdict(int))
         for taxon, length in zip(self.contig_taxonomy, self.lengths):
             for rank, taxid in enumerate(reversed(taxon.taxid_lineage)):

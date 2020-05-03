@@ -177,7 +177,7 @@ def taxonomy_parser(parser):
             "Strictness of the contaminant detection algorithm. "
             "Must be a number between 0 (less strict) and 1 (more strict)."
         ),
-        default=0.75,
+        default=0.5,
         type=float,
     )
     parser.add_argument(
