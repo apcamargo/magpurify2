@@ -247,6 +247,31 @@ def check_prediction(genome_list, output_directory):
     return genomes_without_prediction, genomes_with_prediction
 
 
+def write_mmseqs2_input(output_directory):
+    """
+    Prepare the FASTA input for MMSeqs2 by the concatenation of Prodigal
+    outputs. The header of each record in the FASTA is formatted as
+    ">genome~contig~gene" so that the results for each contig in each genome can
+    be identified in downstream steps.
+
+    Parameters
+    ----------
+    output_directory : Path
+        Path object pointing to the output directory of the program.
+    """
+    mmseqs2_output_directory = output_directory.joinpath("mmseqs2")
+    mmseqs2_input_file = mmseqs2_output_directory.joinpath("mmseqs2_input.faa")
+    with open(mmseqs2_input_file, "w") as fout:
+        prodigal_output_directory = output_directory.joinpath("prodigal")
+        for filepath in prodigal_output_directory.glob("*.faa"):
+            genome = Path(filepath).stem.replace("_genes", "")
+            for name, _, sequence in read_fasta(filepath):
+                contig, gene_number = name.rsplit("_", 1)
+                contig.replace("~", "_")
+                fout.write(f">{genome}~{contig}~{gene_number}\n")
+                fout.write(f"{textwrap.fill(sequence, 70)}\n")
+
+
 def get_taxonomy_dict(mmseqs2_output, taxdb, fraction=0.75):
     """
     Parse the MMSeqs2 output and assign a taxon to each contig based on the
@@ -291,31 +316,6 @@ def get_taxonomy_dict(mmseqs2_output, taxdb, fraction=0.75):
                 (majority_vote,) = contig_taxon
             taxonomy_dict[genome][contig] = majority_vote
     return taxonomy_dict
-
-
-def write_mmseqs2_input(output_directory):
-    """
-    Prepare the FASTA input for MMSeqs2 by the concatenation of Prodigal
-    outputs. The header of each record in the FASTA is formatted as
-    ">genome~contig~gene" so that the results for each contig in each genome can
-    be identified in downstream steps.
-
-    Parameters
-    ----------
-    output_directory : Path
-        Path object pointing to the output directory of the program.
-    """
-    mmseqs2_output_directory = output_directory.joinpath("mmseqs2")
-    mmseqs2_input_file = mmseqs2_output_directory.joinpath("mmseqs2_input.faa")
-    with open(mmseqs2_input_file, "w") as fout:
-        prodigal_output_directory = output_directory.joinpath("prodigal")
-        for filepath in prodigal_output_directory.glob("*.faa"):
-            genome = Path(filepath).stem.replace("_genes", "")
-            for name, _, sequence in read_fasta(filepath):
-                contig, gene_number = name.rsplit("_", 1)
-                contig.replace("~", "_")
-                fout.write(f">{genome}~{contig}~{gene_number}\n")
-                fout.write(f"{textwrap.fill(sequence, 70)}\n")
 
 
 def create_embedding(
