@@ -1,4 +1,4 @@
-<img src="https://apcamargo.github.io/magpurify2/logo.svg" align="left" width="200" height="150px"/>
+<img src="https://raw.githubusercontent.com/apcamargo/magpurify2/master/website/.vuepress/public/logo_without_type.svg?token=AFPA2JEOQW3DH6XWN62XPGC6YH3HQ" align="left" width="200" height="150px"/>
 <img align="left" width="0" height="150px" hspace="20"/>
 
 Improve the quality of metagenome-assembled genomes by identifying and removing contaminant sequences with an easy-to-use and modular command-line interface.
