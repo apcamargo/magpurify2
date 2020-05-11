@@ -1,11 +1,11 @@
-<img src="https://apcamargo.github.io/magpurify2/logo.svg" align="left" width="190px" height="160px"/>
-<img align="left" width="0" height="160px" hspace="10"/>
+<img src="https://apcamargo.github.io/magpurify2/logo.svg" align="left" width="200" height="170px"/>
+<img align="left" width="0" height="170px" hspace="20"/>
 
-Identify and remove contaminants from metagenome-assembled genomes.
+Improve the quality of metagenome-assembled genomes by identifying and removing contaminant sequences with an easy-to-use and modular command-line interface.
 
 [![MIT License](https://img.shields.io/badge/license-MIT-007EC7.svg?style=flat-square)](/LICENSE) [![Fish Shell Version](https://img.shields.io/badge/fish-≥v2.2.0-007EC7.svg?style=flat-square)](http://fishshell.com) [![Travis Build Status](http://img.shields.io/travis/oh-my-fish/oh-my-fish.svg?style=flat-square)](https://travis-ci.org/oh-my-fish/oh-my-fish)
 
-You can find the documentation at the [website](https://apcamargo.github.io/magpurify2/).
+You can find MAGpurify2's full documentation at its [website](https://apcamargo.github.io/magpurify2/).
 
 ---
 
