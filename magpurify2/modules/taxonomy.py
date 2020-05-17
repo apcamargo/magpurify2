@@ -18,18 +18,14 @@
 #
 # Contact: antoniop.camargo@gmail.com
 
-import gzip
 import logging
-import pickle
 import shutil
 import sys
-from collections import defaultdict
 
 import taxopy
-from joblib import Parallel, delayed
 
 from magpurify2 import external, tools
-from magpurify2.core import Composition, Coverage, Mag, Taxonomy
+from magpurify2.core import Mag, Taxonomy
 
 
 def main(args):
