@@ -26,12 +26,6 @@ from pathlib import Path
 from biolib.logger import logger_setup
 
 import magpurify2
-from magpurify2.main import (
-    composition_module,
-    coverage_module,
-    filter_module,
-    taxonomy_module,
-)
 
 
 def cli():
@@ -97,7 +91,7 @@ def cli():
 
 
 def composition_parser(parser):
-    parser.set_defaults(func=composition_module)
+    parser.set_defaults(func=magpurify2.composition.main)
     parser.add_argument(
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
@@ -125,7 +119,7 @@ def composition_parser(parser):
 
 
 def coverage_parser(parser):
-    parser.set_defaults(func=coverage_module)
+    parser.set_defaults(func=magpurify2.coverage.main)
     parser.add_argument(
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
@@ -160,7 +154,7 @@ def coverage_parser(parser):
 
 
 def taxonomy_parser(parser):
-    parser.set_defaults(func=taxonomy_module)
+    parser.set_defaults(func=magpurify2.taxonomy.main)
     parser.add_argument(
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
@@ -191,7 +185,7 @@ def taxonomy_parser(parser):
 
 
 def filter_parser(parser):
-    parser.set_defaults(func=filter_module)
+    parser.set_defaults(func=magpurify2.filter.main)
     parser.add_argument(
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )

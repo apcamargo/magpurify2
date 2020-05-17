@@ -14,4 +14,4 @@ curl https://sh.rustup.rs -sSf | sh -s -- -y --profile=minimal
 rustup default nightly
 
 # Install setuptools-rust
-pip install setuptools-rust
+pip install setuptools-rust==0.10.6

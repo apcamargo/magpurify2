@@ -17,12 +17,3 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 #
 # Contact: antoniop.camargo@gmail.com
-
-from magpurify2.modules import composition, coverage, filter, taxonomy
-
-try:
-    from importlib import metadata
-except ImportError:
-    import importlib_metadata as metadata
-
-__version__ = metadata.version("magpurify2")

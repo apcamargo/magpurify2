@@ -20,6 +20,7 @@
 
 import bz2
 import gzip
+import hashlib
 import lzma
 import os
 import sys
@@ -137,6 +138,24 @@ def is_compressed(filepath):
             return Compression.xz
         else:
             return Compression.noncompressed
+
+
+def get_file_signature(filepath):
+    """
+    Returns the SHA-256 hash of the first 64 kilobytes of the input file.
+
+    Parameters
+    ----------
+    filepath : Path
+        Path object pointing to a file.
+
+    Returns
+    -------
+    bytes
+        SHA-256 hash of the first 64 kilobytes of the input file.
+    """
+    with open(filepath, "rb") as fin:
+        return hashlib.sha256(fin.read(64000)).digest()
 
 
 def is_sorted_bam(filepath):
