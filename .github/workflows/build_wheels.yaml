@@ -1,16 +1,18 @@
 name: build wheels
 
-on:
-  push:
-    tags:
-      - "v*"
+on: [push]
+# on:
+#   push:
+#     tags:
+#       - "v*"
 
 jobs:
   build-wheels:
     name: Build
     strategy:
       matrix:
-        platform: [ ubuntu-18.04, macos-10.15 ]
+        platform: [ ubuntu-18.04 ]
+        # platform: [ ubuntu-18.04, macos-10.15 ]
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Checkout
