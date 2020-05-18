@@ -21,6 +21,7 @@
 import gzip
 import logging
 import pickle
+from itertools import compress
 
 from joblib import Parallel, delayed
 
@@ -36,7 +37,7 @@ def main(args):
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome, store_sequences=False) for genome in args.genomes]
     coverage_data_file = args.output_directory.joinpath("coverages.pickle.gz")
-    bam_signatures = {tools.get_file_signature(filepath) for filepath in args.bam_files}
+    bam_signatures = [tools.get_file_signature(filepath) for filepath in args.bam_files]
 
     # Check if the coverage computation needs to be executed again. To do that, we check
     # if a pickle dump exists. If it does, we check if the signatures of all input BAM
@@ -45,9 +46,19 @@ def main(args):
     if coverage_data_file.exists():
         with gzip.open(coverage_data_file) as fin:
             loaded_bam_signatures, coverage_dict = pickle.load(fin)
-            if bam_signatures.issubset(loaded_bam_signatures):
+            if set(bam_signatures).issubset(loaded_bam_signatures):
                 logger.info("Skipping contig coverages computation.")
                 skip_coverage = True
+                # If the number of input BAM files is less than the number of input BAM
+                # files, select the coverage data of the input BAMs.
+                if loaded_bam_signatures > bam_signatures:
+                    selected_bams = [
+                        signature in bam_signatures for signature in loaded_bam_signatures
+                    ]
+                    coverage_dict = {
+                        contig: list(compress(coverages, selected_bams))
+                        for contig, coverages in coverage_dict.items()
+                    }
             else:
                 coverage_data_file.unlink()
     if not skip_coverage:
@@ -58,6 +69,10 @@ def main(args):
         logger.info(f"Saving contig coverages data to '{coverage_data_file}'.")
         with gzip.open(coverage_data_file, "wb") as fout:
             pickle.dump((bam_signatures, coverage_dict), fout)
+
+    print(coverage_dict["MAG_4_contig_4"])
+    print(coverage_dict["MAG_5_contig_635"])
+    print(coverage_dict["MAG_6_contig_603"])
 
     logger.info("Identifying putative contaminants.")
     mag_coverage_list = Parallel(n_jobs=args.threads)(
