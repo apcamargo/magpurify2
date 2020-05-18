@@ -142,7 +142,7 @@ def is_compressed(filepath):
 
 def get_file_signature(filepath):
     """
-    Returns the SHA-256 hash of the first 64 kilobytes of the input file.
+    Returns the SHA-256 hash of the last 128 kilobytes of the input file.
 
     Parameters
     ----------
@@ -152,10 +152,11 @@ def get_file_signature(filepath):
     Returns
     -------
     bytes
-        SHA-256 hash of the first 64 kilobytes of the input file.
+        SHA-256 hash of the last 128 kilobytes of the input file.
     """
     with open(filepath, "rb") as fin:
-        return hashlib.sha256(fin.read(64000)).digest()
+        fin.seek(-128000, os.SEEK_END)
+        return hashlib.sha256(fin.read(128000)).hexdigest()
 
 
 def is_sorted_bam(filepath):

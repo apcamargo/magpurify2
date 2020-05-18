@@ -24,7 +24,7 @@ tar zxfv magpurify2_test_data.tar.gz
 - Download database:
 
 ```bash
-fileId="14qAK-4NJNu0sOPldnZhO8vcAFpb1BcrB"
+fileId="1ooWiR3LplBy5GsY5wZ7o6dwswiCWVvmi"
 fileName="magpurify2DB.v1.0.tar.gz"
 curl -sc /tmp/cookie "https://drive.google.com/uc?export=download&id=${fileId}" > /dev/null
 code="$(awk '/_warning_/ {print $NF}' /tmp/cookie)"
