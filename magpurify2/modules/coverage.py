@@ -70,10 +70,6 @@ def main(args):
         with gzip.open(coverage_data_file, "wb") as fout:
             pickle.dump((bam_signatures, coverage_dict), fout)
 
-    print(coverage_dict["MAG_4_contig_4"])
-    print(coverage_dict["MAG_5_contig_635"])
-    print(coverage_dict["MAG_6_contig_603"])
-
     logger.info("Identifying putative contaminants.")
     mag_coverage_list = Parallel(n_jobs=args.threads)(
         delayed(Coverage)(mag, coverage_dict, args.strictness) for mag in mag_list
