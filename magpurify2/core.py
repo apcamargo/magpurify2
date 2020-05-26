@@ -93,22 +93,19 @@ class Coverage:
             else [0.0] * len(list(coverage_dict.values())[0])
             for contig in self.contigs
         ]
-        self.contaminants = self.identify_contaminants()
+        self.embedding, self.contaminants = self.identify_contaminants()
 
     def identify_contaminants(self):
-        contaminants = np.zeros(len(self))
-        for seed in range(5):
-            embedding = tools.create_embedding(
-                data=self.coverages, min_dist=0.05, n_neighbors=15, set_op_mix_ratio=0.25, random_state=seed
-            )
-            iteration_contaminants = tools.identify_contaminant_clusters(
-                embedding=embedding,
-                base_bandwidth=5.5,
-                lengths=self.lengths,
-                strictness=self.strictness,
-            )
-            contaminants += iteration_contaminants
-        return contaminants >= 5
+        embedding = tools.create_embedding(
+            data=self.coverages, min_dist=0.05, n_neighbors=15, set_op_mix_ratio=0.25
+        )
+        contaminants = tools.identify_contaminant_clusters(
+            embedding=embedding,
+            base_bandwidth=5.5,
+            lengths=self.lengths,
+            strictness=self.strictness,
+        )
+        return embedding, contaminants
 
     def __len__(self):
         return len(self.contigs)
