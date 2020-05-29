@@ -54,83 +54,90 @@ class Mag:
 
 
 class Composition:
-    def __init__(self, mag, composition_dict, strictness):
+    def __init__(self, mag, composition_dict):
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
-        self.strictness = strictness
         self.tnf = composition_dict[mag.genome]
-        self.embedding, self.contaminants = self.identify_contaminants()
-
-    def identify_contaminants(self):
-        embedding = tools.create_embedding(
+        self.embedding = tools.create_embedding(
             data=self.tnf, min_dist=0.1, n_neighbors=5, set_op_mix_ratio=1,
         )
-        contaminants = tools.identify_contaminant_clusters(
-            embedding=embedding,
-            base_bandwidth=7,
-            lengths=self.lengths,
-            strictness=self.strictness,
+        self.scores = tools.compute_contig_cluster_score(
+            data=self.embedding, allow_single_cluster=True, lengths=self.lengths,
         )
-        return embedding, contaminants
 
     def __len__(self):
         return len(self.contigs)
 
     def __iter__(self):
-        return zip(self.contigs, self.contaminants)
+        return zip(self.contigs, self.scores)
 
 
 class Coverage:
-    def __init__(self, mag, coverage_dict, strictness):
+    def __init__(self, mag, coverage_dict):
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
-        self.strictness = strictness
-        self.coverages = [
-            coverage_dict[contig]
-            if contig in coverage_dict
-            else [0.0] * len(list(coverage_dict.values())[0])
-            for contig in self.contigs
-        ]
-        self.embedding, self.contaminants = self.identify_contaminants()
-
-    def identify_contaminants(self):
-        embedding = tools.create_embedding(
-            data=self.coverages, min_dist=0.05, n_neighbors=15, set_op_mix_ratio=0.25
+        self.coverages = np.array(
+            [
+                coverage_dict[contig]
+                if contig in coverage_dict
+                else [0.0] * len(list(coverage_dict.values())[0])
+                for contig in self.contigs
+            ]
         )
-        contaminants = tools.identify_contaminant_clusters(
-            embedding=embedding,
-            base_bandwidth=5.5,
-            lengths=self.lengths,
-            strictness=self.strictness,
+        self.scores = tools.compute_contig_cluster_score(
+            data=self.coverages, allow_single_cluster=False, lengths=self.lengths,
         )
-        return embedding, contaminants
 
     def __len__(self):
         return len(self.contigs)
 
     def __iter__(self):
-        return zip(self.contigs, self.contaminants)
+        return zip(self.contigs, self.scores)
 
 
 class Taxonomy:
-    def __init__(self, mag, taxonomy_dict, strictness, taxdb):
+    def __init__(
+        self,
+        mag,
+        taxonomy_dict,
+        contig_min_fraction,
+        genome_min_fraction,
+        allow_genus,
+        taxdb,
+    ):
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
-        self.strictness = strictness
-        self.contig_taxonomy = []
         self.taxdb = taxdb
-        for contig in self.contigs:
-            contig_taxon = taxonomy_dict[mag.genome].get(contig, taxopy.Taxon("1", taxdb))
-            self.contig_taxonomy.append(contig_taxon)
-        self.genome_taxonomy = self.get_genome_taxonomy()
-        self.contaminants = self.identify_contaminants()
+        self.gene_taxonomy = [
+            taxonomy_dict[mag.genome].get(contig, [taxopy.Taxon("1", self.taxdb)])
+            for contig in self.contigs
+        ]
+        self.contig_taxonomy = self.get_contig_taxonomy(taxonomy_dict, contig_min_fraction, allow_genus)
+        self.genome_taxonomy = self.get_genome_taxonomy(genome_min_fraction)
+        self.scores = self.compute_gene_agreement()
 
-    def get_genome_taxonomy(self):
+    def get_contig_taxonomy(self, taxonomy_dict, fraction=0.75, allow_genus=False):
+        contig_taxonomy = []
+        for contig in self.gene_taxonomy:
+            if len(contig) > 1:
+                majority_vote = taxopy.find_majority_vote(contig, self.taxdb, fraction)
+            else:
+                (majority_vote,) = contig
+            if allow_genus and majority_vote.rank == "species":
+                majority_vote = taxopy.Taxon(majority_vote.taxid_lineage[1], self.taxdb)
+            elif majority_vote.rank == "species":
+                majority_vote = taxopy.Taxon(majority_vote.taxid_lineage[2], self.taxdb)
+            elif majority_vote.rank == "genus":
+                majority_vote = taxopy.Taxon(majority_vote.taxid_lineage[1], self.taxdb)
+            contig_taxonomy.append(majority_vote)
+        return contig_taxonomy
+
+    def get_genome_taxonomy(self, fraction=0.75):
         selected_taxon = "1"
-        threshold = (0.75 + (self.strictness - 0.5) * 0.4) * sum(self.lengths)
+        threshold = fraction * sum(self.lengths)
         taxa_weights = defaultdict(lambda: defaultdict(int))
         for taxon, length in zip(self.contig_taxonomy, self.lengths):
             for rank, taxid in enumerate(reversed(taxon.taxid_lineage)):
@@ -144,24 +151,24 @@ class Taxonomy:
                 break
         return taxopy.Taxon(selected_taxon, self.taxdb)
 
-    def identify_contaminants(self):
-        genome_taxonomy_rank = len(self.genome_taxonomy.taxid_lineage) - 1
-        contaminants = []
-        for taxon in self.contig_taxonomy:
-            if len(taxon.taxid_lineage) >= genome_taxonomy_rank + 1:
-                if (
-                    list(reversed(taxon.taxid_lineage))[genome_taxonomy_rank]
-                    != self.genome_taxonomy.taxid
-                ):
-                    contaminants.append(True)
+    def compute_gene_agreement(self):
+        gene_agreement = []
+        for gene_taxonomy in self.gene_taxonomy:
+            score = 0
+            for gene in gene_taxonomy:
+                lca = taxopy.find_lca([gene, self.genome_taxonomy], self.taxdb)
+                if len(self.genome_taxonomy.taxid_lineage) <= len(gene.taxid_lineage):
+                    if lca.taxid == self.genome_taxonomy.taxid:
+                        score += 1
                 else:
-                    contaminants.append(False)
-            else:
-                contaminants.append(False)
-        return contaminants
+                    if lca.taxid == gene.taxid:
+                        score += 1
+            score /= len(gene_taxonomy)
+            gene_agreement.append(score)
+        return gene_agreement
 
     def __len__(self):
         return len(self.contigs)
 
     def __iter__(self):
-        return zip(self.contigs, self.contaminants)
+        return zip(self.contigs, self.scores)

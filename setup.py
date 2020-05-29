@@ -38,10 +38,10 @@ setup(
     install_requires=[
         "biolib",
         "biopython",
+        "hdbscan",
         "importlib-metadata>=0.12; python_version<'3.8'",
         "joblib",
         "numpy",
-        "scikit-learn",
         "taxopy",
         "tbb",
         "umap-learn",

@@ -99,16 +99,6 @@ def composition_parser(parser):
         "output_directory", help="Directory to write the output files to.", type=Path,
     )
     parser.add_argument(
-        "-s",
-        "--strictness",
-        help=(
-            "Strictness of the contaminant detection algorithm. "
-            "Must be a number between 0 (less strict) and 1 (more strict)."
-        ),
-        default=0.5,
-        type=float,
-    )
-    parser.add_argument(
         "-t",
         "--threads",
         default=multiprocessing.cpu_count(),
@@ -134,16 +124,6 @@ def coverage_parser(parser):
         type=Path,
     )
     parser.add_argument(
-        "-s",
-        "--strictness",
-        help=(
-            "Strictness of the contaminant detection algorithm. "
-            "Must be a number between 0 (less strict) and 1 (more strict)."
-        ),
-        default=0.5,
-        type=float,
-    )
-    parser.add_argument(
         "-t",
         "--threads",
         default=multiprocessing.cpu_count(),
@@ -165,14 +145,25 @@ def taxonomy_parser(parser):
         "database", help="Path to MAGpurify2's database directory.", type=Path,
     )
     parser.add_argument(
-        "-s",
-        "--strictness",
-        help=(
-            "Strictness of the contaminant detection algorithm. "
-            "Must be a number between 0 (less strict) and 1 (more strict)."
-        ),
-        default=0.5,
+        "--contig_min_fraction",
+        default=0.75,
         type=float,
+        help="The contig-level taxonomy must agree with the taxonomy of at least "
+        "`contig_min_fraction` of its genes. This value must be equal to or greater than "
+        "0.5 and less than 1.",
+    )
+    parser.add_argument(
+        "--genome_min_fraction",
+        default=0.75,
+        type=float,
+        help="The genome-level taxonomy must agree with the taxonomy of at least "
+        "`genome_min_fraction` of its contigs (weighted by length). This value must be "
+        "equal to or greater than 0.5 and less than 1.",
+    )
+    parser.add_argument(
+        "--allow_genus",
+        help="Allows genus-level taxonomic assignment.",
+        action="store_true",
     )
     parser.add_argument(
         "-t",

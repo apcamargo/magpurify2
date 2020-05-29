@@ -30,7 +30,12 @@ from magpurify2.core import Mag, Taxonomy
 
 def main(args):
     logger = logging.getLogger("timestamp")
-    args.strictness = tools.check_strictness(args.strictness, logger)
+    args.contig_min_fraction = tools.validade_input(
+        args.contig_min_fraction, "contig_min_fraction", [0.5, 1.0], logger
+    )
+    args.genome_min_fraction = tools.validade_input(
+        args.genome_min_fraction, "genome_min_fraction", [0.5, 1.0], logger
+    )
     # Check if Prodigal and MMSeqs2 are executables in the user PATH.
     missing_executables = [
         executable
@@ -84,16 +89,23 @@ def main(args):
         nodes_dmp=database.nodes_dmp, names_dmp=database.names_dmp, keep_files=True,
     )
     logger.info(f"Reading MMSeqs2 output file.")
-    taxonomy_dict = tools.get_taxonomy_dict(mmseqs2_output_file, taxdb, 0.75)
-    logger.info("Identifying putative contaminants.")
+    taxonomy_dict = tools.get_taxonomy_dict(mmseqs2_output_file, taxdb)
+    logger.info("Computing contig scores.")
     mag_taxonomy_list = [
-        Taxonomy(mag, taxonomy_dict, args.strictness, taxdb) for mag in mag_list
-    ]
-    for mag_taxonomy in mag_taxonomy_list:
-        logger.info(
-            f"{mag_taxonomy.genome}: {sum(mag_taxonomy.contaminants)}/"
-            f"{len(mag_taxonomy)} contigs flagged as contaminants."
+        Taxonomy(
+            mag,
+            taxonomy_dict,
+            args.contig_min_fraction,
+            args.genome_min_fraction,
+            args.allow_genus,
+            taxdb,
         )
-    taxonomy_output_file = args.output_directory.joinpath("contaminants_taxonomy.tsv")
-    logger.info(f"Writing output to: '{taxonomy_output_file}'.")
-    tools.write_contamination_output(mag_taxonomy_list, taxonomy_output_file)
+        for mag in mag_list
+    ]
+    taxonomy_score_file = args.output_directory.joinpath("scores_taxonomy.tsv")
+    contig_taxonomy_file = args.output_directory.joinpath("taxonomic_assignment.tsv")
+    logger.info(
+        f"Writing output to: '{taxonomy_score_file} and '{contig_taxonomy_file}'."
+    )
+    tools.write_contig_score_output(mag_taxonomy_list, taxonomy_score_file)
+    tools.write_contig_taxonomy_output(mag_taxonomy_list, contig_taxonomy_file)

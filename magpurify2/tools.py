@@ -29,10 +29,11 @@ from collections import defaultdict
 from enum import Enum, auto
 from pathlib import Path
 
+import hdbscan
+import numpy as np
 import taxopy
 import umap
 from Bio import SeqIO, bgzf
-from sklearn.cluster import MeanShift
 
 from magpurify2._coverage import get_coverages
 from magpurify2._tnf import get_tnf
@@ -45,32 +46,37 @@ class Compression(Enum):
     noncompressed = auto()
 
 
-def check_strictness(strictness, logger):
+def validade_input(value, parameter_name, interval, logger):
     """
-    Checks the value of the `strictness` argument. If it is between 0 and 1, the
-    same value is returned. If the value is less than 0 or greater than 1, the
-    logger will give a warning and the returned value will be 0 (if the input
-    was less than 0) or 1 (is the input was greater than 1)
+    Checks the value of a numeric input. If it is between the provided interval,
+    the same value is returned. If the value is outside of the interval the
+    minimum or the maximum value will be returned (if the inpur is less than the
+    minimum value or greater than the maximum value, respectively).
 
     Parameters
     ----------
-    strictness : float
-        The value of the `strictness` argument.
+    value : float
+        The numerical value that will be validated.
+    parameter_name : str
+        Name of the input.
+    interval : list
+        A list containing the minimum and maximum allowerd values.
     logger : Logger
         The logger of the program.
 
     Returns
     -------
     float
-        A float between 0 and 1.
+        A value thats falls within the provided interval.
     """
-    if strictness > 1 or strictness < 0:
-        strictness = min(max(strictness, 0.0), 1.0)
+    interval = sorted(interval)
+    if value > interval[1] or value < interval[0]:
+        value = min(max(value, interval[0]), interval[1])
         logger.warning(
-            "The value of the `strictness` parameter must be between 0 and 1. "
-            f"Setting it to {strictness}."
+            f"The value of the `{parameter_name}` parameter must be between {interval[0]} and "
+            f"{interval[1]}. Setting it to {value}."
         )
-    return strictness
+    return value
 
 
 def check_output_directory(output_directory, logger):
@@ -292,7 +298,7 @@ def write_mmseqs2_input(output_directory):
                 fout.write(f"{textwrap.fill(sequence, 70)}\n")
 
 
-def get_taxonomy_dict(mmseqs2_output, taxdb, fraction=0.75):
+def get_taxonomy_dict(mmseqs2_output, taxdb):
     """
     Parse the MMSeqs2 output and assign a taxon to each contig based on the
     taxonomic assignment of its genes.
@@ -303,10 +309,6 @@ def get_taxonomy_dict(mmseqs2_output, taxdb, fraction=0.75):
         Path object pointing to the MMSeqs2 output.
     taxdb : TaxDb
         A TaxDb object.
-    fraction : float, default 0.75
-        The taxon assigned to each contig will be shared by more than `fraction`
-        of the contig genes. This value must be equal to or greater than 0.5 and
-        less than 1.
 
     Returns
     -------
@@ -314,27 +316,16 @@ def get_taxonomy_dict(mmseqs2_output, taxdb, fraction=0.75):
         Returns a nested dictionary. In the outer dictionary, the keys are the
         names of the genomes found in the MMSeqs2 output. In the inner
         dictionary the keys are the names of the contigs in the genome and the
-        values are Taxon objects of the most specific taxon that is shared by
-        more than the chosen fraction of the contig genes.
+        values are lists with Taxon objects for each gene in the contig.
     """
-    contig_taxids = defaultdict(lambda: defaultdict(list))
+    taxonomy_dict = defaultdict(lambda: defaultdict(list))
     with open(mmseqs2_output) as fin:
         for line in fin:
             taxid = line.split()[1]
             if taxid != "0":
+                taxon = taxopy.Taxon(taxid, taxdb)
                 genome, contig, _ = line.split()[0].split("~")
-                contig_taxids[genome][contig].append(taxid)
-    taxonomy_dict = defaultdict(dict)
-    for genome, contigs in contig_taxids.items():
-        for contig in contigs:
-            contig_taxon = [
-                taxopy.Taxon(taxid, taxdb) for taxid in contig_taxids[genome][contig]
-            ]
-            if len(contig_taxon) > 1:
-                majority_vote = taxopy.find_majority_vote(contig_taxon, taxdb, fraction)
-            else:
-                (majority_vote,) = contig_taxon
-            taxonomy_dict[genome][contig] = majority_vote
+                taxonomy_dict[genome][contig].append(taxon)
     return taxonomy_dict
 
 
@@ -379,59 +370,77 @@ def create_embedding(
     return reducer.fit_transform(data)
 
 
-def identify_contaminant_clusters(embedding, base_bandwidth, lengths, strictness):
-    """
-    Clusters the input data using the `MeanShift` algorithm and finds the main
-    cluster using contigs lengths as weights. The reimaining clusters are
-    labeled as contaminants.
-
-    Parameters
-    ----------
-    embedding : array-like
-        UMAP embedding of the contigs.
-    base_bandwidth : float
-        Base bandwidth used in the RBF kernel.
-    lengths : list
-        A list containing the lengths of the contigs in the input data.
-    strictness : float
-        Controls how strict the clustering is by adjusting the bandwidth with
-        the following formula:
-        `bandwidth = base_bandwidth + (strictness - 0.5) * 4`
-        Accepts values ranging from 0 (more clusters) and 1 (less clusters).
-
-    Returns
-    -------
-    ndarray
-        A boolean array where `True` represents contaminants and `False`
-        represents contigs contained in the main cluster.
-    """
-    bandwidth = base_bandwidth + (strictness - 0.5) * 4
-    clusters = MeanShift(bandwidth=bandwidth, n_jobs=1).fit(embedding).labels_
+def compute_contig_cluster_score(data, allow_single_cluster, lengths):
+    # Get a min_samples value based on the size of the dataset.
+    if len(lengths) >= 750:
+        min_samples = len(lengths) // 50
+    elif len(lengths) >= 100:
+        min_samples = 15
+    elif len(lengths) >= 40:
+        min_samples = 10
+    elif len(lengths) >= 20:
+        min_samples = 5
+    else:
+        min_samples = 3
+    # HDBSCAN doesn't accept 1D data. So, if the data contains a single feature,
+    # concatenate two arrays to create a two-dimensional array.
+    if data.shape[1] == 1:
+        data = np.concatenate((data, data), axis=1)
     weights = defaultdict(int)
-    for cluster, lenght in zip(clusters, lengths):
-        weights[cluster] += lenght
-    selected_cluster = max(weights, key=weights.get)
-    return clusters != selected_cluster
+    clusterer = hdbscan.HDBSCAN(
+        min_samples=min_samples,
+        prediction_data=True,
+        allow_single_cluster=allow_single_cluster,
+        core_dist_n_jobs=1,
+    ).fit(data)
+    clusters = clusterer.labels_
+    soft_clusters = hdbscan.all_points_membership_vectors(clusterer)
+    # If no clusters were identified, give a score of 1 to all contigs.
+    if np.all(clusters == -1):
+        scores = np.array([1] * len(lengths))
+    else:
+        for cluster, lenght in zip(clusters, lengths):
+            weights[cluster] += lenght
+        # Ignore unclustered contigs to identify the main cluster.
+        weights.pop(-1, None)
+        selected_cluster = max(weights, key=weights.get)
+        scores = soft_clusters[:, selected_cluster]
+    return scores
 
 
-def write_contamination_output(mag_contamination_list, contamination_output_file):
+def write_contig_taxonomy_output(mag_taxonomy_list, taxonomy_output_file):
+    with open(taxonomy_output_file, "w") as fout:
+        fout.write("genome\tcontig\tgenome_taxonomy\tcontig_taxonomy\n")
+        for mag_taxonomy in mag_taxonomy_list:
+            genome_taxonomy_str = ";".join(
+                reversed(mag_taxonomy.genome_taxonomy.name_lineage)
+            )
+            for index, (contig, _) in enumerate(mag_taxonomy):
+                contig_taxonomy_str = ";".join(
+                    reversed(mag_taxonomy.contig_taxonomy[index].name_lineage)
+                )
+                fout.write(
+                    f"{mag_taxonomy.genome}\t{contig}\t"
+                    f"{genome_taxonomy_str}\t{contig_taxonomy_str}\n"
+                )
+
+
+def write_contig_score_output(mag_score_list, score_output_file):
     """
-    Write a file containing the information of which contigs of each genome were
-    flagged as putative contaminants.
+    Write a file containing the scores for each contig of the input genomes.
 
     Parameters
     ----------
-    mag_contamination_list : list
+    mag_score_list : list
         List of objects of the `Composition`, `Coverage` or `Taxonomy` classes.
-    contamination_output_file : Path
+    score_output_file : Path
         Path object pointing to the output file.
     """
-    with open(contamination_output_file, "w") as fout:
-        fout.write("genome\tcontig\tcontamination\n")
-        for mag_contamination in mag_contamination_list:
-            for contig, contaminant in mag_contamination:
-                contaminant = "Yes" if contaminant else "No"
-                fout.write(f"{mag_contamination.genome}\t{contig}\t{contaminant}\n")
+    with open(score_output_file, "w") as fout:
+        fout.write("genome\tcontig\tscore\n")
+        for mag_score in mag_score_list:
+            for contig, score in mag_score:
+                fout.write(f"{mag_score.genome}\t{contig}\t{score:.4f}\n")
 
 
 def write_filtered_genome(mag, mags_contaminants, filtering, filtered_output_directory):

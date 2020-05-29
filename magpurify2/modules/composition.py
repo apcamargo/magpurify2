@@ -31,13 +31,10 @@ from magpurify2.core import Composition, Mag
 
 def main(args):
     logger = logging.getLogger("timestamp")
-    args.strictness = tools.check_strictness(args.strictness, logger)
     tools.check_output_directory(args.output_directory, logger)
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome) for genome in args.genomes]
-    composition_data_file = args.output_directory.joinpath(
-        "tnfs.pickle.gz"
-    )
+    composition_data_file = args.output_directory.joinpath("tnfs.pickle.gz")
 
     # Check if the TNF computation needs to be executed again. To do that, we check if
     # a pickle dump exists. If it does, we check if all the input genomes are in it.
@@ -62,17 +59,10 @@ def main(args):
         with gzip.open(composition_data_file, "wb") as fout:
             pickle.dump(composition_dict, fout)
 
-    logger.info("Identifying putative contaminants.")
+    logger.info("Computing contig scores.")
     mag_composition_list = Parallel(n_jobs=args.threads)(
-        delayed(Composition)(mag, composition_dict, args.strictness) for mag in mag_list
+        delayed(Composition)(mag, composition_dict) for mag in mag_list
     )
-    for mag_composition in mag_composition_list:
-        logger.info(
-            f"{mag_composition.genome}: {sum(mag_composition.contaminants)}/"
-            f"{len(mag_composition)} contigs flagged as contaminants."
-        )
-    composition_output_file = args.output_directory.joinpath(
-        "contaminants_composition.tsv"
-    )
-    logger.info(f"Writing output to: '{composition_output_file}'.")
-    tools.write_contamination_output(mag_composition_list, composition_output_file)
+    composition_score_file = args.output_directory.joinpath("scores_composition.tsv")
+    logger.info(f"Writing output to: '{composition_score_file}'.")
+    tools.write_contig_score_output(mag_composition_list, composition_score_file)

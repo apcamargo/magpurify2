@@ -31,7 +31,6 @@ from magpurify2.core import Coverage, Mag
 
 def main(args):
     logger = logging.getLogger("timestamp")
-    args.strictness = tools.check_strictness(args.strictness, logger)
     tools.check_bam_files(args.bam_files, logger)
     tools.check_output_directory(args.output_directory, logger)
     logger.info(f"Reading {len(args.genomes)} genomes.")
@@ -70,15 +69,10 @@ def main(args):
         with gzip.open(coverage_data_file, "wb") as fout:
             pickle.dump((bam_signatures, coverage_dict), fout)
 
-    logger.info("Identifying putative contaminants.")
+    logger.info("Computing contig scores.")
     mag_coverage_list = Parallel(n_jobs=args.threads)(
-        delayed(Coverage)(mag, coverage_dict, args.strictness) for mag in mag_list
+        delayed(Coverage)(mag, coverage_dict) for mag in mag_list
     )
-    for mag_coverage in mag_coverage_list:
-        logger.info(
-            f"{mag_coverage.genome}: {sum(mag_coverage.contaminants)}/"
-            f"{len(mag_coverage)} contigs flagged as contaminants."
-        )
-    coverage_output_file = args.output_directory.joinpath("contaminants_coverage.tsv")
-    logger.info(f"Writing output to: '{coverage_output_file}'.")
-    tools.write_contamination_output(mag_coverage_list, coverage_output_file)
+    coverage_score_file = args.output_directory.joinpath("scores_coverage.tsv")
+    logger.info(f"Writing output to: '{coverage_score_file}'.")
+    tools.write_contig_score_output(mag_coverage_list, coverage_score_file)

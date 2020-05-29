@@ -32,14 +32,14 @@ def main(args):
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome) for genome in args.genomes]
     input_genomes = {mag.genome for mag in mag_list}
-    contamination_file_list = args.output_directory.glob("contaminants*.tsv")
+    scores_file_list = args.output_directory.glob("scores*.tsv")
     mags_contaminants = defaultdict(lambda: defaultdict(list))
     if not args.filtered_output_directory.is_dir():
         logger.warning(
             "Output directory for the filtered genomes does not exist. Creating it now."
         )
         args.filtered_output_directory.mkdir()
-    for contamination_file in contamination_file_list:
+    for contamination_file in scores_file_list:
         logger.info(f"Reading '{contamination_file}'.")
         with open(contamination_file) as fin:
             for line in fin:
