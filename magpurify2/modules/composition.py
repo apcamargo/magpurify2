@@ -22,7 +22,6 @@ import gzip
 import logging
 import pickle
 
-import taxopy
 from joblib import Parallel, delayed
 
 from magpurify2 import tools

@@ -60,7 +60,7 @@ class Composition:
         self.lengths = mag.lengths
         self.tnf = composition_dict[mag.genome]
         self.embedding = tools.create_embedding(
-            data=self.tnf, min_dist=0.1, n_neighbors=5, set_op_mix_ratio=1,
+            data=self.tnf, n_components=3, min_dist=0.1, n_neighbors=15, set_op_mix_ratio=1,
         )
         self.scores = tools.compute_contig_cluster_score(
             data=self.embedding, allow_single_cluster=True, lengths=self.lengths,
@@ -87,7 +87,7 @@ class Coverage:
             ]
         )
         self.scores = tools.compute_contig_cluster_score(
-            data=self.coverages, allow_single_cluster=False, lengths=self.lengths,
+            data=self.coverages, allow_single_cluster=True, lengths=self.lengths,
         )
 
     def __len__(self):

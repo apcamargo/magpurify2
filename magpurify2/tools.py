@@ -330,7 +330,7 @@ def get_taxonomy_dict(mmseqs2_output, taxdb):
 
 
 def create_embedding(
-    data, min_dist, n_neighbors, set_op_mix_ratio, metric="euclidean", random_state=42,
+    data, n_components, min_dist, n_neighbors, set_op_mix_ratio, metric="euclidean", random_state=42,
 ):
     """
     Creates an UMAP embedding from the input data.
@@ -339,6 +339,8 @@ def create_embedding(
     ----------
     data : array-like
         Input data to be fit into an embedded space.
+    n_components : int
+        The dimension of the space to embed into.
     min_dist : float
         The effective minimum distance between embedded points.
     n_neighbors : int
@@ -360,7 +362,7 @@ def create_embedding(
     os.environ["NUMBA_NUM_THREADS"] = "1"
     os.environ["THREADING_LAYER"] = "tbb"
     reducer = umap.UMAP(
-        n_components=2,
+        n_components=n_components,
         metric=metric,
         min_dist=min_dist,
         n_neighbors=n_neighbors,
@@ -371,23 +373,26 @@ def create_embedding(
 
 
 def compute_contig_cluster_score(data, allow_single_cluster, lengths):
-    # Get a min_samples value based on the size of the dataset.
-    if len(lengths) >= 750:
+    # Get min_cluster_size and min_samples values based on the size of the dataset.
+    if len(lengths) >= 250:
+        min_cluster_size = 5
         min_samples = len(lengths) // 50
-    elif len(lengths) >= 100:
-        min_samples = 15
-    elif len(lengths) >= 40:
-        min_samples = 10
-    elif len(lengths) >= 20:
-        min_samples = 5
-    else:
+    elif len(lengths) >= 150:
+        min_cluster_size = 4
+        min_samples = 4
+    elif len(lengths) >= 50:
+        min_cluster_size = 3
         min_samples = 3
+    else:
+        min_cluster_size = 2
+        min_samples = 2
     # HDBSCAN doesn't accept 1D data. So, if the data contains a single feature,
     # concatenate two arrays to create a two-dimensional array.
     if data.shape[1] == 1:
         data = np.concatenate((data, data), axis=1)
     weights = defaultdict(int)
     clusterer = hdbscan.HDBSCAN(
+        min_cluster_size=min_cluster_size,
         min_samples=min_samples,
         prediction_data=True,
         allow_single_cluster=allow_single_cluster,
