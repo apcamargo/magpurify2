@@ -386,10 +386,6 @@ def compute_contig_cluster_score(data, allow_single_cluster, lengths):
     else:
         min_cluster_size = 2
         min_samples = 2
-    # HDBSCAN doesn't accept 1D data. So, if the data contains a single feature,
-    # concatenate two arrays to create a two-dimensional array.
-    if data.shape[1] == 1:
-        data = np.concatenate((data, data), axis=1)
     weights = defaultdict(int)
     clusterer = hdbscan.HDBSCAN(
         min_cluster_size=min_cluster_size,

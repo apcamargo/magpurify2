@@ -124,7 +124,7 @@ def coverage_parser(parser):
         type=Path,
     )
     parser.add_argument(
-        "--min_identity"
+        "--min_identity",
         default=0.97,
         help="Exclude reads by overall identity to the reference sequences.",
         type=float,
