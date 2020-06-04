@@ -78,6 +78,8 @@ def main(args):
     mag_coverage_list = Parallel(n_jobs=args.threads)(
         delayed(Coverage)(mag, coverage_dict) for mag in mag_list
     )
-    coverage_score_file = args.output_directory.joinpath("scores_coverage.tsv")
+    scores_directory = args.output_directory.joinpath("scores")
+    scores_directory.mkdir(exist_ok=True)
+    coverage_score_file = scores_directory.joinpath("coverage_scores.tsv")
     logger.info(f"Writing output to: '{coverage_score_file}'.")
     tools.write_contig_score_output(mag_coverage_list, coverage_score_file)

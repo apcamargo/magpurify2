@@ -32,22 +32,29 @@ def main(args):
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome) for genome in args.genomes]
     input_genomes = {mag.genome for mag in mag_list}
-    scores_file_list = args.output_directory.glob("scores*.tsv")
+    scores_directory = args.output_directory.joinpath("scores")
+    scores_file_list = scores_directory.glob("*_scores.tsv")
     mags_contaminants = defaultdict(lambda: defaultdict(list))
+    module_thresholds = {
+        "composition": args.composition_threshold,
+        "coverage": args.coverage_threshold,
+        "taxonomy": args.taxonomy_threshold,
+    }
     if not args.filtered_output_directory.is_dir():
         logger.warning(
             "Output directory for the filtered genomes does not exist. Creating it now."
         )
         args.filtered_output_directory.mkdir()
-    for contamination_file in scores_file_list:
-        logger.info(f"Reading '{contamination_file}'.")
-        with open(contamination_file) as fin:
+    for score_file in scores_file_list:
+        logger.info(f"Reading '{score_file}'.")
+        current_module = score_file.stem.replace("_scores", "")
+        with open(score_file) as fin:
             for line in fin:
-                genome, contig, contamination = line.split()
+                genome, contig, score = line.split()
                 if genome in input_genomes:
-                    if contamination == "Yes":
+                    if float(score) < module_thresholds[current_module]:
                         mags_contaminants[genome][contig].append(False)
-                    elif contamination == "No":
+                    else:
                         mags_contaminants[genome][contig].append(True)
     logger.info("Writing filtered genomes.")
     not_in_mags_contaminants = set(input_genomes).difference(mags_contaminants.keys())
@@ -58,7 +65,7 @@ def main(args):
         )
     Parallel(n_jobs=args.threads)(
         delayed(tools.write_filtered_genome)(
-            mag, mags_contaminants, args.filtering, args.filtered_output_directory
+            mag, mags_contaminants, args.mode, args.filtered_output_directory
         )
         for mag in mag_list
     )

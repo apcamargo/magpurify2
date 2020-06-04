@@ -102,7 +102,10 @@ def main(args):
         )
         for mag in mag_list
     ]
-    taxonomy_score_file = args.output_directory.joinpath("scores_taxonomy.tsv")
+    # Write contig score file
+    scores_directory = args.output_directory.joinpath("scores")
+    scores_directory.mkdir(exist_ok=True)
+    taxonomy_score_file = scores_directory.joinpath("taxonomy_scores.tsv")
     contig_taxonomy_file = args.output_directory.joinpath("taxonomic_assignment.tsv")
     logger.info(
         f"Writing output to: '{taxonomy_score_file} and '{contig_taxonomy_file}'."

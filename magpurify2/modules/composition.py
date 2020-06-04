@@ -62,6 +62,9 @@ def main(args):
     mag_composition_list = Parallel(n_jobs=args.threads)(
         delayed(Composition)(mag, composition_dict) for mag in mag_list
     )
-    composition_score_file = args.output_directory.joinpath("scores_composition.tsv")
+    # Write contig score file
+    scores_directory = args.output_directory.joinpath("scores")
+    scores_directory.mkdir(exist_ok=True)
+    composition_score_file = scores_directory.joinpath("composition_scores.tsv")
     logger.info(f"Writing output to: '{composition_score_file}'.")
     tools.write_contig_score_output(mag_composition_list, composition_score_file)

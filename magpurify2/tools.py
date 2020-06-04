@@ -444,7 +444,7 @@ def write_contig_score_output(mag_score_list, score_output_file):
                 fout.write(f"{mag_score.genome}\t{contig}\t{score:.4f}\n")
 
 
-def write_filtered_genome(mag, mags_contaminants, filtering, filtered_output_directory):
+def write_filtered_genome(mag, mags_contaminants, mode, filtered_output_directory):
     """
     Writes a FASTA file containing contigs not flagged as contaminants.
 
@@ -458,7 +458,7 @@ def write_filtered_genome(mag, mags_contaminants, filtering, filtered_output_dir
         in the genome and the values are boolean lists. Each value in those
         lists indicates if the contig was flagged as a contaminant by one of the
         contaminant-detection approaches.
-    filtering : str
+    mode : str
         If `"any"`, the contig will be removed if it was flagged as a
         contaminant by any of the contaminant-detection approaches. If `"all"`,
         the contig will only be removed if it was flagged by all the approaches.
@@ -470,11 +470,11 @@ def write_filtered_genome(mag, mags_contaminants, filtering, filtered_output_dir
     if mag.genome in mags_contaminants:
         with open(output_fasta, "w") as fout:
             for contig, description, sequence in mag:
-                if filtering == "any":
+                if mode == "any":
                     if all(mags_contaminants[mag.genome][contig]):
                         fout.write(f">{description}\n")
                         fout.write(f"{textwrap.fill(sequence, 70)}\n")
-                elif filtering == "all":
+                elif mode == "all":
                     if any(mags_contaminants[mag.genome][contig]):
                         fout.write(f">{description}\n")
                         fout.write(f"{textwrap.fill(sequence, 70)}\n")

@@ -209,12 +209,29 @@ def filter_parser(parser):
         type=Path,
     )
     options.add_argument(
-        "-f",
-        "--filtering",
+        "--composition_threshold",
+        default=0.15,
+        type=float,
+        help="Minimum score for a contig not to be flagged as a contaminant by the 'composition' module.",
+    )
+    options.add_argument(
+        "--coverage_threshold",
+        default=0.15,
+        type=float,
+        help="Minimum score for a contig not to be flagged as a contaminant by the 'coverage' module.",
+    )
+    options.add_argument(
+        "--taxonomy_threshold",
+        default=0.25,
+        type=float,
+        help="Minimum score for a contig not to be flagged as a contaminant by the 'taxonomy' module.",
+    )
+    options.add_argument(
+        "--mode",
         default="any",
         type=str,
         choices=["any", "all"],
-        help="Remove contigs that were flagged as contaminants in 'any' or in 'all' modules",
+        help="Remove contigs that were flagged as contaminants by 'any' or by 'all' modules",
     )
     options.add_argument(
         "-t",
