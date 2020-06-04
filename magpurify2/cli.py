@@ -124,6 +124,12 @@ def coverage_parser(parser):
         type=Path,
     )
     parser.add_argument(
+        "--min_identity"
+        default=0.97,
+        help="Exclude reads by overall identity to the reference sequences.",
+        type=float,
+    )
+    parser.add_argument(
         "-t",
         "--threads",
         default=multiprocessing.cpu_count(),

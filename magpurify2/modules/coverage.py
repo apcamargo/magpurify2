@@ -31,6 +31,9 @@ from magpurify2.core import Coverage, Mag
 
 def main(args):
     logger = logging.getLogger("timestamp")
+    args.contig_min_fraction = tools.validade_input(
+        args.min_identity, "min_identity", [0.0, 1.0], logger
+    )
     tools.check_bam_files(args.bam_files, logger)
     tools.check_output_directory(args.output_directory, logger)
     logger.info(f"Reading {len(args.genomes)} genomes.")
@@ -63,7 +66,9 @@ def main(args):
     if not skip_coverage:
         logger.info(f"Computing contig coverages from {len(args.bam_files)} BAM files.")
         coverage_dict = tools.get_coverages(
-            [str(filepath) for filepath in args.bam_files], threads=args.threads
+            [str(filepath) for filepath in args.bam_files],
+            min_identity=args.min_identity,
+            threads=args.threads,
         )
         logger.info(f"Saving contig coverages data to '{coverage_data_file}'.")
         with gzip.open(coverage_data_file, "wb") as fout:
