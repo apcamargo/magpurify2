@@ -60,7 +60,11 @@ class Composition:
         self.lengths = mag.lengths
         self.tnf = composition_dict[mag.genome]
         self.embedding = tools.create_embedding(
-            data=self.tnf, n_components=3, min_dist=0.1, n_neighbors=15, set_op_mix_ratio=1,
+            data=self.tnf,
+            n_components=3,
+            min_dist=0.1,
+            n_neighbors=15,
+            set_op_mix_ratio=1,
         )
         self.scores = tools.compute_contig_cluster_score(
             data=self.embedding, allow_single_cluster=True, lengths=self.lengths,
@@ -86,8 +90,15 @@ class Coverage:
                 for contig in self.contigs
             ]
         )
+        self.embedding = tools.create_embedding(
+            data=np.log1p(self.coverages),
+            n_components=3,
+            min_dist=0.1,
+            n_neighbors=15,
+            set_op_mix_ratio=0.3,
+        )
         self.scores = tools.compute_contig_cluster_score(
-            data=self.coverages, allow_single_cluster=True, lengths=self.lengths,
+            data=self.embedding, allow_single_cluster=True, lengths=self.lengths,
         )
 
     def __len__(self):
@@ -115,7 +126,9 @@ class Taxonomy:
             taxonomy_dict[mag.genome].get(contig, [taxopy.Taxon("1", self.taxdb)])
             for contig in self.contigs
         ]
-        self.contig_taxonomy = self.get_contig_taxonomy(taxonomy_dict, contig_min_fraction, allow_genus)
+        self.contig_taxonomy = self.get_contig_taxonomy(
+            taxonomy_dict, contig_min_fraction, allow_genus
+        )
         self.genome_taxonomy = self.get_genome_taxonomy(genome_min_fraction)
         self.scores = self.compute_gene_agreement()
 
