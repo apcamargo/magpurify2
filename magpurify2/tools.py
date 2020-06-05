@@ -389,7 +389,7 @@ def compute_contig_cluster_score(data, allow_single_cluster, lengths):
     elif len(lengths) >= 50:
         min_cluster_size = 3
         min_samples = 3
-    elif len(lengths) >= 20:
+    elif len(lengths) >= 6:
         min_cluster_size = 2
         min_samples = 2
     else:
@@ -404,18 +404,22 @@ def compute_contig_cluster_score(data, allow_single_cluster, lengths):
         core_dist_n_jobs=1,
     ).fit(data)
     clusters = clusterer.labels_
-    soft_clusters = hdbscan.all_points_membership_vectors(clusterer)
-    # If no clusters were identified, give a score of 1 to all contigs.
-    if np.all(clusters == -1):
-        scores = np.array([1] * len(lengths))
-    else:
-        for cluster, lenght in zip(clusters, lengths):
-            weights[cluster] += lenght
-        # Ignore unclustered contigs to identify the main cluster.
-        weights.pop(-1, None)
-        selected_cluster = max(weights, key=weights.get)
-        scores = soft_clusters[:, selected_cluster]
-    return scores
+    try:
+        soft_clusters = hdbscan.all_points_membership_vectors(clusterer)
+        # If no clusters were identified, give a score of 1 to all contigs.
+        if np.all(clusters == -1):
+            scores = np.ones(len(lengths))
+        else:
+            for cluster, lenght in zip(clusters, lengths):
+                weights[cluster] += lenght
+            # Ignore unclustered contigs to identify the main cluster.
+            weights.pop(-1, None)
+            selected_cluster = max(weights, key=weights.get)
+            scores = soft_clusters[:, selected_cluster]
+        scores = scores / np.max(scores)
+        return scores
+    except KeyError:
+        return np.ones(len(lengths))
 
 
 def write_contig_taxonomy_output(mag_taxonomy_list, taxonomy_output_file):
