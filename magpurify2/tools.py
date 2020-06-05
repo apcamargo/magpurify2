@@ -330,7 +330,13 @@ def get_taxonomy_dict(mmseqs2_output, taxdb):
 
 
 def create_embedding(
-    data, n_components, min_dist, n_neighbors, set_op_mix_ratio, metric="euclidean", random_state=42,
+    data,
+    n_components,
+    min_dist,
+    n_neighbors,
+    set_op_mix_ratio,
+    metric="euclidean",
+    random_state=42,
 ):
     """
     Creates an UMAP embedding from the input data.
@@ -383,9 +389,12 @@ def compute_contig_cluster_score(data, allow_single_cluster, lengths):
     elif len(lengths) >= 50:
         min_cluster_size = 3
         min_samples = 3
-    else:
+    elif len(lengths) >= 20:
         min_cluster_size = 2
         min_samples = 2
+    else:
+        min_cluster_size = 2
+        min_samples = 1
     weights = defaultdict(int)
     clusterer = hdbscan.HDBSCAN(
         min_cluster_size=min_cluster_size,
