@@ -378,7 +378,7 @@ def create_embedding(
     return reducer.fit_transform(data)
 
 
-def compute_contig_cluster_score(data, allow_single_cluster, lengths):
+def get_cluster_score(data, allow_single_cluster, lengths):
     # Get min_cluster_size and min_samples values based on the size of the dataset.
     if len(lengths) >= 250:
         min_cluster_size = 5
@@ -416,10 +416,12 @@ def compute_contig_cluster_score(data, allow_single_cluster, lengths):
             weights.pop(-1, None)
             selected_cluster = max(weights, key=weights.get)
             scores = soft_clusters[:, selected_cluster]
-        scores = scores / np.max(scores)
         return scores
     except KeyError:
         return np.ones(len(lengths))
+
+
+def get_contig_embedding_score(data, n_iterations, n_components, n_neighbors, min_dist, set_op_mix_ratio)
 
 
 def write_contig_taxonomy_output(mag_taxonomy_list, taxonomy_output_file):

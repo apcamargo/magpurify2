@@ -73,10 +73,10 @@ class Composition:
                 set_op_mix_ratio=1,
                 random_state=i,
             )
-            scores += tools.compute_contig_cluster_score(
+            scores += tools.get_cluster_score(
                 data=embedding, allow_single_cluster=True, lengths=self.lengths,
             )
-        scores /= n_iterations
+        scores = scores / max(scores)
         return scores
 
     def __len__(self):
@@ -108,15 +108,15 @@ class Coverage:
             embedding = tools.create_embedding(
                 data=np.log1p(self.coverages),
                 n_components=3,
-                min_dist=0.1,
+                min_dist=0.15,
                 n_neighbors=n_neighbors,
                 set_op_mix_ratio=0.3,
                 random_state=i,
             )
-            scores += tools.compute_contig_cluster_score(
+            scores += tools.get_cluster_score(
                 data=embedding, allow_single_cluster=True, lengths=self.lengths,
             )
-        scores /= n_iterations
+        scores = scores / max(scores)
         return scores
 
     def __len__(self):
