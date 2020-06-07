@@ -421,9 +421,6 @@ def get_cluster_score(data, allow_single_cluster, lengths):
         return np.ones(len(lengths))
 
 
-def get_contig_embedding_score(data, n_iterations, n_components, n_neighbors, min_dist, set_op_mix_ratio)
-
-
 def write_contig_taxonomy_output(mag_taxonomy_list, taxonomy_output_file):
     with open(taxonomy_output_file, "w") as fout:
         fout.write("genome\tcontig\tgenome_taxonomy\tcontig_taxonomy\n")
