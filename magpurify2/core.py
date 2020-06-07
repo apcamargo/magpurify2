@@ -59,25 +59,15 @@ class Composition:
         self.contigs = mag.contigs
         self.lengths = mag.lengths
         self.tnf = composition_dict[mag.genome]
-        self.scores = self.get_scores(4)
-
-    def get_scores(self, n_iterations):
-        scores = np.zeros(len(self))
-        n_neighbors = len(self) - 1 if len(self) <= 15 else 15
-        for i in range(n_iterations):
-            embedding = tools.create_embedding(
-                data=self.tnf,
-                n_components=3,
-                min_dist=0.1,
-                n_neighbors=n_neighbors,
-                set_op_mix_ratio=1,
-                random_state=i,
-            )
-            scores += tools.get_cluster_score(
-                data=embedding, allow_single_cluster=True, lengths=self.lengths,
-            )
-        scores = scores / max(scores)
-        return scores
+        self.scores = tools.get_cluster_score_from_embedding(
+            data=self.tnf,
+            lengths=self.lengths,
+            n_iterations=4,
+            n_components=3,
+            min_dist=0.1,
+            n_neighbors=15,
+            set_op_mix_ratio=1,
+        )
 
     def __len__(self):
         return len(self.contigs)
@@ -99,25 +89,15 @@ class Coverage:
                 for contig in self.contigs
             ]
         )
-        self.scores = self.get_scores(4)
-
-    def get_scores(self, n_iterations):
-        scores = np.zeros(len(self))
-        n_neighbors = len(self) - 1 if len(self) <= 15 else 15
-        for i in range(n_iterations):
-            embedding = tools.create_embedding(
-                data=np.log1p(self.coverages),
-                n_components=3,
-                min_dist=0.15,
-                n_neighbors=n_neighbors,
-                set_op_mix_ratio=0.3,
-                random_state=i,
-            )
-            scores += tools.get_cluster_score(
-                data=embedding, allow_single_cluster=True, lengths=self.lengths,
-            )
-        scores = scores / max(scores)
-        return scores
+        self.scores = tools.get_cluster_score_from_embedding(
+            data=np.log1p(self.coverages),
+            lengths=self.lengths,
+            n_iterations=4,
+            n_components=3,
+            min_dist=0.15,
+            n_neighbors=15,
+            set_op_mix_ratio=0.3,
+        )
 
     def __len__(self):
         return len(self.contigs)

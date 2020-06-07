@@ -421,6 +421,27 @@ def get_cluster_score(data, allow_single_cluster, lengths):
         return np.ones(len(lengths))
 
 
+def get_cluster_score_from_embedding(
+    data, lengths, n_iterations, n_components, min_dist, n_neighbors, set_op_mix_ratio
+):
+    scores = np.zeros(len(lengths))
+    n_neighbors = len(lengths) - 1 if len(lengths) <= n_neighbors else n_neighbors
+    for i in range(n_iterations):
+        embedding = create_embedding(
+            data=data,
+            n_components=n_components,
+            min_dist=min_dist,
+            n_neighbors=n_neighbors,
+            set_op_mix_ratio=set_op_mix_ratio,
+            random_state=i,
+        )
+        scores += get_cluster_score(
+            data=embedding, allow_single_cluster=True, lengths=lengths,
+        )
+    scores = scores / max(scores)
+    return scores
+
+
 def write_contig_taxonomy_output(mag_taxonomy_list, taxonomy_output_file):
     with open(taxonomy_output_file, "w") as fout:
         fout.write("genome\tcontig\tgenome_taxonomy\tcontig_taxonomy\n")
