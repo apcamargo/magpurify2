@@ -102,6 +102,36 @@ def composition_parser(parser):
     required.add_argument(
         "output_directory", help="Directory to write the output files to.", type=Path,
     )
+    options.add_argument(
+        "--n_iterations",
+        default=4,
+        help="Number of iterations of data embedding and cluster selection with different seeds.",
+        type=int,
+    )
+    options.add_argument(
+        "--n_components",
+        default=3,
+        help="The dimension of the space to embed the data into (UMAP parameter).",
+        type=int,
+    )
+    options.add_argument(
+        "--min_dist",
+        default=0.1,
+        help="The effective minimum distance between embedded points (UMAP parameter).",
+        type=float,
+    )
+    options.add_argument(
+        "--n_neighbors",
+        default=15,
+        help="The size of local neighborhood used for manifold approximation (UMAP parameter).",
+        type=int,
+    )
+    options.add_argument(
+        "--set_op_mix_ratio",
+        default=1.0,
+        help="Interpolate between the union (1.0) and intersection (0.0) to combine the local simplicial sets (UMAP parameter).",
+        type=float,
+    )
     other.add_argument(
         "-t",
         "--threads",
@@ -135,6 +165,36 @@ def coverage_parser(parser):
         "--min_identity",
         default=0.97,
         help="Exclude reads by overall identity to the reference sequences.",
+        type=float,
+    )
+    options.add_argument(
+        "--n_iterations",
+        default=4,
+        help="Number of iterations of data embedding and cluster selection with different seeds.",
+        type=int,
+    )
+    options.add_argument(
+        "--n_components",
+        default=3,
+        help="The dimension of the space to embed the data into (UMAP parameter).",
+        type=int,
+    )
+    options.add_argument(
+        "--min_dist",
+        default=0.15,
+        help="The effective minimum distance between embedded points (UMAP parameter).",
+        type=float,
+    )
+    options.add_argument(
+        "--n_neighbors",
+        default=15,
+        help="The size of local neighborhood used for manifold approximation (UMAP parameter).",
+        type=int,
+    )
+    options.add_argument(
+        "--set_op_mix_ratio",
+        default=0.3,
+        help="Interpolate between the union (1.0) and intersection (0.0) to combine the local simplicial sets (UMAP parameter).",
         type=float,
     )
     other.add_argument(

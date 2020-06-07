@@ -54,7 +54,16 @@ class Mag:
 
 
 class Composition:
-    def __init__(self, mag, composition_dict):
+    def __init__(
+        self,
+        mag,
+        composition_dict,
+        n_iterations,
+        n_components,
+        min_dist,
+        n_neighbors,
+        set_op_mix_ratio,
+    ):
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
@@ -66,7 +75,7 @@ class Composition:
             n_components=3,
             min_dist=0.1,
             n_neighbors=15,
-            set_op_mix_ratio=1,
+            set_op_mix_ratio=1.0,
         )
 
     def __len__(self):
@@ -77,7 +86,16 @@ class Composition:
 
 
 class Coverage:
-    def __init__(self, mag, coverage_dict):
+    def __init__(
+        self,
+        mag,
+        coverage_dict,
+        n_iterations,
+        n_components,
+        min_dist,
+        n_neighbors,
+        set_op_mix_ratio,
+    ):
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths

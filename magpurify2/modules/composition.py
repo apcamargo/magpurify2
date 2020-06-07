@@ -30,6 +30,18 @@ from magpurify2.core import Composition, Mag
 
 def main(args):
     logger = logging.getLogger("timestamp")
+    args.n_iterations = tools.validade_input(
+        args.n_iterations, "n_iterations", [1, 999], logger
+    )
+    args.n_components = tools.validade_input(
+        args.n_components, "n_components", [1, 999], logger
+    )
+    args.n_neighbors = tools.validade_input(
+        args.n_neighbors, "n_neighbors", [1, 999], logger
+    )
+    args.set_op_mix_ratio = tools.validade_input(
+        args.set_op_mix_ratio, "set_op_mix_ratio", [0.0, 1.0], logger
+    )
     tools.check_output_directory(args.output_directory, logger)
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome) for genome in args.genomes]
@@ -60,7 +72,16 @@ def main(args):
 
     logger.info("Computing contig scores.")
     mag_composition_list = Parallel(n_jobs=args.threads)(
-        delayed(Composition)(mag, composition_dict) for mag in mag_list
+        delayed(Composition)(
+            mag,
+            composition_dict,
+            args.n_iterations,
+            args.n_components,
+            args.min_dist,
+            args.n_neighbors,
+            args.set_op_mix_ratio,
+        )
+        for mag in mag_list
     )
     # Write contig score file
     scores_directory = args.output_directory.joinpath("scores")
