@@ -181,7 +181,7 @@ def mmseqs2(output_directory, database, logger, threads):
             try:
                 subprocess.run(command, stdout=fout, stderr=fout, check=True)
             except subprocess.CalledProcessError:
-                command_str = ' '.join([str(i) for i in command])
+                command_str = " ".join([str(i) for i in command])
                 logger.error(f"'{command_str}' failed.")
                 sys.exit(1)
     # Remove intermediate directories.

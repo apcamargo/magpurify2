@@ -379,6 +379,26 @@ def create_embedding(
 
 
 def get_cluster_score(data, allow_single_cluster, lengths):
+    """
+    Clusters the data with HDBSCAN, identify the main cluster as the one that
+    contains the largest sum of contig lengths and returns the score of each
+    contig as the measured membership to the main cluster.
+
+    Parameters
+    ----------
+    data : array-like
+        Input data to be clustered.
+    allow_single_cluster : bool
+        Allow HDBSCAN to identify a single cluster.
+    lengths : list
+        Lengths of the contigs.
+
+    Returns
+    -------
+    array-like
+        The score of each contig, measured as the membership of each contig to
+        the main cluster.
+    """
     # Get min_cluster_size and min_samples values based on the size of the dataset.
     if len(lengths) >= 250:
         min_cluster_size = 5
@@ -424,6 +444,34 @@ def get_cluster_score(data, allow_single_cluster, lengths):
 def get_cluster_score_from_embedding(
     data, lengths, n_iterations, n_components, min_dist, n_neighbors, set_op_mix_ratio
 ):
+    """
+    Iterativelly create UMAP embeddings and compute contigs score using
+    different seeds.
+
+    Parameters
+    ----------
+    data : array-like
+        Input data to be fit into an embedded space.
+    lengths : list
+        Lengths of the contigs.
+    n_iterations : int
+        Number of iterations to execute using different seeds.
+    n_components : int
+        The dimension of the space to embed into.
+    min_dist : float
+        The effective minimum distance between embedded points.
+    n_neighbors : int
+        The size of local neighborhood used for manifold approximation.
+    set_op_mix_ratio : float
+        Interpolate between (fuzzy) union and intersection as the set operation
+        used to combine local fuzzy simplicial sets to obtain a global fuzzy
+        simplicial sets.
+
+    Returns
+    -------
+    ndarray
+        Embedding of the training data in low-dimensional space.
+    """
     scores = np.zeros(len(lengths))
     n_neighbors = len(lengths) - 1 if len(lengths) <= n_neighbors else n_neighbors
     for i in range(n_iterations):
@@ -443,6 +491,18 @@ def get_cluster_score_from_embedding(
 
 
 def write_contig_taxonomy_output(mag_taxonomy_list, taxonomy_output_file):
+    """
+    Write a file containing the genome and contig-level taxonomic lineages for
+    each contig.
+
+    Parameters
+    ----------
+    mag_taxonomy_list : list
+        List containing the `Taxonomy` objects of the input genomes.
+    taxonomy_output_file : Path
+        Path object pointing to the file where the taxonomic lineages will be
+        written to.
+    """
     with open(taxonomy_output_file, "w") as fout:
         fout.write("genome\tcontig\tgenome_taxonomy\tcontig_taxonomy\n")
         for mag_taxonomy in mag_taxonomy_list:

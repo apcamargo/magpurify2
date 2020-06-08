@@ -71,11 +71,11 @@ class Composition:
         self.scores = tools.get_cluster_score_from_embedding(
             data=self.tnf,
             lengths=self.lengths,
-            n_iterations=4,
-            n_components=3,
-            min_dist=0.1,
-            n_neighbors=15,
-            set_op_mix_ratio=1.0,
+            n_iterations=n_iterations,
+            n_components=n_components,
+            min_dist=min_dist,
+            n_neighbors=n_neighbors,
+            set_op_mix_ratio=set_op_mix_ratio,
         )
 
     def __len__(self):
@@ -110,11 +110,11 @@ class Coverage:
         self.scores = tools.get_cluster_score_from_embedding(
             data=np.log1p(self.coverages),
             lengths=self.lengths,
-            n_iterations=4,
-            n_components=3,
-            min_dist=0.15,
-            n_neighbors=15,
-            set_op_mix_ratio=0.3,
+            n_iterations=n_iterations,
+            n_components=n_components,
+            min_dist=min_dist,
+            n_neighbors=n_neighbors,
+            set_op_mix_ratio=set_op_mix_ratio,
         )
 
     def __len__(self):
@@ -148,7 +148,7 @@ class Taxonomy:
         self.genome_taxonomy = self.get_genome_taxonomy(genome_min_fraction)
         self.scores = self.compute_gene_agreement()
 
-    def get_contig_taxonomy(self, taxonomy_dict, fraction=0.75, allow_genus=False):
+    def get_contig_taxonomy(self, fraction=0.75, allow_genus=False):
         contig_taxonomy = []
         for contig in self.gene_taxonomy:
             if len(contig) > 1:

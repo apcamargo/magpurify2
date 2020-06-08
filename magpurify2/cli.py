@@ -31,36 +31,43 @@ import magpurify2
 def cli():
     parser = argparse.ArgumentParser(
         description="Identify and remove contaminants from metagenome-assembled genomes.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        add_help=False,
     )
-    options = parser.add_argument_group('Options')
+    options = parser.add_argument_group("Options")
     options.add_argument(
         "--version", action="version", version=f"{parser.prog} v{magpurify2.__version__}",
     )
-    options.add_argument("-h", "--help", action="help", help="Show this help message and exit")
+    options.add_argument(
+        "-h", "--help", action="help", help="Show this help message and exit"
+    )
     subparsers = parser.add_subparsers(title="Modules")
     composition_subcommand = subparsers.add_parser(
         "composition",
         help="Identify putative contaminants using tetranucleotide frequences.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        add_help=False,
     )
     composition_parser(composition_subcommand)
     coverage_subcommand = subparsers.add_parser(
         "coverage",
         help="Identify putative contaminants using coverage profiles.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        add_help=False,
     )
     coverage_parser(coverage_subcommand)
     taxonomy_subcommand = subparsers.add_parser(
         "taxonomy",
         help="Identify putative contaminants through taxonomy assignment.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        add_help=False,
     )
     taxonomy_parser(taxonomy_subcommand)
     filter_subcommand = subparsers.add_parser(
         "filter",
         help="Remove identified contaminants from input MAGs.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter, add_help=False,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        add_help=False,
     )
     filter_parser(filter_subcommand)
 
@@ -93,9 +100,9 @@ def cli():
 
 def composition_parser(parser):
     parser.set_defaults(func=magpurify2.composition.main)
-    required = parser.add_argument_group('Required arguments')
-    options = parser.add_argument_group('Data processing options')
-    other = parser.add_argument_group('Other options')
+    required = parser.add_argument_group("Required arguments")
+    options = parser.add_argument_group("Data processing options")
+    other = parser.add_argument_group("Other options")
     required.add_argument(
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
@@ -139,15 +146,19 @@ def composition_parser(parser):
         type=int,
         help="Number of threads to use. All by default.",
     )
-    other.add_argument("-q", "--quiet", help="Suppress the logger output", action="store_true")
-    other.add_argument("-h", "--help", action="help", help="Show this help message and exit")
+    other.add_argument(
+        "-q", "--quiet", help="Suppress the logger output", action="store_true"
+    )
+    other.add_argument(
+        "-h", "--help", action="help", help="Show this help message and exit"
+    )
 
 
 def coverage_parser(parser):
     parser.set_defaults(func=magpurify2.coverage.main)
-    required = parser.add_argument_group('Required arguments')
-    options = parser.add_argument_group('Data processing options')
-    other = parser.add_argument_group('Other options')
+    required = parser.add_argument_group("Required arguments")
+    options = parser.add_argument_group("Data processing options")
+    other = parser.add_argument_group("Other options")
     required.add_argument(
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
@@ -204,15 +215,19 @@ def coverage_parser(parser):
         type=int,
         help="Number of threads to use. All by default.",
     )
-    other.add_argument("-q", "--quiet", help="Suppress the logger output", action="store_true")
-    other.add_argument("-h", "--help", action="help", help="Show this help message and exit")
+    other.add_argument(
+        "-q", "--quiet", help="Suppress the logger output", action="store_true"
+    )
+    other.add_argument(
+        "-h", "--help", action="help", help="Show this help message and exit"
+    )
 
 
 def taxonomy_parser(parser):
     parser.set_defaults(func=magpurify2.taxonomy.main)
-    required = parser.add_argument_group('Required arguments')
-    options = parser.add_argument_group('Data processing options')
-    other = parser.add_argument_group('Other options')
+    required = parser.add_argument_group("Required arguments")
+    options = parser.add_argument_group("Data processing options")
+    other = parser.add_argument_group("Other options")
     required.add_argument(
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
@@ -250,15 +265,19 @@ def taxonomy_parser(parser):
         type=int,
         help="Number of threads to use. All by default.",
     )
-    other.add_argument("-q", "--quiet", help="Suppress the logger output", action="store_true")
-    other.add_argument("-h", "--help", action="help", help="Show this help message and exit")
+    other.add_argument(
+        "-q", "--quiet", help="Suppress the logger output", action="store_true"
+    )
+    other.add_argument(
+        "-h", "--help", action="help", help="Show this help message and exit"
+    )
 
 
 def filter_parser(parser):
     parser.set_defaults(func=magpurify2.filter.main)
-    required = parser.add_argument_group('Required arguments')
-    options = parser.add_argument_group('Data processing options')
-    other = parser.add_argument_group('Other options')
+    required = parser.add_argument_group("Required arguments")
+    options = parser.add_argument_group("Data processing options")
+    other = parser.add_argument_group("Other options")
     required.add_argument(
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
@@ -304,5 +323,9 @@ def filter_parser(parser):
         type=int,
         help="Number of threads to use. All by default.",
     )
-    other.add_argument("-q", "--quiet", help="Suppress the logger output", action="store_true")
-    other.add_argument("-h", "--help", action="help", help="Show this help message and exit")
+    other.add_argument(
+        "-q", "--quiet", help="Suppress the logger output", action="store_true"
+    )
+    other.add_argument(
+        "-h", "--help", action="help", help="Show this help message and exit"
+    )
