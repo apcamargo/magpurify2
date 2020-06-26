@@ -1,6 +1,6 @@
 name: deploy website
 
-on: [push]
+# on: [push]
 
 jobs:
   deploy-website:
