@@ -35,6 +35,7 @@ import taxopy
 import umap
 from Bio import SeqIO, bgzf
 
+from magpurify2._codon import get_codon_index, get_cai
 from magpurify2._coverage import get_coverages
 from magpurify2._tnf import get_tnf
 

@@ -16,5 +16,6 @@
 //
 // Contact: antoniop.camargo@gmail.com
 
+mod codon;
 mod coverage;
 mod tnf;

@@ -27,8 +27,9 @@ setup(
     version="0.1.0",
     packages=find_packages(),
     rust_extensions=[
-        RustExtension("magpurify2._tnf", debug=False),
+        RustExtension("magpurify2._codon", debug=False),
         RustExtension("magpurify2._coverage", debug=False),
+        RustExtension("magpurify2._tnf", debug=False),
     ],
     zip_safe=False,
     license="GNU General Public License v3.0",
