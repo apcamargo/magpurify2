@@ -31,11 +31,13 @@ from pathlib import Path
 
 import hdbscan
 import numpy as np
+import scipy.stats as ss
 import taxopy
 import umap
 from Bio import SeqIO, bgzf
+from scipy.signal import find_peaks
 
-from magpurify2._codon import get_codon_index, get_cai
+from magpurify2._codon import get_cai, get_codon_index
 from magpurify2._coverage import get_coverages
 from magpurify2._tnf import get_tnf
 
@@ -488,6 +490,20 @@ def get_cluster_score_from_embedding(
             data=embedding, allow_single_cluster=True, lengths=lengths,
         )
     scores = scores / max(scores)
+    return scores
+
+
+def identify_outliers(data, lengths, max_deviation=5.0):
+    data = np.array(data).flatten()
+    kernel = ss.gaussian_kde(data, weights=lengths)
+    data_kde = kernel(np.linspace(0, np.max(data), 1000))
+    peaks = find_peaks(data_kde, height=(None, None))
+    if len(peaks[0]):
+        threshold = peaks[0][np.argmax(peaks[1]["peak_heights"])] / 1000 * np.max(data)
+        limits = sorted([max_deviation * threshold, threshold / max_deviation])
+        scores = np.logical_and((data <= limits[1]), (data >= limits[0])).astype(float)
+    else:
+        scores = np.ones(len(data))
     return scores
 
 

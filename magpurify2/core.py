@@ -95,6 +95,7 @@ class Coverage:
         min_dist,
         n_neighbors,
         set_op_mix_ratio,
+        max_deviation,
     ):
         self.genome = mag.genome
         self.contigs = mag.contigs
@@ -107,15 +108,18 @@ class Coverage:
                 for contig in self.contigs
             ]
         )
-        self.scores = tools.get_cluster_score_from_embedding(
-            data=np.log1p(self.coverages),
-            lengths=self.lengths,
-            n_iterations=n_iterations,
-            n_components=n_components,
-            min_dist=min_dist,
-            n_neighbors=n_neighbors,
-            set_op_mix_ratio=set_op_mix_ratio,
-        )
+        if len(list(coverage_dict.values())[0]) > 1:
+            self.scores = tools.get_cluster_score_from_embedding(
+                data=np.log1p(self.coverages),
+                lengths=self.lengths,
+                n_iterations=n_iterations,
+                n_components=n_components,
+                min_dist=min_dist,
+                n_neighbors=n_neighbors,
+                set_op_mix_ratio=set_op_mix_ratio,
+            )
+        else:
+            self.scores = tools.identify_outliers(self.coverages, self.lengths, max_deviation)
 
     def __len__(self):
         return len(self.contigs)

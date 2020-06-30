@@ -43,6 +43,7 @@ setup(
         "importlib-metadata>=0.12; python_version<'3.8'",
         "joblib",
         "numpy",
+        "scipy",
         "taxopy",
         "tbb",
         "umap-learn",

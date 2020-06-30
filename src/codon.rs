@@ -54,14 +54,14 @@ lazy_static! {
 
 /// Counts the absolute codon frequencies from a list of in-frame ORF sequences. If the sequence
 /// length if not a multiple of 3, the last nucleotides will be ignored.
-fn count_codons(seq_list: Vec<&str>, use_pseudocount: bool) -> HashMap<&str, u16> {
-    let pseudo: u16;
+fn count_codons(seq_list: Vec<&str>, use_pseudocount: bool) -> HashMap<&str, u32> {
+    let pseudo: u32;
     if use_pseudocount {
         pseudo = 1;
     } else {
         pseudo = 0;
     }
-    let mut codon_count: HashMap<&str, u16> = [
+    let mut codon_count: HashMap<&str, u32> = [
         ("TTT", pseudo),
         ("TTC", pseudo),
         ("TTA", pseudo),
