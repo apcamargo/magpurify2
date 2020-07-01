@@ -104,7 +104,6 @@ class CodonUsage:
             max_peak = peaks[0][np.argmax(peaks[1]["peak_heights"])] / 1000
         else:
             return np.ones(len(self))
-        print(max_valley)
         if max_peak > max_valley:
             threshold = max_valley - np.abs(max_peak - max_valley) / 6
             scores = (unit_mean_contig_cai >= threshold).astype(float)
