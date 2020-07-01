@@ -31,11 +31,9 @@ from pathlib import Path
 
 import hdbscan
 import numpy as np
-import scipy.stats as ss
 import taxopy
 import umap
 from Bio import SeqIO, bgzf
-from scipy.signal import find_peaks
 
 from magpurify2._codon import get_cai, get_codon_index
 from magpurify2._coverage import get_coverages
@@ -244,6 +242,39 @@ def read_fasta(filepath):
     fin.close()
 
 
+def zscore(data, unit_interval=True):
+    """
+    Trans
+
+    Parameters
+    ----------
+    data : array-like
+        Data vector that will be standardized.
+    unit_interval : bool, default True
+        Transform the computed value so it lies in the [0,1] range.
+
+    Returns
+    -------
+    ndarray
+        Standardized data.
+    """
+    n = len(data)
+    data = np.array(data)
+    if n == 1:
+        return np.array([0.0])
+    else:
+        std = np.std(data, ddof=1)
+        if std == 0:
+            return np.zeros(n)
+        else:
+            zs = (data - np.mean(data)) / std
+            if unit_interval:
+                max_zs = (n - 1) / np.sqrt(n)
+                return (zs + max_zs) / (2 * max_zs)
+            else:
+                return zs
+
+
 def check_prediction(genome_list, output_directory):
     """
     Checks which genomes have been processed by Prodigal and which ones still
@@ -398,7 +429,7 @@ def get_cluster_score(data, allow_single_cluster, lengths):
 
     Returns
     -------
-    array-like
+    ndarray
         The score of each contig, measured as the membership of each contig to
         the main cluster.
     """
@@ -490,42 +521,6 @@ def get_cluster_score_from_embedding(
             data=embedding, allow_single_cluster=True, lengths=lengths,
         )
     scores = scores / max(scores)
-    return scores
-
-
-def identify_outliers(data, lengths, max_deviation=5.0):
-    """
-    Identify outliers using a maximum deviation from the peak approach. First,
-    a kernel density estimation (KDE) is fit to the data using contig lengths as
-    weights. Then, the highest peak is identified and contigs with coverage
-    greater than [max_deviation * coverage peak value] or less than
-    [(1 / max_deviation) * coverage peak value] will be given a score of 0.
-
-    Parameters
-    ----------
-    data : array-like
-        Input data to be used to fit a kernel density estimation (KDE).
-    lengths : list
-        Lengths of the contigs. Used as weights for fitting the KDE.
-    max_deviation : float
-        Maximum deviation relative to the KDE peak's position.
-
-    Returns
-    -------
-    ndarray
-        The score of each contig. 1.0 if the contig is within and 0.0 is the
-        contig is out the bounds set by the KDE peak and `max_deviation`.
-    """
-    data = np.array(data).flatten()
-    kernel = ss.gaussian_kde(data, weights=lengths)
-    data_kde = kernel(np.linspace(0, np.max(data), 1000))
-    peaks = find_peaks(data_kde, height=(None, None))
-    if len(peaks[0]):
-        threshold = peaks[0][np.argmax(peaks[1]["peak_heights"])] / 1000 * np.max(data)
-        limits = sorted([max_deviation * threshold, threshold / max_deviation])
-        scores = np.logical_and((data <= limits[1]), (data >= limits[0])).astype(float)
-    else:
-        scores = np.ones(len(data))
     return scores
 
 

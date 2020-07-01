@@ -158,8 +158,6 @@ fn cai_for_gene(seq: &str, index: &HashMap<&str, f64>) -> f64 {
             }
         }
     }
-    println!("{}", cai_value);
-    println!("{}", cai_length);
     return (cai_value / (cai_length - 1.0)).exp();
 }
 

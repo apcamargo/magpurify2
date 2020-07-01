@@ -56,6 +56,13 @@ def cli():
         add_help=False,
     )
     coverage_parser(coverage_subcommand)
+    codon_usage_subcommand = subparsers.add_parser(
+        "codon_usage",
+        help="Identify putative contaminants using gene codon usage profiles.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        add_help=False,
+    )
+    codon_usage_parser(codon_usage_subcommand)
     taxonomy_subcommand = subparsers.add_parser(
         "taxonomy",
         help="Identify putative contaminants through taxonomy assignment.",
@@ -80,6 +87,9 @@ def cli():
             sys.exit(0)
         elif sys.argv[1] == "coverage":
             coverage_subcommand.print_help()
+            sys.exit(0)
+        elif sys.argv[1] == "codon_usage":
+            codon_usage_subcommand.print_help()
             sys.exit(0)
         elif sys.argv[1] == "taxonomy":
             taxonomy_subcommand.print_help()
@@ -213,6 +223,38 @@ def coverage_parser(parser):
         default=5.0,
         help="Contigs with coverage greater than [max_deviation * coverage peak value] or less than [(1 / max_deviation) * coverage peak value] will be flagged as outliers. This parameter is used if a single BAM file is provided.",
         type=float,
+    )
+    other.add_argument(
+        "-t",
+        "--threads",
+        default=multiprocessing.cpu_count(),
+        type=int,
+        help="Number of threads to use. All by default.",
+    )
+    other.add_argument(
+        "-q", "--quiet", help="Suppress the logger output", action="store_true"
+    )
+    other.add_argument(
+        "-h", "--help", action="help", help="Show this help message and exit"
+    )
+
+
+def codon_usage_parser(parser):
+    parser.set_defaults(func=magpurify2.codon_usage.main)
+    required = parser.add_argument_group("Required arguments")
+    options = parser.add_argument_group("Data processing options")
+    other = parser.add_argument_group("Other options")
+    required.add_argument(
+        "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
+    )
+    required.add_argument(
+        "output_directory", help="Directory to write the output files to.", type=Path,
+    )
+    options.add_argument(
+        "--min_genes",
+        default=1,
+        help="Minimum number of genes in a contig for it to be considered for contamination detection. Contigs with less than `min_genes` will never be flagged as contaminants.",
+        type=int,
     )
     other.add_argument(
         "-t",

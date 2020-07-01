@@ -18,7 +18,7 @@
 #
 # Contact: antoniop.camargo@gmail.com
 
-from magpurify2.modules import composition, coverage, filter, taxonomy
+from magpurify2.modules import codon_usage, composition, coverage, filter, taxonomy
 
 try:
     from importlib import metadata

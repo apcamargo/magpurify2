@@ -21,7 +21,9 @@
 from collections import defaultdict
 
 import numpy as np
+import scipy.stats as ss
 import taxopy
+from scipy.signal import find_peaks
 
 from magpurify2 import tools
 
@@ -51,6 +53,72 @@ class Mag:
 
     def __repr__(self):
         return f"{self.genome}: {len(self)} contigs"
+
+
+class CodonUsage:
+    def __init__(self, mag, min_genes, prodigal_fna_filepath):
+        self.genome = mag.genome
+        self.contigs = mag.contigs
+        self.cds = []
+        self.cds_sequences = []
+        self.lengths = []
+        for cds, _, cds_sequence in tools.read_fasta(prodigal_fna_filepath):
+            self.cds.append(cds)
+            self.cds_sequences.append(cds_sequence)
+        self.delta_cai = self.get_delta_cai()
+        self.scores = self.identify_codon_usage_outliers(min_genes)
+
+    def get_delta_cai(self, quantile=0.25):
+        cds_sequences = np.array(self.cds_sequences)
+        codon_index = tools.get_codon_index(cds_sequences)
+        cai_list = tools.get_cai(cds_sequences, codon_index)
+        cai_threshold = np.quantile(cai_list, quantile)
+        upper_cds_sequences = cds_sequences[cai_list > cai_threshold]
+        new_codon_index = tools.get_codon_index(upper_cds_sequences)
+        new_cai_list = tools.get_cai(cds_sequences, new_codon_index)
+        return new_cai_list - cai_list
+
+    def identify_codon_usage_outliers(self, min_genes):
+        contig_delta_cai = defaultdict(list)
+        for cds, delta_cai in zip(self.cds, self.delta_cai):
+            contig, _ = cds.rsplit("_", 1)
+            contig_delta_cai[contig].append(delta_cai)
+        kept_contigs, n_genes, mean_contig_cai = [], [], []
+        for contig, delta_cai_list in contig_delta_cai.items():
+            if len(delta_cai_list) >= min_genes:
+                kept_contigs.append(contig)
+                mean_contig_cai.append(np.mean(delta_cai_list))
+                n_genes.append(len(delta_cai_list))
+        unit_mean_contig_cai = tools.zscore(mean_contig_cai, unit_interval=True)
+        kernel = ss.gaussian_kde(unit_mean_contig_cai, weights=n_genes)
+        contig_cai_kde = kernel(np.linspace(0, 1, 1000))
+        # Find the deepest valley in the KDE.
+        valleys = find_peaks(-contig_cai_kde, prominence=(0.05, None))
+        if len(valleys[0]):
+            max_valley = valleys[0][np.argmax(valleys[1]["prominences"])] / 1000
+        else:
+            return np.ones(len(self))
+        # Find the highest peak, where the non-contaminant contigs are concentrated.
+        peaks = find_peaks(contig_cai_kde, height=(None, None))
+        if len(peaks[0]):
+            max_peak = peaks[0][np.argmax(peaks[1]["peak_heights"])] / 1000
+        else:
+            return np.ones(len(self))
+        print(max_valley)
+        if max_peak > max_valley:
+            threshold = max_valley - np.abs(max_peak - max_valley) / 6
+            scores = (unit_mean_contig_cai >= threshold).astype(float)
+        else:
+            threshold = max_valley + np.abs(max_peak - max_valley) / 6
+            scores = (unit_mean_contig_cai <= threshold).astype(float)
+        contig_score_dict = dict(zip(kept_contigs, scores))
+        return np.array([contig_score_dict.get(contig, 0.0) for contig in self.contigs])
+
+    def __len__(self):
+        return len(self.contigs)
+
+    def __iter__(self):
+        return zip(self.contigs, self.scores)
 
 
 class Composition:
@@ -120,7 +188,24 @@ class Coverage:
                 set_op_mix_ratio=set_op_mix_ratio,
             )
         else:
-            self.scores = tools.identify_outliers(self.coverages, self.lengths, max_deviation)
+            self.scores = self.identify_coverage_outliers(max_deviation)
+
+    def identify_coverage_outliers(self, max_deviation=5.0):
+        data = np.array(self.coverages).flatten()
+        kernel = ss.gaussian_kde(data, weights=self.lengths)
+        data_kde = kernel(np.linspace(0, np.max(data), 1000))
+        peaks = find_peaks(data_kde, height=(None, None))
+        if len(peaks[0]):
+            threshold = (
+                peaks[0][np.argmax(peaks[1]["peak_heights"])] / 1000 * np.max(data)
+            )
+            limits = sorted([max_deviation * threshold, threshold / max_deviation])
+            scores = np.logical_and((data <= limits[1]), (data >= limits[0])).astype(
+                float
+            )
+        else:
+            scores = np.ones(len(data))
+        return scores
 
     def __len__(self):
         return len(self.contigs)
