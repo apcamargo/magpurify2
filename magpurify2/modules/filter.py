@@ -36,6 +36,7 @@ def main(args):
     scores_file_list = scores_directory.glob("*_scores.tsv")
     mags_contaminants = defaultdict(lambda: defaultdict(list))
     module_thresholds = {
+        "codon_usage": 0.5,
         "composition": args.composition_threshold,
         "coverage": args.coverage_threshold,
         "taxonomy": args.taxonomy_threshold,
