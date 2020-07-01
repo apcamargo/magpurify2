@@ -495,8 +495,11 @@ def get_cluster_score_from_embedding(
 
 def identify_outliers(data, lengths, max_deviation=5.0):
     """
-    Iterativelly create UMAP embeddings and compute contigs score using
-    different seeds.
+    Identify outliers using a maximum deviation from the peak approach. First,
+    a kernel density estimation (KDE) is fit to the data using contig lengths as
+    weights. Then, the highest peak is identified and contigs with coverage
+    greater than [max_deviation * coverage peak value] or less than
+    [(1 / max_deviation) * coverage peak value] will be given a score of 0.
 
     Parameters
     ----------
