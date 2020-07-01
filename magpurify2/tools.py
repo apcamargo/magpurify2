@@ -494,6 +494,25 @@ def get_cluster_score_from_embedding(
 
 
 def identify_outliers(data, lengths, max_deviation=5.0):
+    """
+    Iterativelly create UMAP embeddings and compute contigs score using
+    different seeds.
+
+    Parameters
+    ----------
+    data : array-like
+        Input data to be used to fit a kernel density estimation (KDE).
+    lengths : list
+        Lengths of the contigs. Used as weights for fitting the KDE.
+    max_deviation : float
+        Maximum deviation relative to the KDE peak's position.
+
+    Returns
+    -------
+    ndarray
+        The score of each contig. 1.0 if the contig is within and 0.0 is the
+        contig is out the bounds set by the KDE peak and `max_deviation`.
+    """
     data = np.array(data).flatten()
     kernel = ss.gaussian_kde(data, weights=lengths)
     data_kde = kernel(np.linspace(0, np.max(data), 1000))

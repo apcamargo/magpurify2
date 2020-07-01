@@ -211,7 +211,7 @@ def coverage_parser(parser):
     options.add_argument(
         "--max_deviation",
         default=5.0,
-        help="Contigs with coverage greater than [max_deviation * mean coverage] or less than [(1 / max_deviation) * mean coverage] will be flagged as outliers. This parameter is used if a single BAM file is provided.",
+        help="Contigs with coverage greater than [max_deviation * coverage peak value] or less than [(1 / max_deviation) * coverage peak value] will be flagged as outliers. This parameter is used if a single BAM file is provided.",
         type=float,
     )
     other.add_argument(
