@@ -31,6 +31,7 @@ from magpurify2.core import Mag, CodonUsage
 def main(args):
     logger = logging.getLogger("timestamp")
     args.min_genes = tools.validade_input(args.min_genes, "min_genes", [1, 999], logger)
+    args.stringency = tools.validade_input(args.stringency, "stringency", [0, 1], logger)
     # Check if Prodigal is an executable in the user PATH.
     missing_executables = [
         executable
@@ -53,7 +54,10 @@ def main(args):
     logger.info("Computing contig scores.")
     mag_codon_usage_list = [
         CodonUsage(
-            mag, args.min_genes, prodigal_output_directory.joinpath(mag.genome + "_genes.fna"),
+            mag,
+            args.min_genes,
+            args.stringency,
+            prodigal_output_directory.joinpath(mag.genome + "_genes.fna"),
         )
         for mag in mag_list
     ]
@@ -61,7 +65,5 @@ def main(args):
     scores_directory = args.output_directory.joinpath("scores")
     scores_directory.mkdir(exist_ok=True)
     codon_usage_score_file = scores_directory.joinpath("codon_usage_scores.tsv")
-    logger.info(
-        f"Writing output to: '{codon_usage_score_file}'."
-    )
+    logger.info(f"Writing output to: '{codon_usage_score_file}'.")
     tools.write_contig_score_output(mag_codon_usage_list, codon_usage_score_file)

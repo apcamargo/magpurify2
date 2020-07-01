@@ -256,6 +256,12 @@ def codon_usage_parser(parser):
         help="Minimum number of genes in a contig for it to be considered for contamination detection. Contigs with less than `min_genes` will never be flagged as contaminants.",
         type=int,
     )
+    options.add_argument(
+        "--stringency",
+        default=0.2,
+        help="Controls how stringent is the contaminant detection. Must be between 0 and 1.",
+        type=float,
+    )
     other.add_argument(
         "-t",
         "--threads",
