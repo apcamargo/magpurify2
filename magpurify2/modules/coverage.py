@@ -68,7 +68,7 @@ def main(args):
                 skip_coverage = True
                 # If the number of input BAM files is less than the number of input BAM
                 # files, select the coverage data of the input BAMs.
-                if loaded_bam_signatures > bam_signatures:
+                if len(loaded_bam_signatures) > len(bam_signatures):
                     selected_bams = [
                         signature in bam_signatures for signature in loaded_bam_signatures
                     ]

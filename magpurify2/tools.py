@@ -401,12 +401,14 @@ def create_embedding(
     """
     os.environ["NUMBA_NUM_THREADS"] = "1"
     os.environ["THREADING_LAYER"] = "tbb"
+    init = "random" if data.shape[1] <= n_components else "spectral"
     reducer = umap.UMAP(
         n_components=n_components,
         metric=metric,
         min_dist=min_dist,
         n_neighbors=n_neighbors,
         set_op_mix_ratio=set_op_mix_ratio,
+        init=init,
         random_state=random_state,
     )
     return reducer.fit_transform(data)
