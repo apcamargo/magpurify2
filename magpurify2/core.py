@@ -232,9 +232,9 @@ class Taxonomy:
             for contig in self.contigs
         ]
         self.contig_taxonomy = self.get_contig_taxonomy(
-            taxonomy_dict, contig_min_fraction, allow_genus
+            fraction=contig_min_fraction, allow_genus=allow_genus
         )
-        self.genome_taxonomy = self.get_genome_taxonomy(genome_min_fraction)
+        self.genome_taxonomy = self.get_genome_taxonomy(fraction=genome_min_fraction)
         self.scores = self.compute_gene_agreement()
 
     def get_contig_taxonomy(self, fraction=0.75, allow_genus=False):
