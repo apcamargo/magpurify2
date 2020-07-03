@@ -89,18 +89,11 @@ def main(args):
         with gzip.open(coverage_data_file, "wb") as fout:
             pickle.dump((bam_signatures, coverage_dict), fout)
 
-    # Decide whether to use the single-sample mode () or the multi-sample mode ().
-    multi_sample = True if len(args.bam_files) > 1 else False
-    if multi_sample:
-        logger.info("Computing contig scores using the clustering approach (multi-sample mode).")
-    else:
-        logger.info("Computing contig scores using the maximum deviation approach (single-sample mode).")
-
+    logger.info("Computing contig scores.")
     mag_coverage_list = Parallel(n_jobs=args.threads)(
         delayed(Coverage)(
             mag,
             coverage_dict,
-            multi_sample,
             args.n_iterations,
             args.n_components,
             args.min_dist,

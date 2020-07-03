@@ -157,7 +157,6 @@ class Coverage:
         self,
         mag,
         coverage_dict,
-        multi_sample,
         n_iterations,
         n_components,
         min_dist,
@@ -176,7 +175,9 @@ class Coverage:
                 for contig in self.contigs
             ]
         )
-        if multi_sample:
+        selected_samples = self.coverages.mean(axis=0) >= 1
+        self.coverages = self.coverages[:, selected_samples]
+        if self.coverages.shape[1] > 1:
             self.scores = tools.get_cluster_score_from_embedding(
                 data=np.log1p(self.coverages),
                 lengths=self.lengths,
