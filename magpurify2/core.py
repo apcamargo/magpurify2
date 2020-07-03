@@ -187,10 +187,10 @@ class Coverage:
                 n_neighbors=n_neighbors,
                 set_op_mix_ratio=set_op_mix_ratio,
             )
-        elif self.coverages.shape[1] == 0:
-            self.scores = np.ones(len(self))
-        else:
+        elif self.coverages.shape[1] == 1:
             self.scores = self.identify_coverage_outliers(max_deviation)
+        else:
+            self.scores = np.ones(len(self))
 
     def identify_coverage_outliers(self, max_deviation=5.0):
         data = np.array(self.coverages).flatten()
