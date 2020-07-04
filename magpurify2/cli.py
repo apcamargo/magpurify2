@@ -380,7 +380,7 @@ def filter_parser(parser):
     )
     options.add_argument(
         "--coverage_threshold",
-        default=0.52,
+        default=0.5,
         type=float,
         help="Minimum score for a contig not to be flagged as a contaminant by the "
         "relative error method of the 'coverage' module.",
