@@ -206,7 +206,7 @@ class Coverage:
             weighted_medians = weighted_medians[selected_samples]
             deviation = selected_data / weighted_medians
             scores = 1 - np.abs(np.log(deviation + 1e-5) / np.log(25))
-            scores = np.average(scores, axis=1))
+            scores = np.average(scores, axis=1)
             scores[scores < 0] = 0
             return scores
 
