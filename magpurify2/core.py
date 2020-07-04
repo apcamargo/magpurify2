@@ -162,7 +162,6 @@ class Coverage:
         min_dist,
         n_neighbors,
         set_op_mix_ratio,
-        max_deviation,
     ):
         self.genome = mag.genome
         self.contigs = mag.contigs
@@ -175,9 +174,7 @@ class Coverage:
                 for contig in self.contigs
             ]
         )
-        selected_samples = self.coverages.mean(axis=0) >= 1
-        self.coverages = self.coverages[:, selected_samples]
-        if self.coverages.shape[1] > 1:
+        if self.coverages.shape[1] > 30:
             self.scores = tools.get_cluster_score_from_embedding(
                 data=np.log1p(self.coverages),
                 lengths=self.lengths,
@@ -187,27 +184,21 @@ class Coverage:
                 n_neighbors=n_neighbors,
                 set_op_mix_ratio=set_op_mix_ratio,
             )
-        elif self.coverages.shape[1] == 1:
-            self.scores = self.identify_coverage_outliers(max_deviation)
         else:
-            self.scores = np.ones(len(self))
+            self.scores = self.deviation_from_genome_coverage()
 
-    def identify_coverage_outliers(self, max_deviation=5.0):
-        data = np.array(self.coverages).flatten()
-        kernel = ss.gaussian_kde(data, weights=self.lengths)
-        data_kde = kernel(np.linspace(0, np.max(data), 1000))
-        peaks = find_peaks(data_kde, height=(None, None))
-        if len(peaks[0]):
-            threshold = (
-                peaks[0][np.argmax(peaks[1]["peak_heights"])] / 1000 * np.max(data)
-            )
-            limits = sorted([max_deviation * threshold, threshold / max_deviation])
-            scores = np.logical_and((data <= limits[1]), (data >= limits[0])).astype(
-                float
-            )
+    def deviation_from_genome_coverage(self):
+        weighted_medians = np.apply_along_axis(tools.weighted_median, 0, self.coverages, weights=self.lengths)
+        selected_samples = self.coverages.mean(axis=0) >= 0.5
+        if not selected_samples.sum():
+            return np.ones(len(self))
         else:
-            scores = np.ones(len(data))
-        return scores
+            selected_data = self.coverages[:, selected_samples]
+            weighted_medians = weighted_medians[selected_samples]
+            deviation = selected_data / weighted_medians
+            scores = 1 - np.abs(np.log10(deviation + 1e-5))
+            scores = scores.mean(axis=1)
+            return scores
 
     def __len__(self):
         return len(self.contigs)

@@ -218,12 +218,6 @@ def coverage_parser(parser):
         help="Interpolate between the union (1.0) and intersection (0.0) to combine the local simplicial sets (UMAP parameter).",
         type=float,
     )
-    options.add_argument(
-        "--max_deviation",
-        default=5.0,
-        help="Contigs with coverage greater than [max_deviation * coverage peak value] or less than [(1 / max_deviation) * coverage peak value] will be flagged as outliers. This parameter is used if a single BAM file is provided.",
-        type=float,
-    )
     other.add_argument(
         "-t",
         "--threads",
