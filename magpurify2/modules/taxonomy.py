@@ -51,6 +51,12 @@ def main(args):
     database = external.Database(args.database, logger)
     logger.info(f"Using database '{database.name}' version {database.version}.")
     tools.check_output_directory(args.output_directory, logger)
+    scores_directory = args.output_directory.joinpath("scores")
+    scores_directory.mkdir(exist_ok=True)
+    taxonomy_score_file = scores_directory.joinpath("taxonomy_scores.tsv")
+    contig_taxonomy_file = args.output_directory.joinpath("taxonomic_assignment.tsv")
+
+    # Read input genomes
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome, store_sequences=False) for genome in args.genomes]
 
@@ -103,10 +109,6 @@ def main(args):
         for mag in mag_list
     ]
     # Write contig score file
-    scores_directory = args.output_directory.joinpath("scores")
-    scores_directory.mkdir(exist_ok=True)
-    taxonomy_score_file = scores_directory.joinpath("taxonomy_scores.tsv")
-    contig_taxonomy_file = args.output_directory.joinpath("taxonomic_assignment.tsv")
     logger.info(
         f"Writing output to: '{taxonomy_score_file} and '{contig_taxonomy_file}'."
     )

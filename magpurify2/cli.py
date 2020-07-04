@@ -170,7 +170,9 @@ def composition_parser(parser):
 def coverage_parser(parser):
     parser.set_defaults(func=magpurify2.coverage.main)
     required = parser.add_argument_group("Required arguments")
-    options = parser.add_argument_group("Data processing options")
+    bam_options = parser.add_argument_group("BAM parsing options")
+    rel_error_options = parser.add_argument_group("Relative error method options")
+    clustering_options = parser.add_argument_group("Clustering method options")
     other = parser.add_argument_group("Other options")
     required.add_argument(
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
@@ -185,46 +187,53 @@ def coverage_parser(parser):
         help="Input sorted BAM files.",
         type=Path,
     )
-    options.add_argument(
+    bam_options.add_argument(
         "--min_identity",
         default=0.97,
         help="Exclude reads by overall identity to the reference sequences.",
         type=float,
     )
-    options.add_argument(
+    rel_error_options.add_argument(
         "--min_average_coverage",
         default=0.5,
         help="Ignore samples where the average genome coverage is less than "
         "`min_average_coverage`.",
         type=float,
     )
-    options.add_argument(
+    other.add_argument(
+        "--use_clustering",
+        help="Activate the clustering method to detect contaminants. Recommended when 5 "
+        "or more data points (BAM files) are available. Results might be unreliable "
+        "if few samples are provided.",
+        action="store_true",
+    )
+    clustering_options.add_argument(
         "--n_iterations",
         default=4,
         help="Number of iterations of data embedding and cluster selection with "
         "different seeds.",
         type=int,
     )
-    options.add_argument(
+    clustering_options.add_argument(
         "--n_components",
         default=3,
         help="The dimension of the space to embed the data into (UMAP parameter).",
         type=int,
     )
-    options.add_argument(
+    clustering_options.add_argument(
         "--min_dist",
         default=0.15,
         help="The effective minimum distance between embedded points (UMAP parameter).",
         type=float,
     )
-    options.add_argument(
+    clustering_options.add_argument(
         "--n_neighbors",
         default=15,
         help="The size of local neighborhood used for manifold approximation "
         "(UMAP parameter).",
         type=int,
     )
-    options.add_argument(
+    clustering_options.add_argument(
         "--set_op_mix_ratio",
         default=0.3,
         help="Interpolate between the union (1.0) and intersection (0.0) to combine the "

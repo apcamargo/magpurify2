@@ -157,6 +157,8 @@ class Coverage:
         self,
         mag,
         coverage_dict,
+        min_average_coverage,
+        use_clustering,
         n_iterations,
         n_components,
         min_dist,
@@ -174,7 +176,8 @@ class Coverage:
                 for contig in self.contigs
             ]
         )
-        if self.coverages.shape[1] > 30:
+        self.use_clustering = use_clustering
+        if self.use_clustering:
             self.scores = tools.get_cluster_score_from_embedding(
                 data=np.log1p(self.coverages),
                 lengths=self.lengths,
@@ -185,11 +188,13 @@ class Coverage:
                 set_op_mix_ratio=set_op_mix_ratio,
             )
         else:
-            self.scores = self.deviation_from_genome_coverage()
+            self.scores = self.log_relative_error_scores(min_average_coverage)
 
-    def deviation_from_genome_coverage(self):
-        weighted_medians = np.apply_along_axis(tools.weighted_median, 0, self.coverages, weights=self.lengths)
-        selected_samples = self.coverages.mean(axis=0) >= 0.5
+    def log_relative_error_scores(self, min_average_coverage):
+        weighted_medians = np.apply_along_axis(
+            tools.weighted_median, 0, self.coverages, weights=self.lengths
+        )
+        selected_samples = self.coverages.mean(axis=0) >= min_average_coverage
         if not selected_samples.sum():
             return np.ones(len(self))
         else:

@@ -45,6 +45,11 @@ def main(args):
         )
         sys.exit(1)
     tools.check_output_directory(args.output_directory, logger)
+    scores_directory = args.output_directory.joinpath("scores")
+    scores_directory.mkdir(exist_ok=True)
+    codon_usage_score_file = scores_directory.joinpath("codon_usage_scores.tsv")
+
+    # Read input genomes
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome, store_sequences=False) for genome in args.genomes]
 
@@ -62,8 +67,5 @@ def main(args):
         for mag in mag_list
     ]
     # Write contig score file
-    scores_directory = args.output_directory.joinpath("scores")
-    scores_directory.mkdir(exist_ok=True)
-    codon_usage_score_file = scores_directory.joinpath("codon_usage_scores.tsv")
     logger.info(f"Writing output to: '{codon_usage_score_file}'.")
     tools.write_contig_score_output(mag_codon_usage_list, codon_usage_score_file)

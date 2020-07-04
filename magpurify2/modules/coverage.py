@@ -34,6 +34,9 @@ def main(args):
     args.contig_min_fraction = tools.validade_input(
         args.min_identity, "min_identity", [0.0, 1.0], logger
     )
+    args.min_average_coverage = tools.validade_input(
+        args.min_average_coverage, "min_average_coverage", [0, 999], logger
+    )
     args.n_iterations = tools.validade_input(
         args.n_iterations, "n_iterations", [1, 999], logger
     )
@@ -48,6 +51,15 @@ def main(args):
     )
     tools.check_bam_files(args.bam_files, logger)
     tools.check_output_directory(args.output_directory, logger)
+    scores_directory = args.output_directory.joinpath("scores")
+    scores_directory.mkdir(exist_ok=True)
+    coverage_score_file = scores_directory.joinpath("coverage_scores.tsv")
+    if args.use_clustering:
+        coverage_clust_score_file = scores_directory.joinpath("coverage_clust_scores.tsv")
+    else:
+        coverage_clust_score_file = None
+
+    # Read input genomes
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome, store_sequences=False) for genome in args.genomes]
     coverage_data_file = args.output_directory.joinpath("coverages.pickle.gz")
@@ -86,11 +98,13 @@ def main(args):
         with gzip.open(coverage_data_file, "wb") as fout:
             pickle.dump((bam_signatures, coverage_dict), fout)
 
-    logger.info("Computing contig scores.")
+    logger.info("Computing contig scores (relative error method).")
     mag_coverage_list = Parallel(n_jobs=args.threads)(
         delayed(Coverage)(
             mag,
             coverage_dict,
+            args.min_average_coverage,
+            False,
             args.n_iterations,
             args.n_components,
             args.min_dist,
@@ -99,8 +113,29 @@ def main(args):
         )
         for mag in mag_list
     )
-    scores_directory = args.output_directory.joinpath("scores")
-    scores_directory.mkdir(exist_ok=True)
-    coverage_score_file = scores_directory.joinpath("coverage_scores.tsv")
     logger.info(f"Writing output to: '{coverage_score_file}'.")
     tools.write_contig_score_output(mag_coverage_list, coverage_score_file)
+
+    if args.use_clustering:
+        if len(args.bam_files) == 1:
+            logger.warning(
+                "The clustering method will output unreliable results when a "
+                "single data point (BAM file) is provided."
+            )
+        logger.info("Computing contig scores (clustering method).")
+        mag_coverage_list = Parallel(n_jobs=args.threads)(
+            delayed(Coverage)(
+                mag,
+                coverage_dict,
+                args.min_average_coverage,
+                args.use_clustering,
+                args.n_iterations,
+                args.n_components,
+                args.min_dist,
+                args.n_neighbors,
+                args.set_op_mix_ratio,
+            )
+            for mag in mag_list
+        )
+        logger.info(f"Writing output to: '{coverage_clust_score_file}'.")
+        tools.write_contig_score_output(mag_coverage_list, coverage_clust_score_file)

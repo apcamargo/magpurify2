@@ -43,6 +43,11 @@ def main(args):
         args.set_op_mix_ratio, "set_op_mix_ratio", [0.0, 1.0], logger
     )
     tools.check_output_directory(args.output_directory, logger)
+    scores_directory = args.output_directory.joinpath("scores")
+    scores_directory.mkdir(exist_ok=True)
+    composition_score_file = scores_directory.joinpath("composition_scores.tsv")
+
+    # Read input genomes
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome) for genome in args.genomes]
     composition_data_file = args.output_directory.joinpath("tnfs.pickle.gz")
@@ -84,8 +89,5 @@ def main(args):
         for mag in mag_list
     )
     # Write contig score file
-    scores_directory = args.output_directory.joinpath("scores")
-    scores_directory.mkdir(exist_ok=True)
-    composition_score_file = scores_directory.joinpath("composition_scores.tsv")
     logger.info(f"Writing output to: '{composition_score_file}'.")
     tools.write_contig_score_output(mag_composition_list, composition_score_file)
