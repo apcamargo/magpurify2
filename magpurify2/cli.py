@@ -365,6 +365,13 @@ def filter_parser(parser):
         type=Path,
     )
     options.add_argument(
+        "--codon_usage",
+        default=0.8,
+        type=float,
+        help="Minimum score for a contig not to be flagged as a contaminant by the "
+        "'codon_usage' module.",
+    )
+    options.add_argument(
         "--composition_threshold",
         default=0.15,
         type=float,
@@ -373,10 +380,17 @@ def filter_parser(parser):
     )
     options.add_argument(
         "--coverage_threshold",
+        default=0.52,
+        type=float,
+        help="Minimum score for a contig not to be flagged as a contaminant by the "
+        "relative error method of the 'coverage' module.",
+    )
+    options.add_argument(
+        "--coverage_clustering_threshold",
         default=0.15,
         type=float,
         help="Minimum score for a contig not to be flagged as a contaminant by the "
-        "'coverage' module.",
+        "clustering method of the 'coverage' module.",
     )
     options.add_argument(
         "--taxonomy_threshold",

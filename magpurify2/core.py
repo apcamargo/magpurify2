@@ -66,7 +66,7 @@ class CodonUsage:
             self.cds.append(cds)
             self.cds_sequences.append(cds_sequence)
         self.delta_cai = self.get_delta_cai()
-        self.scores = self.identify_codon_usage_outliers(min_genes, stringency)
+        self.scores = self.compute_codon_usage_scores(min_genes, stringency)
 
     def get_delta_cai(self, quantile=0.25):
         cds_sequences = np.array(self.cds_sequences)
@@ -78,40 +78,44 @@ class CodonUsage:
         new_cai_list = tools.get_cai(cds_sequences, new_codon_index)
         return new_cai_list - cai_list
 
-    def identify_codon_usage_outliers(self, min_genes, stringency):
+    def compute_codon_usage_scores(self, min_genes, stringency):
         contig_delta_cai = defaultdict(list)
         for cds, delta_cai in zip(self.cds, self.delta_cai):
             contig, _ = cds.rsplit("_", 1)
             contig_delta_cai[contig].append(delta_cai)
-        kept_contigs, n_genes, mean_contig_cai = [], [], []
+        kept_contigs, n_genes, mean_contig_delta_cai = [], [], []
         for contig, delta_cai_list in contig_delta_cai.items():
             if len(delta_cai_list) >= min_genes:
                 kept_contigs.append(contig)
-                mean_contig_cai.append(np.mean(delta_cai_list))
+                mean_contig_delta_cai.append(np.mean(delta_cai_list))
                 n_genes.append(len(delta_cai_list))
-        unit_mean_contig_cai = tools.zscore(mean_contig_cai, unit_interval=True)
-        kernel = ss.gaussian_kde(unit_mean_contig_cai, weights=n_genes)
-        contig_cai_kde = kernel(np.linspace(0, 1, 1000))
+        unit_mean_contig_delta_cai = tools.zscore(
+            mean_contig_delta_cai, unit_interval=True
+        )
+        kernel = ss.gaussian_kde(unit_mean_contig_delta_cai, weights=n_genes)
+        contig_delta_cai_kde = kernel(np.linspace(0, 1, 1000))
         # Find the deepest valley in the KDE.
-        valleys = find_peaks(-contig_cai_kde, prominence=(0.05, None))
+        valleys = find_peaks(-contig_delta_cai_kde, prominence=(0.05, None))
         if len(valleys[0]):
             max_valley = valleys[0][np.argmax(valleys[1]["prominences"])] / 1000
         else:
             return np.ones(len(self))
         # Find the highest peak, where the non-contaminant contigs are concentrated.
-        peaks = find_peaks(contig_cai_kde, height=(None, None))
+        peaks = find_peaks(contig_delta_cai_kde, height=(None, None))
         if len(peaks[0]):
             max_peak = peaks[0][np.argmax(peaks[1]["peak_heights"])] / 1000
         else:
             return np.ones(len(self))
+        divisor = np.abs(max_peak - max_valley)
         if max_peak > max_valley:
-            threshold = max_valley - np.abs(max_peak - max_valley) * stringency
-            scores = (unit_mean_contig_cai >= threshold).astype(float)
+            kept_scores = 1 - (max_valley - unit_mean_contig_delta_cai) / divisor
         else:
-            threshold = max_valley + np.abs(max_peak - max_valley) * stringency
-            scores = (unit_mean_contig_cai <= threshold).astype(float)
-        contig_score_dict = dict(zip(kept_contigs, scores))
-        return np.array([contig_score_dict.get(contig, 0.0) for contig in self.contigs])
+            kept_scores = 1 - (unit_mean_contig_delta_cai - max_valley) / divisor
+        contig_score_dict = dict(zip(kept_contigs, kept_scores))
+        scores = np.array([contig_score_dict.get(contig, 1.0) for contig in self.contigs])
+        scores[scores > 1] = 1
+        scores[scores < 0] = 0
+        return scores
 
     def __len__(self):
         return len(self.contigs)
@@ -201,8 +205,9 @@ class Coverage:
             selected_data = self.coverages[:, selected_samples]
             weighted_medians = weighted_medians[selected_samples]
             deviation = selected_data / weighted_medians
-            scores = 1 - np.abs(np.log10(deviation + 1e-5))
+            scores = 1 - np.abs(np.log(deviation + 1e-5) / np.log(25))
             scores = scores.mean(axis=1)
+            scores[scores < 0] = 0
             return scores
 
     def __len__(self):
