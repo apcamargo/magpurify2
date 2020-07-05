@@ -195,7 +195,7 @@ def coverage_parser(parser):
     )
     rel_error_options.add_argument(
         "--min_average_coverage",
-        default=0.5,
+        default=1.0,
         help="Ignore samples where the average genome coverage is less than "
         "`min_average_coverage`.",
         type=float,
@@ -373,7 +373,7 @@ def filter_parser(parser):
     )
     options.add_argument(
         "--coverage_threshold",
-        default=0.5,
+        default=0.55,
         type=float,
         help="Minimum score for a contig not to be flagged as a contaminant by the "
         "relative error method of the 'coverage' module.",
