@@ -200,7 +200,7 @@ def coverage_parser(parser):
         "`min_average_coverage`.",
         type=float,
     )
-    other.add_argument(
+    clustering_options.add_argument(
         "--use_clustering",
         help="Activate the clustering method to detect contaminants. Recommended when 5 "
         "or more data points (BAM files) are available. Results might be unreliable "
