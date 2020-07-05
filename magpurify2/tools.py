@@ -243,6 +243,21 @@ def read_fasta(filepath):
 
 
 def weighted_median(data, weights):
+    """
+    Computes the weighted median of the input data.
+
+    Parameters
+    ----------
+    data : array-like
+        Data vector whose weighted median will be computed.
+    weights : array-like
+        An array of weights associated with the values in the input data.
+
+    Returns
+    -------
+    ndarray
+        Weighted median of the input data.
+    """
     data, weights = np.array(data).squeeze(), np.array(weights).squeeze()
     s_data, s_weights = map(np.array, zip(*sorted(zip(data, weights))))
     midpoint = 0.5 * sum(s_weights)
@@ -260,7 +275,7 @@ def weighted_median(data, weights):
 
 def zscore(data, unit_interval=True):
     """
-    Trans
+    Standardize the input data and optionally put it into the unit interval.
 
     Parameters
     ----------
