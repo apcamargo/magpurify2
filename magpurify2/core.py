@@ -59,12 +59,16 @@ class CodonUsage:
     def __init__(self, mag, min_genes, prodigal_fna_filepath):
         self.genome = mag.genome
         self.contigs = mag.contigs
+        self.lengths = mag.lengths
         self.cds = []
         self.cds_sequences = []
-        self.lengths = []
+        n_genes_dict = defaultdict(int)
         for cds, _, cds_sequence in tools.read_fasta(prodigal_fna_filepath):
             self.cds.append(cds)
             self.cds_sequences.append(cds_sequence)
+            contig, _ = cds.rsplit("_", 1)
+            n_genes_dict[contig] += 1
+        self.n_genes = np.array([n_genes_dict.get(contig, 0) for contig in self.contigs])
         self.delta_cai = self.get_delta_cai()
         self.scores = self.compute_codon_usage_scores(min_genes)
 
@@ -83,16 +87,13 @@ class CodonUsage:
         for cds, delta_cai in zip(self.cds, self.delta_cai):
             contig, _ = cds.rsplit("_", 1)
             contig_delta_cai[contig].append(delta_cai)
-        kept_contigs, n_genes, mean_contig_delta_cai = [], [], []
-        for contig, delta_cai_list in contig_delta_cai.items():
-            if len(delta_cai_list) >= min_genes:
-                kept_contigs.append(contig)
-                mean_contig_delta_cai.append(np.mean(delta_cai_list))
-                n_genes.append(len(delta_cai_list))
-        unit_mean_contig_delta_cai = tools.zscore(
-            mean_contig_delta_cai, unit_interval=True
-        )
-        kernel = ss.gaussian_kde(unit_mean_contig_delta_cai, weights=n_genes)
+        kept_contigs = np.array(self.contigs)[self.n_genes >= min_genes]
+        kept_n_genes = self.n_genes[self.n_genes >= min_genes]
+        mean_contig_delta_cai = [
+            np.average(contig_delta_cai[contig]) for contig in kept_contigs
+        ]
+        mean_contig_delta_cai = tools.zscore(mean_contig_delta_cai, unit_interval=True)
+        kernel = ss.gaussian_kde(mean_contig_delta_cai, weights=kept_n_genes)
         contig_delta_cai_kde = kernel(np.linspace(0, 1, 1000))
         # Find the deepest valley in the KDE.
         valleys = find_peaks(-contig_delta_cai_kde, prominence=(0.05, None))
@@ -108,9 +109,9 @@ class CodonUsage:
             return np.ones(len(self))
         divisor = np.abs(max_peak - max_valley)
         if max_peak > max_valley:
-            kept_scores = 1 - (max_valley - unit_mean_contig_delta_cai) / divisor
+            kept_scores = 1 - (max_valley - mean_contig_delta_cai) / divisor
         else:
-            kept_scores = 1 - (unit_mean_contig_delta_cai - max_valley) / divisor
+            kept_scores = 1 - (mean_contig_delta_cai - max_valley) / divisor
         contig_score_dict = dict(zip(kept_contigs, kept_scores))
         scores = np.array([contig_score_dict.get(contig, 1.0) for contig in self.contigs])
         scores[scores > 1] = 1
