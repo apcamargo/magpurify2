@@ -31,7 +31,6 @@ from magpurify2.core import Mag, CodonUsage
 def main(args):
     logger = logging.getLogger("timestamp")
     args.min_genes = tools.validade_input(args.min_genes, "min_genes", [1, 999], logger)
-    args.stringency = tools.validade_input(args.stringency, "stringency", [0, 1], logger)
     # Check if Prodigal is an executable in the user PATH.
     missing_executables = [
         executable
@@ -61,7 +60,6 @@ def main(args):
         CodonUsage(
             mag,
             args.min_genes,
-            args.stringency,
             prodigal_output_directory.joinpath(mag.genome + "_genes.fna"),
         )
         for mag in mag_list

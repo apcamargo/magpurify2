@@ -56,7 +56,7 @@ class Mag:
 
 
 class CodonUsage:
-    def __init__(self, mag, min_genes, stringency, prodigal_fna_filepath):
+    def __init__(self, mag, min_genes, prodigal_fna_filepath):
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.cds = []
@@ -66,7 +66,7 @@ class CodonUsage:
             self.cds.append(cds)
             self.cds_sequences.append(cds_sequence)
         self.delta_cai = self.get_delta_cai()
-        self.scores = self.compute_codon_usage_scores(min_genes, stringency)
+        self.scores = self.compute_codon_usage_scores(min_genes)
 
     def get_delta_cai(self, quantile=0.25):
         cds_sequences = np.array(self.cds_sequences)
@@ -78,7 +78,7 @@ class CodonUsage:
         new_cai_list = tools.get_cai(cds_sequences, new_codon_index)
         return new_cai_list - cai_list
 
-    def compute_codon_usage_scores(self, min_genes, stringency):
+    def compute_codon_usage_scores(self, min_genes):
         contig_delta_cai = defaultdict(list)
         for cds, delta_cai in zip(self.cds, self.delta_cai):
             contig, _ = cds.rsplit("_", 1)

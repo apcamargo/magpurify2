@@ -274,13 +274,6 @@ def codon_usage_parser(parser):
         "flagged as contaminants.",
         type=int,
     )
-    options.add_argument(
-        "--stringency",
-        default=0.2,
-        help="Controls how stringent is the contaminant detection. Must be between 0 and "
-        "1.",
-        type=float,
-    )
     other.add_argument(
         "-t",
         "--threads",
