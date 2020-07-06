@@ -273,39 +273,6 @@ def weighted_median(data, weights):
     return w_median
 
 
-def zscore(data, unit_interval=True):
-    """
-    Standardize the input data and optionally put it into the unit interval.
-
-    Parameters
-    ----------
-    data : array-like
-        Data vector that will be standardized.
-    unit_interval : bool, default True
-        Transform the computed value so it lies in the [0,1] range.
-
-    Returns
-    -------
-    ndarray
-        Standardized data.
-    """
-    n = len(data)
-    data = np.array(data)
-    if n == 1:
-        return np.array([0.0])
-    else:
-        std = np.std(data, ddof=1)
-        if std == 0:
-            return np.zeros(n)
-        else:
-            zs = (data - np.mean(data)) / std
-            if unit_interval:
-                max_zs = (n - 1) / np.sqrt(n)
-                return (zs + max_zs) / (2 * max_zs)
-            else:
-                return zs
-
-
 def check_prediction(genome_list, output_directory):
     """
     Checks which genomes have been processed by Prodigal and which ones still

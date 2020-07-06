@@ -92,11 +92,18 @@ class CodonUsage:
         mean_contig_delta_cai = [
             np.average(contig_delta_cai[contig]) for contig in kept_contigs
         ]
-        mean_contig_delta_cai = tools.zscore(mean_contig_delta_cai, unit_interval=True)
+        # Scale the data and take the average between it and 0.5. This will bring the
+        # points closer to the center and will give the KDE some space to breathe.
+        mean_contig_delta_cai = np.array(mean_contig_delta_cai)
+        mean_contig_delta_cai = (mean_contig_delta_cai - mean_contig_delta_cai.min()) / (
+            mean_contig_delta_cai.max() - mean_contig_delta_cai.min()
+        )
+        mean_contig_delta_cai = np.average(mean_contig_delta_cai, 0.5)
+
         kernel = ss.gaussian_kde(mean_contig_delta_cai, weights=kept_n_genes)
         contig_delta_cai_kde = kernel(np.linspace(0, 1, 1000))
         # Find the deepest valley in the KDE.
-        valleys = find_peaks(-contig_delta_cai_kde, prominence=(0.05, None))
+        valleys = find_peaks(-contig_delta_cai_kde, prominence=(0.035, None))
         if len(valleys[0]):
             max_valley = valleys[0][np.argmax(valleys[1]["prominences"])] / 1000
         else:
