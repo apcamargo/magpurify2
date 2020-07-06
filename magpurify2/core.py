@@ -98,9 +98,8 @@ class CodonUsage:
         mean_contig_delta_cai = (mean_contig_delta_cai - mean_contig_delta_cai.min()) / (
             mean_contig_delta_cai.max() - mean_contig_delta_cai.min()
         )
-        mean_contig_delta_cai = np.average(mean_contig_delta_cai, 0.5)
-
-        kernel = ss.gaussian_kde(mean_contig_delta_cai, weights=kept_n_genes)
+        mean_contig_delta_cai = (mean_contig_delta_cai + 0.5) / 2
+        kernel = ss.gaussian_kde(mean_contig_delta_cai)
         contig_delta_cai_kde = kernel(np.linspace(0, 1, 1000))
         # Find the deepest valley in the KDE.
         valleys = find_peaks(-contig_delta_cai_kde, prominence=(0.035, None))
@@ -108,10 +107,16 @@ class CodonUsage:
             max_valley = valleys[0][np.argmax(valleys[1]["prominences"])] / 1000
         else:
             return np.ones(len(self))
-        # Find the highest peak, where the non-contaminant contigs are concentrated.
+        # Compute the KDE again using the number of genes per contig as weight. Then, find
+        # the highest peak, where the non-contaminant contigs are concentrated.
+        kernel = ss.gaussian_kde(mean_contig_delta_cai, weights=kept_n_genes)
+        contig_delta_cai_kde = kernel(np.linspace(0, 1, 1000))
         peaks = find_peaks(contig_delta_cai_kde, height=(None, None))
-        if len(peaks[0]):
-            max_peak = peaks[0][np.argmax(peaks[1]["peak_heights"])] / 1000
+        if len(peaks[0]) >= 2:
+            max_peak = peaks[0][np.argsort(peaks[1]["peak_heights"])[-1]] / 1000
+            second_peak = peaks[0][np.argsort(peaks[1]["peak_heights"])[-2]] / 1000
+            if np.abs(max_peak - second_peak) < 0.175:
+                return np.ones(len(self))
         else:
             return np.ones(len(self))
         divisor = np.abs(max_peak - max_valley)
@@ -206,6 +211,7 @@ class Coverage:
         weighted_medians = np.apply_along_axis(
             tools.weighted_median, 0, self.coverages, weights=self.lengths
         )
+        print(self.coverages.mean(axis=0))
         selected_samples = self.coverages.mean(axis=0) >= min_average_coverage
         if not selected_samples.sum():
             return np.ones(len(self))
