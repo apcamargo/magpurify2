@@ -9,6 +9,15 @@ module.exports = {
     sidebar: {
       '/docs/': [
         '',
+        {
+          title: 'Theory',
+          collapsable: false,
+          children: [
+            '',
+            '/theory/composition',
+            '/theory/coverage',
+          ]
+        },
         'installation',
         'usage',
       ]
