@@ -37,7 +37,9 @@ BAM files store reads that map to the target metagenome or MAG and are processed
 ```
 $ mkdir bt2
 $ bowtie2-build --threads 4 metagenome.fna bt2/metagenome.fna
-$ bowtie2 --threads 6 -x bt2/metagenome.fna -1 sample1_R1.fastq.gz -2 sample1_R2.fastq.gz | samtools sort -@ 6 -o sample1.bam -
+$ bowtie2 --threads 6 -x bt2/metagenome.fna \
+  -1 sample1_R1.fastq.gz -2 sample1_R2.fastq.gz \
+  | samtools sort -@ 6 -o sample1.bam -
 ```
 
 We reccomend mapping the reads to the metagenome and not directly to the MAGs and this is because of two factors:
