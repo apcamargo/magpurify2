@@ -13,7 +13,6 @@ module.exports = {
           title: 'Theory',
           collapsable: false,
           children: [
-            '',
             'composition',
             'coverage',
           ]
