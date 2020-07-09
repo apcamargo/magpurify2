@@ -211,7 +211,6 @@ class Coverage:
         weighted_medians = np.apply_along_axis(
             tools.weighted_median, 0, self.coverages, weights=self.lengths
         )
-        print(self.coverages.mean(axis=0))
         selected_samples = self.coverages.mean(axis=0) >= min_average_coverage
         if not selected_samples.sum():
             return np.ones(len(self))
