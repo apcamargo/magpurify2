@@ -14,8 +14,8 @@ module.exports = {
           collapsable: false,
           children: [
             '',
-            '/theory/composition',
-            '/theory/coverage',
+            'composition',
+            'coverage',
           ]
         },
         'installation',
