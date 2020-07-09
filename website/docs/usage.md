@@ -28,3 +28,11 @@ optional arguments:
                         Number of threads to use. All by default. (default: 4)
   --quiet               Suppress the logger output (default: False)
 ```
+
+## The `coverage` module
+
+::: tip How to generate the BAM files
+BAM files store reads that map to the target metagenome or MAG and are processed by MAGpurify2 to obtain the coverage data for each contig. To generate BAM files ready to be used by MAGpurify2 you should first map your reads to the complete metagenome using a proper tool (such as [Bowtie 2](https://github.com/BenLangmead/bowtie2), [minimap2](https://github.com/lh3/minimap2) or [BWA-MEM](https://github.com/lh3/bwa)) and then sort the output using [samtools](https://github.com/samtools/samtools). We reccomend mapping the reads to the metagenome and not directly to the MAGs and this is because of two factors:
+- When you map the reads into the MAG a read that was originated from the sequencing of a closely related genome might be erroneously aligned to the MAG (cross-mapping), introducing bias to the coverage estimation.
+- Metagenome-wide mappings can be used to estimate the coverage of all the contigs in the metagenome, thus allowing MAGpurify2 to process multiple MAGs in a single execution.
+:::
