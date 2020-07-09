@@ -34,7 +34,7 @@ optional arguments:
 ::: tip How to generate the BAM files
 BAM files store reads that map to the target metagenome or MAG and are processed by MAGpurify2 to estimate the coverage of each contig. To generate the BAM required by MAGpurify2 you should first map your reads to the complete metagenome using a proper tool (such as [Bowtie 2](https://github.com/BenLangmead/bowtie2), [minimap2](https://github.com/lh3/minimap2) or [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2)) and then convert and sort the output using [samtools](https://github.com/samtools/samtools).
 
-```
+```bash
 $ mkdir bt2
 $ bowtie2-build --threads 4 metagenome.fna bt2/metagenome.fna
 $ bowtie2 --threads 6 -x bt2/metagenome.fna \

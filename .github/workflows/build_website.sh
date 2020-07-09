@@ -2,5 +2,5 @@
 set -e
 
 # Install yarn and build website
-yarn global add vuepress@1.4.1
+yarn global add vuepress@1.5.2
 yarn --cwd ./website website:build
