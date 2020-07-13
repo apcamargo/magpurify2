@@ -235,7 +235,7 @@ def coverage_parser(parser):
     )
     clustering_options.add_argument(
         "--set_op_mix_ratio",
-        default=0.6,
+        default=0.4,
         help="Interpolate between the union (1.0) and intersection (0.0) to combine the "
         "local simplicial sets (UMAP parameter).",
         type=float,
