@@ -6,6 +6,7 @@ module.exports = {
         { text: 'Repository', link: 'https://github.com/apcamargo/magpurify2' },
     ],
     displayAllHeaders: true,
+    sidebarDepth: 0,
     sidebar: {
       '/docs/': [
         '',
