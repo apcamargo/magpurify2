@@ -12,7 +12,7 @@ To identify putative contaminants within a genomic bin, MAGpurify2: (1) computes
 
 ### TNF profile estimation
 
-The four canonical DNA bases (A, T, C and G) can produce $4^4 = 256$ distinct 4-mers.
+The four canonical DNA bases (A, T, C and G) can produce $4^4=256$ distinct 4-mers.
 
 ::: warning
 Short contigs contain a reduced number of 4-mers and thus display greater data variance and statistical uncertainty than longer contigs. That is one of the reasons that most binners filter out contigs shorter than a set threshold (usually around 2,000 bp). MAGpurify2 currently doesn't take into account the length-dependent uncertainty of TNF estimation when identifying putative contaminants.
