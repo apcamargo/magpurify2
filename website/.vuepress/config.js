@@ -13,8 +13,8 @@ module.exports = {
           title: 'Theory',
           collapsable: false,
           children: [
-            'composition',
-            'coverage',
+            'composition-theory',
+            'coverage-theory',
           ]
         },
         'installation',
@@ -23,6 +23,12 @@ module.exports = {
     }
   },
   plugins: [
-    'vuepress-plugin-element-tabs',
+    'vuepress-plugin-mathjax',
+    {
+      target: 'svg',
+      macros: {
+        '*': '\\times',
+      },
+    },
   ],
 }
