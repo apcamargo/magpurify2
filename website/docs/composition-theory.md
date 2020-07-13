@@ -10,9 +10,14 @@ MAGpurify2 processes each genomic bin individually and finds potential contamina
 
 To identify putative contaminants within a genomic bin, MAGpurify2: (1) computes the TNF profile of each contig, (2) embbeds data points into a low-dimentional space using a non-linear transformation, and (3) finds the "core cluster" and computes each contig score.
 
-The four canonical DNA bases (A, T, C and G) can produce 256 distinct 4-mers, however in a strand-independent analysis reverse complement k-mers (eg.: `TTAC` and `GTAA`) are redundant and should be count as a single entity in order to reduce memory usage and data variance. Thus, MAGpurify2 counts the relative frequencies of 136 canonical 4-mers for each contig within the bin.
+![tnf-embedding](./tnf-embedding.png)
+
+The four canonical DNA bases (A, T, C and G) can produce 256 distinct 4-mers, however, in a strand-independent analysis, reverse complement k-mers (eg.: `TTAC` and `GTAA`) are redundant and should be count as a single entity in order to reduce memory usage and data variance. Thus, MAGpurify2 counts the relative frequencies of 136 canonical 4-mers for each contig within the bin.
 
 ::: warning TNF profile of short sequences
 Short contigs contain a reduced number of 4-mers and thus display greater data variance and statistical uncertainty than longer contigs. That is one of the reasons that most binners filter out contigs shorter than a set threshold (usually around 2,000 bp). MAGpurify2 currently doesn't take into account the length-dependent uncertainty of TNF estimation when identifying putative contaminants.
 :::
 
+The high dimensional 4-mer frequency data is then non-linearly projected into a three dimensional space using the [UMAP](https://umap-learn.readthedocs.io/en/latest/) algorithm, which will bring similar data points together and distance contigs with distinct TNF profiles. Next, [hdbscan](https://hdbscan.readthedocs.io/en/latest/) is used to identify clusters within the UMAP embedding and, if at least one cluster is found, compute the membership of each contig to the "core cluster". The "core cluster" is defined as the cluster that emcompassess the largest assembled fraction, that is, the sum of the lengths of all the contigs within the cluster.
+
+As UMAP is a non-deterministic algorithm, MAGpurify2 executes multiple iterations of the dimension reduction and clustering steps. The final contig score correspond to the average of its membership to the "core cluster" across the iterations.
