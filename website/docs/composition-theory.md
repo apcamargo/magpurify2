@@ -1,8 +1,3 @@
----
-mathjax:
-  presets: '\def\lr#1#2#3{\left#1#2\right#3}'
----
-
 # Composition module
 
 Contigs assembled from reads derived from the same genome or from genomes of close organisms tend to display a similar sequence composition profile, represented as k-mer frequencies. Thus, metagenomic binners use 4-mer frequencies, or tetranucleotide frequencies (TNFs), to cluster contigs into putative genomic bins.

@@ -23,12 +23,10 @@ module.exports = {
     }
   },
   plugins: [
-    'vuepress-plugin-mathjax',
+    'md-enhance',
     {
-      target: 'svg',
-      macros: {
-        '*': '\\times',
-      },
+      // Enable Tex Support
+      tex: true,
     },
   ],
 }
