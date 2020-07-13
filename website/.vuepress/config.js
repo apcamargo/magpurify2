@@ -22,7 +22,7 @@ module.exports = {
       ]
     }
   },
-  plugin: [
+  plugins: [
     'md-enhance',
     {
       tex: true,
