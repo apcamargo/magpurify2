@@ -3,7 +3,7 @@
 Contigs assembled from reads derived from the same genome or from genomes of closely related organisms tend to display a similar sequence composition profile, represented as k-mer frequencies. Metagenomic binners exploit this property to cluster contigs into putative genomic bins using 4-mer frequencies, or tetranucleotide frequencies (TNFs).
 
 ::: tip Genomic islands and plasmids
-Mobile genetic elements such as genomic islands and plasmids usually have a 4-mer composition that is distinct from the majority of the genome, making them problematic for binning algorithms. As a consequence, these elements are usually not recovered in genomic bins.
+Mobile genetic elements such as genomic islands and plasmids usually have a 4-mer composition that is distinct from the majority of the genome, making them problematic for binning algorithms. As a consequence, these elements are usually not retrieved in genomic bins.
 :::
 
 Whether or not two given contigs will be clustered into the same genomic bin does not depend exclusively on their TNF profiles. In most modern clustering algorithms local relationships are influenced by other data points, meaning that a given pair of contigs may end up in the same bin or not, depending on the full set contigs that is being clustered. Moreover, most binners also use sequencing coverage information in addition to TNF data to cluster contigs, which may lead to genomic bins that encompass contigs with distinct TNF profiles.
@@ -24,6 +24,6 @@ Short contigs contain a reduced number of 4-mers and therefore provide less reli
 MAGpurify2 currently does not take into account the length-dependent statistical uncertainty of the TNF estimation when identifying putative contaminants.
 :::
 
-The high dimensional 4-mer frequency data is then non-linearly projected into a three dimensional space using the [UMAP](https://umap-learn.readthedocs.io/en/latest/) algorithm, which will bring similar data points together and distance contigs with distinct TNF profiles. Next, [hdbscan](https://hdbscan.readthedocs.io/en/latest/) is used to identify clusters within the UMAP embedding and, if at least one cluster is found, compute the membership of each contig to the "core cluster". The "core cluster" is defined as the cluster that emcompassess the largest assembled fraction, that is, the sum of the lengths of all the contigs within the cluster.
+The high dimensional 4-mer frequency data is then non-linearly projected into a three dimensional space using the [UMAP](https://umap-learn.readthedocs.io/en/latest/) algorithm, which will bring similar data points together and distance contigs with distinct TNF profiles. Next, [hdbscan](https://hdbscan.readthedocs.io/en/latest/) is used to identify clusters within the UMAP embedding and, if at least one cluster is found, compute the membership of each contig to the "core cluster". Here, "core cluster" is defined as the cluster that encompassess the largest assembled fraction, that is, the sum of the lengths of all the contigs within the cluster.
 
 As UMAP is a non-deterministic algorithm, MAGpurify2 executes multiple iterations of the dimension reduction and clustering steps. The final contig score correspond to the average of its membership to the "core cluster" across the iterations.
