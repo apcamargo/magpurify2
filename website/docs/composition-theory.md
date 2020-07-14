@@ -2,7 +2,7 @@
 
 Contigs assembled from reads derived from the same genome or from genomes of closely related organisms tend to display a similar sequence composition profile, represented as k-mer frequencies. Metagenomic binners exploit this property to cluster contigs into putative genomic bins using 4-mer frequencies, or tetranucleotide frequencies (TNFs).
 
-::: info Genomic islands and plasmids
+::: tip Genomic islands and plasmids
 Mobile genetic elements such as genomic islands and plasmids usually have a 4-mer composition that is distinct from the majority of the genome, making them problematic for binning algorithms.
 :::
 
