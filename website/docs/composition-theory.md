@@ -16,7 +16,7 @@ To identify putative contaminants within a genomic bin, MAGpurify2: (1) computes
 
 ![tnf-embedding](./tnf-embedding.svg)
 
-The four DNA bases (A, T, C and G) can produce 256 distinct 4-mers, however, in a strand-independent analysis, reverse complement k-mers (eg.: `TTAC` and `GTAA`) are redundant and should be counted as a single entity (a canonical k-mer) in order to reduce memory usage and data variance. Thus, MAGpurify2 counts the 136 canonical 4-mers for each contig within the bin and computes their relative frequencies as maximum-likelihood estimations of the underlying TNF profile of the sequence.
+The four DNA bases (A, T, C and G) can produce $4^4=256$ distinct 4-mers, however, in a strand-independent analysis, reverse complement k-mers (eg.: `TTAC` and `GTAA`) are redundant and should be counted as a single entity (a canonical k-mer) in order to reduce memory usage and data variance. Thus, MAGpurify2 counts the 136 canonical 4-mers for each contig within the bin and computes their relative frequencies as maximum-likelihood estimations of the underlying TNF profile of the sequence.
 
 ::: tip TNF profile of short contigs
 Short contigs contain a reduced number of 4-mers and therefore provide less reliable estimations of the underlying genomic TNF profile than longer contigs. This is one of the reasons why most binners filter out contigs shorter than a set threshold (usually around 2,000 bp) before clustering.

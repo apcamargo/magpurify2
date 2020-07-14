@@ -1,6 +1,6 @@
 # Coverage module
 
-$\Gamma(n) = (n-1)!\quad\foralln\in\mathbb N$
+$a>n <=> a>=n+1$, if $a, n\in\Z$
 
 $$
 \Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.
