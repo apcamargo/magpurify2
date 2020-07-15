@@ -195,12 +195,8 @@ class Coverage:
         )
         self.use_clustering = use_clustering
         if self.use_clustering:
-            norm_over_samples = self.coverages / self.coverages.sum(axis=0)
-            norm_over_contigs = norm_over_samples / norm_over_samples.sum(axis=1).reshape(
-                -1, 1
-            )
             self.scores = tools.get_cluster_score_from_embedding(
-                data=np.log1p(norm_over_contigs),
+                data=np.log1p(self.coverages),
                 lengths=self.lengths,
                 n_iterations=n_iterations,
                 n_components=n_components,
