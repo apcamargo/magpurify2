@@ -19,7 +19,7 @@ To identify putative contaminants within a genomic bin, MAGpurify2: (1) computes
 The four DNA bases (A, T, C and G) can produce $4^4 = 256$ distinct 4-mers, however, in a strand-independent analysis, reverse complement k-mers (eg.: `TTAC` and `GTAA`) are redundant and should be counted as a single entity (a canonical k-mer) in order to reduce memory usage and data variance. Thus, MAGpurify2 counts the 136 canonical 4-mers ($k$) for each contig ($i$) within the bin and computes their relative frequencies as a maximum-likelihood estimation ($q$) of the underlying TNF profile of the sequence:
 
 $$
-q_{k,i} = \frac{TNF_{k,i}}{\sum _{k=1}^{136}\:TNF_{k,i}}
+q_{k,i} = \frac{\mathit{TNF}_{k,i}}{\sum _{k=1}^{136}\:\mathit{TNF}_{k,i}}
 $$
 
 ::: tip TNF profile of short contigs
