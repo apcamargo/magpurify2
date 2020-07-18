@@ -9,9 +9,8 @@ case "$(uname -s)" in
     *)
 esac
 
-# Install Rust and set the toolchain to nightly
+# Install Rust
 curl https://sh.rustup.rs -sSf | sh -s -- -y --profile=minimal
-rustup default nightly
 
 # Install setuptools-rust
 pip install setuptools-rust==0.10.6

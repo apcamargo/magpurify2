@@ -12,6 +12,6 @@ crate-type = ["cdylib"]
 coverm = "0.3.2"
 lazy_static = "1.4.0"
 ndarray = "0.13.1"
-numpy = "0.9.0"
-pyo3 = { version = "0.10.1", features = ["extension-module"] }
+numpy = "0.11.0"
+pyo3 = { version = "0.11.1", features = ["extension-module"] }
 rayon = "1.3.1"
