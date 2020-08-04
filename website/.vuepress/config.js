@@ -16,6 +16,7 @@ module.exports = {
           children: [
             'composition-theory',
             'coverage-theory',
+            'codon-usage-theory',
           ]
         },
         'installation',

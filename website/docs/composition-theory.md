@@ -14,7 +14,7 @@ MAGpurify2 processes each genomic bin individually and finds potential contamina
 
 To identify putative contaminants within a genomic bin, MAGpurify2: (1) computes the TNF profile of each contig, (2) embbeds data points into a low-dimentional space using a non-linear transformation, and (3) finds the "core cluster" and computes each contig score.
 
-![tnf-embedding](./tnf-embedding.svg)
+![tnf-embedding](./figures/tnf-embedding.svg)
 
 The four DNA bases (A, T, C and G) can produce $4^4 = 256$ distinct 4-mers, however, in a strand-independent analysis, reverse complement k-mers (eg.: `TTAC` and `GTAA`) are redundant and should be counted as a single entity (a canonical k-mer) in order to reduce memory usage and data variance. Thus, MAGpurify2 counts the 136 canonical 4-mers ($k$) for each contig ($i$) within the bin and computes their relative frequencies as a maximum-likelihood estimation ($q$) of the underlying TNF profile of the sequence:
 

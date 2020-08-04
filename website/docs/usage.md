@@ -36,13 +36,16 @@ BAM files store reads that map to the target metagenome or MAG and are processed
 
 ```bash
 $ mkdir bt2
-$ bowtie2-build --threads 4 metagenome.fna bt2/metagenome.fna
-$ bowtie2 --threads 4 -x bt2/metagenome.fna \
+$ bowtie2-build --threads 4 metagenome.fna bt2/metagenome
+$ bowtie2 --threads 4 -x bt2/metagenome \
   -1 sample1_R1.fastq.gz -2 sample1_R2.fastq.gz \
   | samtools sort -@ 4 -o sample1.bam -
 ```
 
-We reccomend mapping the reads to the metagenome and not directly to the MAGs and this is because of two factors:
+We reccomend mapping the reads to the metagenome (superset) and not directly to the MAGs (subsets). This is due to two factors:
+
 - When you map the reads into the MAG a read that was originated from the sequencing of a closely related genome might be erroneously aligned to the MAG (cross-mapping), introducing bias to the coverage estimation.
 - Metagenome-wide mappings can be used to estimate the coverage of all the contigs in the metagenome, thus allowing MAGpurify2 to process multiple MAGs in a single execution.
+
+If the target MAGs are derived from multiple source metagenomes you need input BAM files containing read mappings to each one of them.
 :::
