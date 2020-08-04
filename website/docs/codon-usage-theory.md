@@ -2,6 +2,8 @@
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin consectetur rutrum tellus sit amet egestas. Aliquam faucibus condimentum mauris vitae rhoncus. Praesent laoreet rutrum purus, sed sodales neque. Quisque ut tincidunt erat, at rhoncus orci. Aliquam condimentum eget libero sed suscipit. Duis nec eros nec augue porta malesuada. Nulla nec nisl justo. Mauris eget augue a leo laoreet aliquam.
 
+[Alternative summarization of codon usage bias.](https://sci-hub.tw/https://www.sciencedirect.com/science/article/abs/pii/S1567134806000979)
+
 ## How it works
 
 Curabitur eget pellentesque erat. Vivamus et tristique urna. Maecenas non dapibus erat. Phasellus id massa eu erat gravida molestie at in lectus. Etiam vitae semper orci. Donec convallis blandit ornare. Morbi sodales odio orci, eget luctus leo iaculis sed.
@@ -13,7 +15,7 @@ $$
 Aliquam nulla mi, commodo sit amet augue quis, mattis scelerisque nisl. Aliquam aliquam gravida odio ac facilisis. Curabitur in nisi egestas, molestie elit et, pellentesque lectus. Curabitur accumsan mollis pretium. In purus elit, bibendum a mauris vitae, finibus posuere justo. Maecenas non porta dui, vitae commodo lectus. Sed et elit non tortor tristique laoreet ac sed felis.
 
 $$
-w_{i,j} = \frac{\mathit{RSCU}{i,j}}{\max_{1\le j\le n}\mathit{RSCU}_{i,j}}
+w_{i,j} = \frac{\mathit{RSCU}_{i,j}}{\max_{1\le j\le n}\mathit{RSCU}_{i,j}}
 $$
 
 Nullam rhoncus dui eu iaculis congue. Sed elit neque, ultricies eu venenatis nec, vehicula et nisl. Nullam tincidunt dapibus leo, faucibus venenatis justo rutrum et. In hac habitasse platea dictumst. Ut nunc risus, faucibus bibendum gravida vitae, bibendum vel ex. Maecenas quis eros augue. Morbi ornare suscipit magna sodales rutrum.
