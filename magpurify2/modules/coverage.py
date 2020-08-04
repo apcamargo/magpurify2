@@ -98,13 +98,13 @@ def main(args):
         with gzip.open(coverage_data_file, "wb") as fout:
             pickle.dump((bam_signatures, coverage_dict), fout)
 
-    logger.info("Computing contig scores (relative error method).")
+    logger.info("Computing contig scores.")
     mag_coverage_list = Parallel(n_jobs=args.threads)(
         delayed(Coverage)(
             mag,
             coverage_dict,
             args.min_average_coverage,
-            False,
+            args.use_clustering,
             args.n_iterations,
             args.n_components,
             args.min_dist,
@@ -113,29 +113,20 @@ def main(args):
         )
         for mag in mag_list
     )
-    logger.info(f"Writing output to: '{coverage_score_file}'.")
-    tools.write_contig_score_output(mag_coverage_list, coverage_score_file)
-
     if args.use_clustering:
         if len(args.bam_files) == 1:
             logger.warning(
                 "The clustering method will output unreliable results when a "
                 "single data point (BAM file) is provided."
             )
-        logger.info("Computing contig scores (clustering method).")
-        mag_coverage_list = Parallel(n_jobs=args.threads)(
-            delayed(Coverage)(
-                mag,
-                coverage_dict,
-                args.min_average_coverage,
-                args.use_clustering,
-                args.n_iterations,
-                args.n_components,
-                args.min_dist,
-                args.n_neighbors,
-                args.set_op_mix_ratio,
-            )
-            for mag in mag_list
+        logger.info(
+            f"Writing output to: '{coverage_score_file}' and '{coverage_clust_score_file}'."
         )
-        logger.info(f"Writing output to: '{coverage_clust_score_file}'.")
+        tools.write_contig_score_output(mag_coverage_list, coverage_score_file)
+        # Set the `Coverage` objects to iterate over clustering scores.
+        for mag_coverage in mag_coverage_list:
+            mag_coverage.set_iterate_cluster_scores()
         tools.write_contig_score_output(mag_coverage_list, coverage_clust_score_file)
+    else:
+        logger.info(f"Writing output to: '{coverage_score_file}'.")
+        tools.write_contig_score_output(mag_coverage_list, coverage_score_file)

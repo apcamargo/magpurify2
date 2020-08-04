@@ -197,7 +197,7 @@ def coverage_parser(parser):
         "--min_average_coverage",
         default=1.0,
         help="Ignore samples where the average genome coverage is less than "
-        "`min_average_coverage`.",
+        "`min_average_coverage` when executing the relative error method.",
         type=float,
     )
     clustering_options.add_argument(
