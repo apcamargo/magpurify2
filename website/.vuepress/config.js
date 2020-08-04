@@ -3,7 +3,7 @@ module.exports = {
   base: "/magpurify2/",
   themeConfig: {
     nav: [
-        { text: 'Repository', link: 'https://github.com/apcamargo/magpurify2' },
+      { text: 'Repository', link: 'https://github.com/apcamargo/magpurify2' },
     ],
     displayAllHeaders: true,
     sidebarDepth: 0,
@@ -27,9 +27,9 @@ module.exports = {
   plugins: [
     [
       '@maginapp/vuepress-plugin-katex',
-        {
-          delimiters: 'dollars'
-        }
+      {
+        delimiters: 'dollars'
+      }
     ],
   ],
 }

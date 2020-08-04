@@ -14,10 +14,10 @@ Etiam placerat dui id mi fermentum, eget semper sem eleifend. In finibus tincidu
 
 Suspendisse felis orci, pellentesque nec ipsum a, rhoncus pellentesque ex. Nam sollicitudin lacus at orci aliquam, sed sagittis diam fermentum. Vivamus eu maximus massa, eu convallis ex. Suspendisse nec erat eget nisl rhoncus tincidunt vel vel nisl. Mauris a lorem lectus. Quisque sit amet dui id lectus suscipit congue at nec neque. Proin et accumsan arcu. In sagittis, urna at maximus vestibulum, lorem lectus faucibus libero, a tincidunt erat libero vitae ligula. Integer rhoncus imperdiet sagittis.
 
-![gene-delta-cai-kde](./figures/gene-delta-cai-kde.svg)
+![contig-delta-cai-kde](./figures/contig-delta-cai-kde.svg)
 
 Pellentesque scelerisque nunc ligula, vitae congue tellus posuere accumsan. Nunc ac nibh sed ex semper tempus. Aliquam faucibus a magna sit amet hendrerit. Cras ac vestibulum mauris. In efficitur quam pretium massa aliquam maximus. Suspendisse at ornare augue, tincidunt gravida ante. Etiam sed dictum erat. Phasellus convallis ante ut turpis placerat convallis. Phasellus turpis lacus, molestie sed orci eu, sollicitudin tristique magna. Vivamus consequat eu nulla a consectetur. Duis in lacus bibendum, facilisis arcu eu, rhoncus lacus.
 
-![gene-delta-cai-scores](./figures/gene-delta-cai-scores.svg)
+![contig-delta-cai-scores](./figures/contig-delta-cai-scores.svg)
 
 Duis nisl ex, tempus ultrices mauris consectetur, convallis sagittis tellus. Nam nec lobortis dui. Curabitur a risus blandit erat luctus tristique a eget felis. In vestibulum, eros non auctor ultricies, ex leo eleifend lacus, at fermentum dui ligula id diam. Vestibulum arcu ex, finibus quis consequat fermentum, malesuada eu mi. In hendrerit ipsum vestibulum nibh elementum, suscipit faucibus augue viverra. Proin non condimentum orci. Ut sed metus ante. Nam pharetra interdum commodo.
