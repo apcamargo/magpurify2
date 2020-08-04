@@ -13,10 +13,14 @@ $$
 Aliquam nulla mi, commodo sit amet augue quis, mattis scelerisque nisl. Aliquam aliquam gravida odio ac facilisis. Curabitur in nisi egestas, molestie elit et, pellentesque lectus. Curabitur accumsan mollis pretium. In purus elit, bibendum a mauris vitae, finibus posuere justo. Maecenas non porta dui, vitae commodo lectus. Sed et elit non tortor tristique laoreet ac sed felis.
 
 $$
-w_{i,j} = \frac{RSCU_{i,j}}{\max_{1\le k\le n}RSCU_{i,k}}
+w_{i,j} = \frac{\mathit{RSCU}{i,j}}{\max_{1\le j\le n}\mathit{RSCU}_{i,j}}
 $$
 
 Nullam rhoncus dui eu iaculis congue. Sed elit neque, ultricies eu venenatis nec, vehicula et nisl. Nullam tincidunt dapibus leo, faucibus venenatis justo rutrum et. In hac habitasse platea dictumst. Ut nunc risus, faucibus bibendum gravida vitae, bibendum vel ex. Maecenas quis eros augue. Morbi ornare suscipit magna sodales rutrum.
+
+$$
+\mathit{CAI} = \left(\prod \:_{k=1}^Lw_k\right)^{\frac{1}{L}}
+$$
 
 Maecenas sed gravida lectus. Nulla aliquam purus ut justo bibendum ornare. Morbi vestibulum congue urna, quis dapibus urna. Nam ligula augue, rutrum a pellentesque non, ornare id risus. Maecenas malesuada, ipsum ac vehicula fermentum, turpis sapien sollicitudin arcu, a pulvinar dui magna vitae est. Aenean nec purus maximus, pulvinar lacus sed, fermentum magna. Nullam feugiat fringilla diam in auctor.
 
