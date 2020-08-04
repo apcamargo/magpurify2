@@ -6,6 +6,20 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin consectetur rutru
 
 Curabitur eget pellentesque erat. Vivamus et tristique urna. Maecenas non dapibus erat. Phasellus id massa eu erat gravida molestie at in lectus. Etiam vitae semper orci. Donec convallis blandit ornare. Morbi sodales odio orci, eget luctus leo iaculis sed.
 
+$$
+\mathit{RSCU}_{i,j} = \frac{x_{i,j}}{\frac{1}{n_i}\sum_{j=1}^{n_i}x_{i,j}\:}
+$$
+
+Aliquam nulla mi, commodo sit amet augue quis, mattis scelerisque nisl. Aliquam aliquam gravida odio ac facilisis. Curabitur in nisi egestas, molestie elit et, pellentesque lectus. Curabitur accumsan mollis pretium. In purus elit, bibendum a mauris vitae, finibus posuere justo. Maecenas non porta dui, vitae commodo lectus. Sed et elit non tortor tristique laoreet ac sed felis.
+
+$$
+w_{i,j} = \frac{RSCU_{i,j}}{\max_{1\le k\le n}RSCU_{i,k}}
+$$
+
+Nullam rhoncus dui eu iaculis congue. Sed elit neque, ultricies eu venenatis nec, vehicula et nisl. Nullam tincidunt dapibus leo, faucibus venenatis justo rutrum et. In hac habitasse platea dictumst. Ut nunc risus, faucibus bibendum gravida vitae, bibendum vel ex. Maecenas quis eros augue. Morbi ornare suscipit magna sodales rutrum.
+
+Maecenas sed gravida lectus. Nulla aliquam purus ut justo bibendum ornare. Morbi vestibulum congue urna, quis dapibus urna. Nam ligula augue, rutrum a pellentesque non, ornare id risus. Maecenas malesuada, ipsum ac vehicula fermentum, turpis sapien sollicitudin arcu, a pulvinar dui magna vitae est. Aenean nec purus maximus, pulvinar lacus sed, fermentum magna. Nullam feugiat fringilla diam in auctor.
+
 ![gene-cai](./figures/gene-cai.svg)
 
 Etiam placerat dui id mi fermentum, eget semper sem eleifend. In finibus tincidunt massa sit amet posuere. Integer ultricies nibh ac nunc iaculis, vel vehicula mi imperdiet. Nam consequat nunc convallis eros condimentum, non tincidunt sem varius.
