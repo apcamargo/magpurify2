@@ -11,6 +11,3 @@ esac
 
 # Install Rust
 curl https://sh.rustup.rs -sSf | sh -s -- -y --profile=minimal
-
-# Install setuptools-rust
-pip install setuptools-rust==0.10.6
