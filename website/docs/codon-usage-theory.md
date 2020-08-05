@@ -43,5 +43,5 @@ Pellentesque scelerisque nunc ligula, vitae congue tellus posuere accumsan. Nunc
 Duis nisl ex, tempus ultrices mauris consectetur, convallis sagittis tellus. Nam nec lobortis dui. Curabitur a risus blandit erat luctus tristique a eget felis. In vestibulum, eros non auctor ultricies, ex leo eleifend lacus, at fermentum dui ligula id diam. Vestibulum arcu ex, finibus quis consequat fermentum, malesuada eu mi. In hendrerit ipsum vestibulum nibh elementum, suscipit faucibus augue viverra. Proin non condimentum orci. Ut sed metus ante. Nam pharetra interdum commodo.
 
 ::: tip Alternative codon usage bias encodings
-The RSCU is not the only method to summarize the codon usage bias of an organism. [Hughes AL and Langley KJ](https://pubmed.ncbi.nlm.nih.gov/17000138/) proposed an alternative representation that encodes codon usage bias into five variables and this approach was succesfully applied to metagenomic binning by [Yu G et al.](https://pubmed.ncbi.nlm.nih.gov/29947757/).
+The RSCU is not the only method to summarize the codon usage bias of an organism. [Hughes AL and Langley KJ](https://pubmed.ncbi.nlm.nih.gov/17000138/) proposed an alternative representation that encodes codon usage bias into five variables and this approach was succesfully applied to metagenomic binning by [Yu G et al](https://pubmed.ncbi.nlm.nih.gov/29947757/).
 :::

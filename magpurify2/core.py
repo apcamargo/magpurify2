@@ -157,8 +157,8 @@ class Composition:
         self.contigs = mag.contigs
         self.lengths = mag.lengths
         self.tnf = composition_dict[mag.genome]
-        if len(self) == 1:
-            self.scores = np.array([1.0])
+        if len(self) <= 2:
+            self.scores = np.array([1.0] * len(self))
         else:
             self.scores = tools.get_cluster_score_from_embedding(
                 data=self.tnf,
@@ -205,8 +205,8 @@ class Coverage:
                 for contig in self.contigs
             ]
         )
-        if len(self) == 1:
-            self.scores = np.array([1.0])
+        if len(self) <= 2:
+            self.scores = np.array([1.0] * len(self))
         else:
             self.scores = self.log_relative_error_scores(min_average_coverage)
             if self.use_clustering:
