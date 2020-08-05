@@ -62,15 +62,20 @@ class CodonUsage:
         self.lengths = mag.lengths
         self.cds = []
         self.cds_sequences = []
-        n_genes_dict = defaultdict(int)
-        for cds, _, cds_sequence in tools.read_fasta(prodigal_fna_filepath):
-            self.cds.append(cds)
-            self.cds_sequences.append(cds_sequence)
-            contig, _ = cds.rsplit("_", 1)
-            n_genes_dict[contig] += 1
-        self.n_genes = np.array([n_genes_dict.get(contig, 0) for contig in self.contigs])
-        self.delta_cai = self.get_delta_cai()
-        self.scores = self.compute_codon_usage_scores(min_genes)
+        if len(self) == 1:
+            self.scores = np.array([1.0])
+        else:
+            n_genes_dict = defaultdict(int)
+            for cds, _, cds_sequence in tools.read_fasta(prodigal_fna_filepath):
+                self.cds.append(cds)
+                self.cds_sequences.append(cds_sequence)
+                contig, _ = cds.rsplit("_", 1)
+                n_genes_dict[contig] += 1
+            self.n_genes = np.array(
+                [n_genes_dict.get(contig, 0) for contig in self.contigs]
+            )
+            self.delta_cai = self.get_delta_cai()
+            self.scores = self.compute_codon_usage_scores(min_genes)
 
     def get_delta_cai(self, quantile=0.25):
         cds_sequences = np.array(self.cds_sequences)
@@ -152,15 +157,18 @@ class Composition:
         self.contigs = mag.contigs
         self.lengths = mag.lengths
         self.tnf = composition_dict[mag.genome]
-        self.scores = tools.get_cluster_score_from_embedding(
-            data=self.tnf,
-            lengths=self.lengths,
-            n_iterations=n_iterations,
-            n_components=n_components,
-            min_dist=min_dist,
-            n_neighbors=n_neighbors,
-            set_op_mix_ratio=set_op_mix_ratio,
-        )
+        if len(self) == 1:
+            self.scores = np.array([1.0])
+        else:
+            self.scores = tools.get_cluster_score_from_embedding(
+                data=self.tnf,
+                lengths=self.lengths,
+                n_iterations=n_iterations,
+                n_components=n_components,
+                min_dist=min_dist,
+                n_neighbors=n_neighbors,
+                set_op_mix_ratio=set_op_mix_ratio,
+            )
 
     def __len__(self):
         return len(self.contigs)
@@ -188,6 +196,7 @@ class Coverage:
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
+        self.use_clustering = use_clustering
         self.coverages = np.array(
             [
                 coverage_dict[contig]
@@ -196,20 +205,22 @@ class Coverage:
                 for contig in self.contigs
             ]
         )
-        self.scores = self.log_relative_error_scores(min_average_coverage)
-        self.use_clustering = use_clustering
-        if self.use_clustering:
-            self.cluster_scores = tools.get_cluster_score_from_embedding(
-                data=np.log1p(self.coverages),
-                lengths=self.lengths,
-                n_iterations=n_iterations,
-                n_components=n_components,
-                min_dist=min_dist,
-                n_neighbors=n_neighbors,
-                set_op_mix_ratio=set_op_mix_ratio,
-            )
+        if len(self) == 1:
+            self.scores = np.array([1.0])
         else:
-            self.cluster_scores = np.ones(len(self))
+            self.scores = self.log_relative_error_scores(min_average_coverage)
+            if self.use_clustering:
+                self.cluster_scores = tools.get_cluster_score_from_embedding(
+                    data=np.log1p(self.coverages),
+                    lengths=self.lengths,
+                    n_iterations=n_iterations,
+                    n_components=n_components,
+                    min_dist=min_dist,
+                    n_neighbors=n_neighbors,
+                    set_op_mix_ratio=set_op_mix_ratio,
+                )
+            else:
+                self.cluster_scores = np.ones(len(self))
 
     def set_iterate_cluster_scores(self, iterate_cluster_scores=True):
         self._iterate_cluster_scores = iterate_cluster_scores

@@ -2,11 +2,11 @@
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin consectetur rutrum tellus sit amet egestas. Aliquam faucibus condimentum mauris vitae rhoncus. Praesent laoreet rutrum purus, sed sodales neque. Quisque ut tincidunt erat, at rhoncus orci. Aliquam condimentum eget libero sed suscipit. Duis nec eros nec augue porta malesuada. Nulla nec nisl justo. Mauris eget augue a leo laoreet aliquam.
 
-[Alternative summarization of codon usage bias.](https://sci-hub.tw/https://www.sciencedirect.com/science/article/abs/pii/S1567134806000979)
-
 ## How it works
 
 Curabitur eget pellentesque erat. Vivamus et tristique urna. Maecenas non dapibus erat. Phasellus id massa eu erat gravida molestie at in lectus. Etiam vitae semper orci. Donec convallis blandit ornare. Morbi sodales odio orci, eget luctus leo iaculis sed.
+
+To summarize the codon usage bias of each gene MAGpurify2 uses the Codon Adaptation Index (CAI), described by [Sharp PM and Li WH](https://pubmed.ncbi.nlm.nih.gov/3547335/).
 
 $$
 \mathit{RSCU}_{i,j} = \frac{x_{i,j}}{\frac{1}{n_i}\sum_{j=1}^{n_i}x_{i,j}\:}
@@ -32,7 +32,7 @@ Etiam placerat dui id mi fermentum, eget semper sem eleifend. In finibus tincidu
 
 ![gene-delta-cai](./figures/gene-delta-cai.svg)
 
-Suspendisse felis orci, pellentesque nec ipsum a, rhoncus pellentesque ex. Nam sollicitudin lacus at orci aliquam, sed sagittis diam fermentum. Vivamus eu maximus massa, eu convallis ex. Suspendisse nec erat eget nisl rhoncus tincidunt vel vel nisl. Mauris a lorem lectus. Quisque sit amet dui id lectus suscipit congue at nec neque. Proin et accumsan arcu. In sagittis, urna at maximus vestibulum, lorem lectus faucibus libero, a tincidunt erat libero vitae ligula. Integer rhoncus imperdiet sagittis.
+The ΔCAI values of genes within a same contig are averaged to obtain contig-level ΔCAI. Next, a kernel density estimation (KDE) is computed from the data in order to
 
 ![contig-delta-cai-kde](./figures/contig-delta-cai-kde.svg)
 
@@ -41,3 +41,7 @@ Pellentesque scelerisque nunc ligula, vitae congue tellus posuere accumsan. Nunc
 ![contig-delta-cai-scores](./figures/contig-delta-cai-scores.svg)
 
 Duis nisl ex, tempus ultrices mauris consectetur, convallis sagittis tellus. Nam nec lobortis dui. Curabitur a risus blandit erat luctus tristique a eget felis. In vestibulum, eros non auctor ultricies, ex leo eleifend lacus, at fermentum dui ligula id diam. Vestibulum arcu ex, finibus quis consequat fermentum, malesuada eu mi. In hendrerit ipsum vestibulum nibh elementum, suscipit faucibus augue viverra. Proin non condimentum orci. Ut sed metus ante. Nam pharetra interdum commodo.
+
+::: tip Alternative codon usage bias encodings
+The RSCU is not the only method to summarize the codon usage bias of an organism. [Hughes AL and Langley KJ](https://pubmed.ncbi.nlm.nih.gov/17000138/) proposed an alternative representation that encodes codon usage bias into five variables and this approach was succesfully applied to metagenomic binning by [Yu G et al.](https://pubmed.ncbi.nlm.nih.gov/29947757/).
+:::
