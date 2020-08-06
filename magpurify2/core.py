@@ -181,7 +181,7 @@ class Coverage:
     def __init__(
         self,
         mag,
-        coverage_dict,
+        coverages,
         min_average_coverage,
         use_clustering,
         n_iterations,
@@ -197,14 +197,7 @@ class Coverage:
         self.contigs = mag.contigs
         self.lengths = mag.lengths
         self.use_clustering = use_clustering
-        self.coverages = np.array(
-            [
-                coverage_dict[contig]
-                if contig in coverage_dict
-                else [0.0] * len(list(coverage_dict.values())[0])
-                for contig in self.contigs
-            ]
-        )
+        self.coverages = coverages
         if len(self) <= 2:
             self.scores = np.array([1.0] * len(self))
             self.cluster_scores = np.array([1.0] * len(self))

@@ -23,6 +23,7 @@ import logging
 import pickle
 from itertools import compress
 
+import numpy as np
 from joblib import Parallel, delayed
 
 from magpurify2 import tools
@@ -99,10 +100,22 @@ def main(args):
             pickle.dump((bam_signatures, coverage_dict), fout)
 
     logger.info("Computing contig scores.")
+
+
+    coverage_dict = Parallel(n_jobs=args.threads)(
+        delayed(lambda x, y: np.array([y[i] for i in x.contigs]))(
+            mag,
+            coverage_dict,
+        )
+        for mag in mag_list
+    )
+    coverage_dict = dict(zip([mag.genome for mag in mag_list], coverage_dict))
+
+
     mag_coverage_list = Parallel(n_jobs=args.threads)(
         delayed(Coverage)(
             mag,
-            coverage_dict,
+            coverage_dict[mag.genome],
             args.min_average_coverage,
             args.use_clustering,
             args.n_iterations,
