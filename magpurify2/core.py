@@ -207,6 +207,7 @@ class Coverage:
         )
         if len(self) <= 2:
             self.scores = np.array([1.0] * len(self))
+            self.cluster_scores = np.array([1.0] * len(self))
         else:
             self.scores = self.log_relative_error_scores(min_average_coverage)
             if self.use_clustering:
