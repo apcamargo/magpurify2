@@ -101,7 +101,8 @@ def main(args):
 
     logger.info("Computing contig scores.")
 
-
+    # Build a dictionary where the keys are genome names and the values are numpy arrays
+    # of the coverage values
     coverage_dict = Parallel(n_jobs=args.threads)(
         delayed(lambda x, y: np.array([y[i] for i in x.contigs]))(
             mag,
@@ -110,7 +111,6 @@ def main(args):
         for mag in mag_list
     )
     coverage_dict = dict(zip([mag.genome for mag in mag_list], coverage_dict))
-
 
     mag_coverage_list = Parallel(n_jobs=args.threads)(
         delayed(Coverage)(
