@@ -21,6 +21,7 @@
 import bz2
 import gzip
 import hashlib
+import logging
 import lzma
 import os
 import sys
@@ -39,6 +40,8 @@ from magpurify2._codon import get_cai, get_codon_index
 from magpurify2._coverage import get_coverages
 from magpurify2._tnf import get_tnf
 
+logger = logging.getLogger("timestamp")
+
 
 class Compression(Enum):
     gzip = auto()
@@ -47,7 +50,7 @@ class Compression(Enum):
     noncompressed = auto()
 
 
-def validade_input(value, parameter_name, interval, logger):
+def validade_input(value, parameter_name, interval):
     """
     Checks the value of a numeric input. If it is between the provided interval,
     the same value is returned. If the value is outside of the interval the
@@ -62,8 +65,6 @@ def validade_input(value, parameter_name, interval, logger):
         Name of the input.
     interval : list
         A list containing the minimum and maximum allowerd values.
-    logger : Logger
-        The logger of the program.
 
     Returns
     -------
@@ -80,7 +81,7 @@ def validade_input(value, parameter_name, interval, logger):
     return value
 
 
-def check_output_directory(output_directory, logger):
+def check_output_directory(output_directory):
     """
     Checks if the directory exists. If it doesn't, the logger will give a
     warning and the directory will be created.
@@ -89,8 +90,6 @@ def check_output_directory(output_directory, logger):
     ----------
     output_directory : Path
         Path object pointing to the output directory of the program.
-    logger : Logger
-        The logger of the program.
     """
     if not output_directory.is_dir():
         logger.warning("Output directory does not exist. Creating it now.")
@@ -186,7 +185,7 @@ def is_sorted_bam(filepath):
         return b"SO:coordinate" in bam_header
 
 
-def check_bam_files(bam_files, logger):
+def check_bam_files(bam_files):
     """
     Checks if the input BAM files exist and if they are sorted. Exits with an
     error otherwise.
@@ -195,8 +194,6 @@ def check_bam_files(bam_files, logger):
     ----------
     bam_files : list
         List with the Path objects pointing to the input BAM files.
-    logger : Logger
-        The logger of the program.
     """
     if not all(filepath.exists() for filepath in bam_files):
         logger.error("At least one of the supplied BAM files does not exist.")

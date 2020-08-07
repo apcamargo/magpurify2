@@ -20,6 +20,7 @@
 
 import bz2
 import gzip
+import logging
 import lzma
 import shutil
 import subprocess
@@ -29,9 +30,11 @@ from biolib.external.prodigal import Prodigal
 
 from magpurify2 import tools
 
+logger = logging.getLogger("timestamp")
+
 
 class Database:
-    def __init__(self, path, logger):
+    def __init__(self, path):
         if not path.is_dir():
             logger.error("The provided database path does not point to a directory")
             sys.exit(1)
@@ -70,7 +73,7 @@ class Database:
                 sys.exit(1)
 
 
-def prodigal(genomes, output_directory, logger, threads):
+def prodigal(genomes, output_directory, threads):
     prodigal_output_directory = output_directory.joinpath("prodigal")
     # Identify which of the input genomes already have Prodigal predictions in the
     # output directory. Those genomes won't be analyzed by Prodigal again.
@@ -137,7 +140,7 @@ def prodigal(genomes, output_directory, logger, threads):
         filepath.unlink()
 
 
-def mmseqs2(output_directory, database, logger, threads):
+def mmseqs2(output_directory, database, threads):
     log_file = output_directory.joinpath("mmseqs2.log")
     mmseqs2_output_directory = output_directory.joinpath("mmseqs2")
     mmseqs2_input_file = mmseqs2_output_directory.joinpath("mmseqs2_input.faa")

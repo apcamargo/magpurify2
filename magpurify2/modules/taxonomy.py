@@ -31,10 +31,10 @@ from magpurify2.core import Mag, Taxonomy
 def main(args):
     logger = logging.getLogger("timestamp")
     args.contig_min_fraction = tools.validade_input(
-        args.contig_min_fraction, "contig_min_fraction", [0.5, 1.0], logger
+        args.contig_min_fraction, "contig_min_fraction", [0.5, 1.0]
     )
     args.genome_min_fraction = tools.validade_input(
-        args.genome_min_fraction, "genome_min_fraction", [0.5, 1.0], logger
+        args.genome_min_fraction, "genome_min_fraction", [0.5, 1.0]
     )
     # Check if Prodigal and MMSeqs2 are executables in the user PATH.
     missing_executables = [
@@ -48,9 +48,9 @@ def main(args):
             f"{', '.join(missing_executables)}."
         )
         sys.exit(1)
-    database = external.Database(args.database, logger)
+    database = external.Database(args.database)
     logger.info(f"Using database '{database.name}' version {database.version}.")
-    tools.check_output_directory(args.output_directory, logger)
+    tools.check_output_directory(args.output_directory)
     scores_directory = args.output_directory.joinpath("scores")
     scores_directory.mkdir(exist_ok=True)
     taxonomy_score_file = scores_directory.joinpath("taxonomy_scores.tsv")
@@ -84,11 +84,11 @@ def main(args):
         mmseqs2_output_directory.mkdir()
 
     if not skip_mmseqs:
-        external.prodigal(args.genomes, args.output_directory, logger, args.threads)
+        external.prodigal(args.genomes, args.output_directory, args.threads)
         logger.info(f"Writing MMSeqs2 input file to: '{mmseqs2_input_file}'.")
         tools.write_mmseqs2_input(args.output_directory)
         logger.info("Running MMSeqs2 for gene taxonomic assignment.")
-        external.mmseqs2(args.output_directory, database, logger, args.threads)
+        external.mmseqs2(args.output_directory, database, args.threads)
 
     # Create a TaxDb object containing GTDB's taxonomic data.
     taxdb = taxopy.TaxDb(

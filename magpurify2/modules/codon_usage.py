@@ -30,7 +30,7 @@ from magpurify2.core import Mag, CodonUsage
 
 def main(args):
     logger = logging.getLogger("timestamp")
-    args.min_genes = tools.validade_input(args.min_genes, "min_genes", [1, 999], logger)
+    args.min_genes = tools.validade_input(args.min_genes, "min_genes", [1, 999])
     # Check if Prodigal is an executable in the user PATH.
     missing_executables = [
         executable
@@ -43,7 +43,7 @@ def main(args):
             f"{', '.join(missing_executables)}."
         )
         sys.exit(1)
-    tools.check_output_directory(args.output_directory, logger)
+    tools.check_output_directory(args.output_directory)
     scores_directory = args.output_directory.joinpath("scores")
     scores_directory.mkdir(exist_ok=True)
     codon_usage_score_file = scores_directory.joinpath("codon_usage_scores.tsv")
@@ -52,7 +52,7 @@ def main(args):
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome, store_sequences=False) for genome in args.genomes]
 
-    external.prodigal(args.genomes, args.output_directory, logger, args.threads)
+    external.prodigal(args.genomes, args.output_directory, args.threads)
     prodigal_output_directory = args.output_directory.joinpath("prodigal")
 
     logger.info("Computing contig scores.")

@@ -198,12 +198,13 @@ class Coverage:
         self.lengths = mag.lengths
         self.use_clustering = use_clustering
         self.coverages = coverages
-        if len(self) <= 2:
+        self.selected_samples = self.coverages.mean(axis=0) >= min_average_coverage
+        if len(self) <= 2 or self.selected_samples.sum() == 0:
             self.scores = np.array([1.0] * len(self))
             self.cluster_scores = np.array([1.0] * len(self))
         else:
-            self.scores = self.log_relative_error_scores(min_average_coverage)
-            if self.use_clustering:
+            self.scores = self.log_relative_error_scores()
+            if self.use_clustering and self.selected_samples.sum() >= 3:
                 self.cluster_scores = tools.get_cluster_score_from_embedding(
                     data=np.log1p(self.coverages),
                     lengths=self.lengths,
@@ -219,21 +220,17 @@ class Coverage:
     def set_iterate_cluster_scores(self, iterate_cluster_scores=True):
         self._iterate_cluster_scores = iterate_cluster_scores
 
-    def log_relative_error_scores(self, min_average_coverage):
+    def log_relative_error_scores(self):
         weighted_medians = np.apply_along_axis(
             tools.weighted_median, 0, self.coverages, weights=self.lengths
         )
-        selected_samples = self.coverages.mean(axis=0) >= min_average_coverage
-        if not selected_samples.sum():
-            return np.ones(len(self))
-        else:
-            selected_data = self.coverages[:, selected_samples]
-            weighted_medians = weighted_medians[selected_samples]
-            deviation = selected_data / (weighted_medians + 1e-5)
-            scores = 1 - np.abs(np.log(deviation + 1e-5) / np.log(25))
-            scores = np.average(scores, axis=1)
-            scores[scores < 0] = 0
-            return scores
+        selected_data = self.coverages[:, self.selected_samples]
+        weighted_medians = weighted_medians[self.selected_samples]
+        deviation = selected_data / (weighted_medians + 1e-5)
+        scores = 1 - np.abs(np.log(deviation + 1e-5) / np.log(25))
+        scores = np.average(scores, axis=1)
+        scores[scores < 0] = 0
+        return scores
 
     def __len__(self):
         return len(self.contigs)

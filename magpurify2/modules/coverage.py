@@ -33,25 +33,27 @@ from magpurify2.core import Coverage, Mag
 def main(args):
     logger = logging.getLogger("timestamp")
     args.contig_min_fraction = tools.validade_input(
-        args.min_identity, "min_identity", [0.0, 1.0], logger
+        args.min_identity, "min_identity", [0.0, 1.0]
     )
     args.min_average_coverage = tools.validade_input(
-        args.min_average_coverage, "min_average_coverage", [0, 999], logger
+        args.min_average_coverage, "min_average_coverage", [0, 999]
     )
-    args.n_iterations = tools.validade_input(
-        args.n_iterations, "n_iterations", [1, 999], logger
-    )
-    args.n_components = tools.validade_input(
-        args.n_components, "n_components", [1, 999], logger
-    )
-    args.n_neighbors = tools.validade_input(
-        args.n_neighbors, "n_neighbors", [1, 999], logger
-    )
+    args.n_iterations = tools.validade_input(args.n_iterations, "n_iterations", [1, 999])
+    args.n_components = tools.validade_input(args.n_components, "n_components", [1, 999])
+    args.n_neighbors = tools.validade_input(args.n_neighbors, "n_neighbors", [1, 999])
     args.set_op_mix_ratio = tools.validade_input(
-        args.set_op_mix_ratio, "set_op_mix_ratio", [0.0, 1.0], logger
+        args.set_op_mix_ratio, "set_op_mix_ratio", [0.0, 1.0]
     )
-    tools.check_bam_files(args.bam_files, logger)
-    tools.check_output_directory(args.output_directory, logger)
+
+    if args.use_clustering and len(args.bam_files) < 3:
+        logger.warning(
+            "A minimum of three data points (BAM files) is required to use "
+            "the clustering method. `--use_clustering` will be turned off."
+        )
+        args.use_clustering = False
+
+    tools.check_bam_files(args.bam_files)
+    tools.check_output_directory(args.output_directory)
     scores_directory = args.output_directory.joinpath("scores")
     scores_directory.mkdir(exist_ok=True)
     coverage_score_file = scores_directory.joinpath("coverage_scores.tsv")
@@ -104,10 +106,7 @@ def main(args):
     # Build a dictionary where the keys are genome names and the values are numpy arrays
     # of the coverage values
     coverage_dict = Parallel(n_jobs=args.threads)(
-        delayed(lambda x, y: np.array([y[i] for i in x.contigs]))(
-            mag,
-            coverage_dict,
-        )
+        delayed(lambda x, y: np.array([y[i] for i in x.contigs]))(mag, coverage_dict,)
         for mag in mag_list
     )
     coverage_dict = dict(zip([mag.genome for mag in mag_list], coverage_dict))

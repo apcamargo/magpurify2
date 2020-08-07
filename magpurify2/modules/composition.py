@@ -30,19 +30,13 @@ from magpurify2.core import Composition, Mag
 
 def main(args):
     logger = logging.getLogger("timestamp")
-    args.n_iterations = tools.validade_input(
-        args.n_iterations, "n_iterations", [1, 999], logger
-    )
-    args.n_components = tools.validade_input(
-        args.n_components, "n_components", [1, 999], logger
-    )
-    args.n_neighbors = tools.validade_input(
-        args.n_neighbors, "n_neighbors", [1, 999], logger
-    )
+    args.n_iterations = tools.validade_input(args.n_iterations, "n_iterations", [1, 999])
+    args.n_components = tools.validade_input(args.n_components, "n_components", [1, 999])
+    args.n_neighbors = tools.validade_input(args.n_neighbors, "n_neighbors", [1, 999])
     args.set_op_mix_ratio = tools.validade_input(
-        args.set_op_mix_ratio, "set_op_mix_ratio", [0.0, 1.0], logger
+        args.set_op_mix_ratio, "set_op_mix_ratio", [0.0, 1.0]
     )
-    tools.check_output_directory(args.output_directory, logger)
+    tools.check_output_directory(args.output_directory)
     scores_directory = args.output_directory.joinpath("scores")
     scores_directory.mkdir(exist_ok=True)
     composition_score_file = scores_directory.joinpath("composition_scores.tsv")
