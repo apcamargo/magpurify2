@@ -44,7 +44,7 @@ def main(args):
     }
     if not args.filtered_output_directory.is_dir():
         logger.warning(
-            "Output directory for the filtered genomes does not exist. Creating it now."
+            f"'{args.filtered_output_directory}' does not exist. Creating it now."
         )
         args.filtered_output_directory.mkdir()
     for score_file in scores_file_list:
