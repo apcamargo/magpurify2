@@ -198,7 +198,10 @@ class Coverage:
         self.lengths = mag.lengths
         self.use_clustering = use_clustering
         self.coverages = coverages
-        self.selected_samples = self.coverages.mean(axis=0) >= min_average_coverage
+        self.selected_samples = (
+            np.average(self.coverages, axis=0, weights=self.lengths)
+            >= min_average_coverage
+        )
         if len(self) <= 2 or self.selected_samples.sum() == 0:
             self.scores = np.array([1.0] * len(self))
             self.cluster_scores = np.array([1.0] * len(self))
