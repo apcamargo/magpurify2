@@ -97,22 +97,14 @@ class CodonUsage:
         mean_contig_delta_cai = [
             np.average(contig_delta_cai[contig]) for contig in kept_contigs
         ]
-
         # Scale the data and take the average between it and 0.5. This will bring the
         # points closer to the center and will give the KDE some space to breathe.
-        # Scale gene-level delta cai:
-        delta_cai = (self.delta_cai - self.delta_cai.min()) / (
-            self.delta_cai.max() - self.delta_cai.min()
-        )
-        delta_cai = (delta_cai + 0.5) / 2
-        # Scale contig-level delta cai:
         mean_contig_delta_cai = np.array(mean_contig_delta_cai)
         mean_contig_delta_cai = (mean_contig_delta_cai - mean_contig_delta_cai.min()) / (
             mean_contig_delta_cai.max() - mean_contig_delta_cai.min()
         )
         mean_contig_delta_cai = (mean_contig_delta_cai + 0.5) / 2
-
-        kernel = ss.gaussian_kde(delta_cai)
+        kernel = ss.gaussian_kde(mean_contig_delta_cai)
         contig_delta_cai_kde = kernel(np.linspace(0, 1, 1000))
         # Find the deepest valley in the KDE.
         valleys = find_peaks(-contig_delta_cai_kde, prominence=(0.035, None))
