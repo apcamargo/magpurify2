@@ -44,23 +44,11 @@ def main(args):
     args.set_op_mix_ratio = tools.validade_input(
         args.set_op_mix_ratio, "set_op_mix_ratio", [0.0, 1.0]
     )
-
-    if args.use_clustering and len(args.bam_files) < 3:
-        logger.warning(
-            "A minimum of three data points (BAM files) is required to use "
-            "the clustering method. `--use_clustering` will be turned off."
-        )
-        args.use_clustering = False
-
     tools.check_bam_files(args.bam_files)
     tools.check_output_directory(args.output_directory)
     scores_directory = args.output_directory.joinpath("scores")
     scores_directory.mkdir(exist_ok=True)
     coverage_score_file = scores_directory.joinpath("coverage_scores.tsv")
-    if args.use_clustering:
-        coverage_clust_score_file = scores_directory.joinpath("coverage_clust_scores.tsv")
-    else:
-        coverage_clust_score_file = None
 
     # Read input genomes
     logger.info(f"Reading {len(args.genomes)} genomes.")
@@ -116,7 +104,6 @@ def main(args):
             mag,
             coverage_dict[mag.genome],
             args.min_average_coverage,
-            args.use_clustering,
             args.n_iterations,
             args.n_components,
             args.min_dist,
@@ -125,20 +112,5 @@ def main(args):
         )
         for mag in mag_list
     )
-    if args.use_clustering:
-        if len(args.bam_files) == 1:
-            logger.warning(
-                "The clustering method will output unreliable results when a "
-                "single data point (BAM file) is provided."
-            )
-        logger.info(
-            f"Writing output to: '{coverage_score_file}' and '{coverage_clust_score_file}'."
-        )
-        tools.write_contig_score_output(mag_coverage_list, coverage_score_file)
-        # Set the `Coverage` objects to iterate over clustering scores.
-        for mag_coverage in mag_coverage_list:
-            mag_coverage.set_iterate_cluster_scores()
-        tools.write_contig_score_output(mag_coverage_list, coverage_clust_score_file)
-    else:
-        logger.info(f"Writing output to: '{coverage_score_file}'.")
-        tools.write_contig_score_output(mag_coverage_list, coverage_score_file)
+    logger.info(f"Writing output to: '{coverage_score_file}'.")
+    tools.write_module_output(mag_coverage_list, coverage_score_file)

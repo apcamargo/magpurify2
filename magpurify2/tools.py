@@ -554,22 +554,26 @@ def write_contig_taxonomy_output(mag_taxonomy_list, taxonomy_output_file):
                 )
 
 
-def write_contig_score_output(mag_score_list, score_output_file):
+def write_module_output(mag_score_list, score_output_file):
     """
-    Write a file containing the scores for each contig of the input genomes.
+    Write a file containing the computed attributes for each contig of the input
+    genomes.
 
     Parameters
     ----------
     mag_score_list : list
-        List of objects of the `Composition`, `Coverage` or `Taxonomy` classes.
+        List of objects of the `CodonUsage`, `Composition`, `Coverage` or
+        `Taxonomy` classes.
     score_output_file : Path
         Path object pointing to the output file.
     """
     with open(score_output_file, "w") as fout:
-        fout.write("genome\tcontig\tscore\n")
+        header = "\t".join(mag_score_list[0].attributes)
+        fout.write(f"{header}\n")
         for mag_score in mag_score_list:
-            for contig, score in mag_score:
-                fout.write(f"{mag_score.genome}\t{contig}\t{score:.4f}\n")
+            for attributes in mag_score:
+                line = "\t".join(map(str, attributes))
+                fout.write(f"{line}\n")
 
 
 def write_filtered_genome(mag, mags_contaminants, mode, filtered_output_directory):

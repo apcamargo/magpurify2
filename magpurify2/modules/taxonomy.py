@@ -112,5 +112,5 @@ def main(args):
     logger.info(
         f"Writing output to: '{taxonomy_score_file} and '{contig_taxonomy_file}'."
     )
-    tools.write_contig_score_output(mag_taxonomy_list, taxonomy_score_file)
+    tools.write_module_output(mag_taxonomy_list, taxonomy_score_file)
     tools.write_contig_taxonomy_output(mag_taxonomy_list, contig_taxonomy_file)

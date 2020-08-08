@@ -66,4 +66,4 @@ def main(args):
     ]
     # Write contig score file
     logger.info(f"Writing output to: '{codon_usage_score_file}'.")
-    tools.write_contig_score_output(mag_codon_usage_list, codon_usage_score_file)
+    tools.write_module_output(mag_codon_usage_list, codon_usage_score_file)
