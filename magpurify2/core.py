@@ -57,7 +57,13 @@ class Mag:
 
 class CodonUsage:
     def __init__(self, mag, min_genes, prodigal_fna_filepath):
-        self.attributes = ["genome", "contig", "codon_usage_score", "n_genes"]
+        self.attributes = [
+            "genome",
+            "contig",
+            "codon_usage_score",
+            "n_genes",
+            "coding_length",
+        ]
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
@@ -67,13 +73,18 @@ class CodonUsage:
             self.scores = np.array([1.0])
         else:
             n_genes_dict = defaultdict(int)
+            coding_length_dict = defaultdict(int)
             for cds, _, cds_sequence in tools.read_fasta(prodigal_fna_filepath):
                 self.cds.append(cds)
                 self.cds_sequences.append(cds_sequence)
                 contig, _ = cds.rsplit("_", 1)
                 n_genes_dict[contig] += 1
+                coding_length_dict[contig] += len(cds_sequence)
             self.n_genes = np.array(
                 [n_genes_dict.get(contig, 0) for contig in self.contigs]
+            )
+            self.coding_length = np.array(
+                [coding_length_dict.get(contig, 0) for contig in self.contigs]
             )
             self.delta_cai = self.get_delta_cai()
             self.scores = self.compute_codon_usage_scores(min_genes)
@@ -145,6 +156,7 @@ class CodonUsage:
             self.contigs,
             np.round(self.scores, 4),
             self.n_genes,
+            self.coding_length,
         )
 
 
