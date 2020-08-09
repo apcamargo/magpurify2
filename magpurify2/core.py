@@ -69,24 +69,22 @@ class CodonUsage:
         self.lengths = mag.lengths
         self.cds = []
         self.cds_sequences = []
+        self.n_genes = defaultdict(int)
+        self.coding_length = defaultdict(int)
+        for cds, _, cds_sequence in tools.read_fasta(prodigal_fna_filepath):
+            self.cds.append(cds)
+            self.cds_sequences.append(cds_sequence)
+            contig, _ = cds.rsplit("_", 1)
+            self.n_genes[contig] += 1
+            self.coding_length[contig] += len(cds_sequence)
+        self.n_genes = np.array([self.n_genes.get(contig, 0) for contig in self.contigs])
+        self.coding_length = np.array(
+            [self.coding_length.get(contig, 0) for contig in self.contigs]
+        )
+        self.delta_cai = self.get_delta_cai()
         if len(self) == 1:
             self.scores = np.array([1.0])
         else:
-            n_genes_dict = defaultdict(int)
-            coding_length_dict = defaultdict(int)
-            for cds, _, cds_sequence in tools.read_fasta(prodigal_fna_filepath):
-                self.cds.append(cds)
-                self.cds_sequences.append(cds_sequence)
-                contig, _ = cds.rsplit("_", 1)
-                n_genes_dict[contig] += 1
-                coding_length_dict[contig] += len(cds_sequence)
-            self.n_genes = np.array(
-                [n_genes_dict.get(contig, 0) for contig in self.contigs]
-            )
-            self.coding_length = np.array(
-                [coding_length_dict.get(contig, 0) for contig in self.contigs]
-            )
-            self.delta_cai = self.get_delta_cai()
             self.scores = self.compute_codon_usage_scores(min_genes)
 
     def get_delta_cai(self, quantile=0.25):
