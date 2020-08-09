@@ -57,7 +57,7 @@ class Mag:
 
 class CodonUsage:
     def __init__(self, mag, min_genes, prodigal_fna_filepath):
-        self.attributes = ["genome", "contig", "score", "n_genes"]
+        self.attributes = ["genome", "contig", "codon_usage_score", "n_genes"]
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
@@ -159,7 +159,7 @@ class Composition:
         n_neighbors,
         set_op_mix_ratio,
     ):
-        self.attributes = ["genome", "contig", "score", "length"]
+        self.attributes = ["genome", "contig", "composition_score", "length"]
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
@@ -201,7 +201,13 @@ class Coverage:
         n_neighbors,
         set_op_mix_ratio,
     ):
-        self.attributes = ["genome", "contig", "score", "cluster_score", "n_samples"]
+        self.attributes = [
+            "genome",
+            "contig",
+            "coverage_score",
+            "coverage_cluster_score",
+            "n_samples",
+        ]
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
@@ -264,7 +270,7 @@ class Taxonomy:
         allow_genus,
         taxdb,
     ):
-        self.attributes = ["genome", "contig", "score"]
+        self.attributes = ["genome", "contig", "taxonomy_score"]
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
