@@ -74,6 +74,7 @@ def main(args):
         delayed(Composition)(
             mag,
             composition_dict,
+            tools.get_gc(mag.sequences),
             args.n_iterations,
             args.n_components,
             args.min_dist,

@@ -18,4 +18,4 @@
 
 mod codon;
 mod coverage;
-mod tnf;
+mod composition;

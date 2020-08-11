@@ -41,6 +41,7 @@ class Mag:
             self.lengths.append(len(sequence))
             if store_sequences:
                 self.sequences.append(sequence)
+        self.lengths = np.array(self.lengths)
 
     def __len__(self):
         return len(self.contigs)
@@ -62,7 +63,8 @@ class CodonUsage:
             "contig",
             "codon_usage_score",
             "n_genes",
-            "coding_length",
+            "total_cds_length",
+            "mean_strand_coding_density",
         ]
         self.genome = mag.genome
         self.contigs = mag.contigs
@@ -70,17 +72,19 @@ class CodonUsage:
         self.cds = []
         self.cds_sequences = []
         self.n_genes = defaultdict(int)
-        self.coding_length = defaultdict(int)
+        self.total_cds_length = defaultdict(int)
         for cds, _, cds_sequence in tools.read_fasta(prodigal_fna_filepath):
             self.cds.append(cds)
             self.cds_sequences.append(cds_sequence)
             contig, _ = cds.rsplit("_", 1)
             self.n_genes[contig] += 1
-            self.coding_length[contig] += len(cds_sequence)
+            self.total_cds_length[contig] += len(cds_sequence)
         self.n_genes = np.array([self.n_genes.get(contig, 0) for contig in self.contigs])
-        self.coding_length = np.array(
-            [self.coding_length.get(contig, 0) for contig in self.contigs]
+        self.total_cds_length = np.array(
+            [self.total_cds_length.get(contig, 0) for contig in self.contigs]
         )
+        self.mean_strand_coding_density = self.total_cds_length / (2 * self.lengths)
+        self.mean_strand_coding_density = np.round(self.mean_strand_coding_density, 5)
         self.delta_cai = self.get_delta_cai()
         if len(self) == 1:
             self.scores = np.array([1.0])
@@ -141,8 +145,7 @@ class CodonUsage:
             kept_scores = 1 - (mean_contig_delta_cai - max_valley) / divisor
         contig_score_dict = dict(zip(kept_contigs, kept_scores))
         scores = np.array([contig_score_dict.get(contig, 1.0) for contig in self.contigs])
-        scores[scores > 1] = 1
-        scores[scores < 0] = 0
+        scores = np.clip(scores, 0, 1)
         return scores
 
     def __len__(self):
@@ -152,9 +155,10 @@ class CodonUsage:
         return zip(
             [self.genome] * len(self),
             self.contigs,
-            np.round(self.scores, 4),
+            np.round(self.scores, 5),
             self.n_genes,
-            self.coding_length,
+            self.total_cds_length,
+            self.mean_strand_coding_density,
         )
 
 
@@ -163,21 +167,24 @@ class Composition:
         self,
         mag,
         composition_dict,
+        gc_content,
         n_iterations,
         n_components,
         min_dist,
         n_neighbors,
         set_op_mix_ratio,
     ):
-        self.attributes = ["genome", "contig", "composition_score", "length"]
+        self.attributes = ["genome", "contig", "tnf_score", "gc_score", "length"]
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
         self.tnf = composition_dict[mag.genome]
+        self.gc_content = gc_content
         if len(self) <= 2:
-            self.scores = np.array([1.0] * len(self))
+            self.tnf_scores = np.array([1.0] * len(self))
+            self.gc_scores = np.array([1.0] * len(self))
         else:
-            self.scores = tools.get_cluster_score_from_embedding(
+            self.tnf_scores = tools.get_cluster_score_from_embedding(
                 data=self.tnf,
                 lengths=self.lengths,
                 n_iterations=n_iterations,
@@ -186,6 +193,7 @@ class Composition:
                 n_neighbors=n_neighbors,
                 set_op_mix_ratio=set_op_mix_ratio,
             )
+            self.gc_scores = tools.get_log_ratio_scores(self.gc_content, self.lengths, 2)
 
     def __len__(self):
         return len(self.contigs)
@@ -194,7 +202,8 @@ class Composition:
         return zip(
             [self.genome] * len(self),
             self.contigs,
-            np.round(self.scores, 4),
+            np.round(self.tnf_scores, 5),
+            np.round(self.gc_scores, 5),
             self.lengths,
         )
 
@@ -231,7 +240,9 @@ class Coverage:
             self.scores = np.array([1.0] * len(self))
             self.cluster_scores = np.array([1.0] * len(self))
         else:
-            self.scores = self.log_relative_error_scores()
+            self.scores = tools.get_log_ratio_scores(
+                self.coverages[:, self.selected_samples], self.lengths, 25
+            )
             if self.n_samples >= 3:
                 self.cluster_scores = tools.get_cluster_score_from_embedding(
                     data=np.log1p(self.coverages),
@@ -245,18 +256,6 @@ class Coverage:
             else:
                 self.cluster_scores = np.ones(len(self))
 
-    def log_relative_error_scores(self):
-        weighted_medians = np.apply_along_axis(
-            tools.weighted_median, 0, self.coverages, weights=self.lengths
-        )
-        selected_data = self.coverages[:, self.selected_samples]
-        weighted_medians = weighted_medians[self.selected_samples]
-        deviation = selected_data / (weighted_medians + 1e-5)
-        scores = 1 - np.abs(np.log(deviation + 1e-5) / np.log(25))
-        scores = np.average(scores, axis=1)
-        scores[scores < 0] = 0
-        return scores
-
     def __len__(self):
         return len(self.contigs)
 
@@ -264,8 +263,8 @@ class Coverage:
         return zip(
             [self.genome] * len(self),
             self.contigs,
-            np.round(self.scores, 4),
-            np.round(self.cluster_scores, 4),
+            np.round(self.scores, 5),
+            np.round(self.cluster_scores, 5),
             [self.n_samples] * len(self),
         )
 
@@ -347,4 +346,4 @@ class Taxonomy:
         return len(self.contigs)
 
     def __iter__(self):
-        return zip([self.genome] * len(self), self.contigs, np.round(self.scores, 4))
+        return zip([self.genome] * len(self), self.contigs, np.round(self.scores, 5))

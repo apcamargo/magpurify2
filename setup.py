@@ -29,7 +29,7 @@ setup(
     rust_extensions=[
         RustExtension("magpurify2._codon", debug=False),
         RustExtension("magpurify2._coverage", debug=False),
-        RustExtension("magpurify2._tnf", debug=False),
+        RustExtension("magpurify2._composition", debug=False),
     ],
     zip_safe=False,
     license="GNU General Public License v3.0",

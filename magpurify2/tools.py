@@ -38,7 +38,7 @@ from Bio import SeqIO, bgzf
 
 from magpurify2._codon import get_cai, get_codon_index
 from magpurify2._coverage import get_coverages
-from magpurify2._tnf import get_tnf
+from magpurify2._composition import get_tnf, get_gc
 
 logger = logging.getLogger("timestamp")
 
@@ -239,7 +239,7 @@ def read_fasta(filepath):
     fin.close()
 
 
-def weighted_median(data, weights):
+def get_weighted_median(data, weights):
     """
     Computes the weighted median of the input data.
 
@@ -268,6 +268,46 @@ def weighted_median(data, weights):
         else:
             w_median = s_data[idx + 1]
     return w_median
+
+
+def get_log_ratio_scores(data, weights, base, pseudo=1e-5, min=0., max=1.):
+    """
+    Computes the deviation from the weighted median as the log of the ratio
+    between each data point and the weighted median.
+
+    Parameters
+    ----------
+    data : array-like
+        Input data that will be used to compute the score.
+    weights : array-like
+        An array of weights associated with the values in the input data. Used
+        to compute the weighted median.
+    base : float
+        Base of the log.
+    pseudo : float
+        Pseudocount added to the numerator and denominator in the ratio between
+        the data and the weighted median.
+    min : float
+        Minimum allowed value within the resulting score array.
+    max : float
+        Maximum allowed value within the resulting score array.
+
+    Returns
+    -------
+    ndarray
+        Array of containing the score of each data point.
+    """
+    if data.ndim == 1:
+        weighted_median = get_weighted_median(data, weights=weights)
+    else:
+        weighted_median = np.apply_along_axis(
+            get_weighted_median, 0, data, weights=weights
+        )
+    scores = (data + pseudo) / (weighted_median + pseudo)
+    scores = 1 - np.abs(np.log(scores) / np.log(base))
+    if data.ndim != 1:
+        scores = np.average(scores, axis=1)
+    return np.clip(scores, min, max)
 
 
 def check_prediction(genome_list, output_directory):

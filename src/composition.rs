@@ -16,7 +16,7 @@
 //
 // Contact: antoniop.camargo@gmail.com
 
-use ndarray::{Array2, Axis};
+use ndarray::{Array, Array2, Axis};
 use numpy::convert::ToPyArray;
 use pyo3::{prelude::*, wrap_pyfunction};
 use rayon::{prelude::*, ThreadPoolBuilder};
@@ -123,8 +123,46 @@ fn get_tnf(py: Python, seq_list: Vec<&str>, relative: bool, threads: usize) -> P
     }
 }
 
+/// Computes the relative GC content of a nucleotide sequence by counting `G`, `g`, `C`
+/// and `c` characters.
+fn gc_content(seq: &str) -> f32 {
+    let g_count = seq.matches("G").count() + seq.matches("g").count();
+    let c_count = seq.matches("C").count() + seq.matches("c").count();
+    (g_count + c_count) as f32 / seq.chars().count() as f32
+}
+
+/// get_gc(seq_list)
+/// --
+///
+/// Computes the relative GC content of a list of DNA sequences.
+///
+/// Parameters
+/// ----------
+/// seq_list : list
+///    DNA sequence string from which k-mers will be counted.
+///
+/// Returns
+/// -------
+/// ndarray
+///    An array containing the GC content of each sequence in the input.
+#[pyfunction]
+fn get_gc(py: Python, seq_list: Vec<&str>) -> PyObject {
+    let gc_array = {
+        Array::from(
+            seq_list
+                .iter()
+                .map(|seq| gc_content(seq))
+                .collect::<Vec<f32>>(),
+        )
+    };
+    gc_array
+        .to_pyarray(Python::acquire_gil().python())
+        .into_py(py)
+}
+
 #[pymodule]
-fn _tnf(_py: Python, m: &PyModule) -> PyResult<()> {
+fn _composition(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(get_tnf))?;
+    m.add_wrapped(wrap_pyfunction!(get_gc))?;
     Ok(())
 }
