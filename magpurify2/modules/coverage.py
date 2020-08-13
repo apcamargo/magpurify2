@@ -21,7 +21,6 @@
 import gzip
 import logging
 import pickle
-from itertools import compress
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -62,7 +61,7 @@ def main(args):
     skip_coverage = False
     if coverage_data_file.exists():
         with gzip.open(coverage_data_file) as fin:
-            loaded_bam_signatures, coverage_dict = pickle.load(fin)
+            loaded_bam_signatures, contig_names, coverage_matrix = pickle.load(fin)
             if set(bam_signatures).issubset(loaded_bam_signatures):
                 logger.info("Skipping contig coverages computation.")
                 skip_coverage = True
@@ -72,29 +71,29 @@ def main(args):
                     selected_bams = [
                         signature in bam_signatures for signature in loaded_bam_signatures
                     ]
-                    coverage_dict = {
-                        contig: list(compress(coverages, selected_bams))
-                        for contig, coverages in coverage_dict.items()
-                    }
+                    coverage_matrix = coverage_matrix[:, selected_bams]
             else:
                 coverage_data_file.unlink()
     if not skip_coverage:
         logger.info(f"Computing contig coverages from {len(args.bam_files)} BAM files.")
-        coverage_dict = tools.get_coverages(
+        contig_names, coverage_matrix = tools.get_coverages(
             [str(filepath) for filepath in args.bam_files],
             min_identity=args.min_identity,
             threads=args.threads,
         )
+        contig_names = np.array(contig_names)
         logger.info(f"Saving contig coverages data to '{coverage_data_file}'.")
         with gzip.open(coverage_data_file, "wb") as fout:
-            pickle.dump((bam_signatures, coverage_dict), fout)
+            pickle.dump((bam_signatures, contig_names, coverage_matrix), fout)
 
     logger.info("Computing contig scores.")
 
-    # Build a dictionary where the keys are genome names and the values are numpy arrays
+    # Build a dictionary where the keys are genome names and the values are numpy matrices
     # of the coverage values
     coverage_dict = Parallel(n_jobs=args.threads)(
-        delayed(lambda x, y: np.array([y[i] for i in x.contigs]))(mag, coverage_dict,)
+        delayed(lambda x, y, z: z[[np.where(y==i)[0][0] for i in x.contigs]])(
+            mag, contig_names, coverage_matrix,
+        )
         for mag in mag_list
     )
     coverage_dict = dict(zip([mag.genome for mag in mag_list], coverage_dict))

@@ -23,6 +23,8 @@ use coverm::{
     mosdepth_genome_coverage_estimators::*,
     FlagFilter,
 };
+use ndarray::Array2;
+use numpy::convert::ToPyArray;
 use pyo3::{prelude::*, wrap_pyfunction};
 use std::collections::HashMap;
 
@@ -61,9 +63,9 @@ struct EstimatorsAndTaker<'a> {
 ///
 /// Returns
 /// -------
-/// dict
-///    A dictionary where the keys are contig names and the values are lists
-///    containing the contig mean coverage in each BAM file.
+/// tuple
+///    A tuple whose fist element is a list of the contig names and the second
+///    one is a numpy matrix of contig coverages in the input BAM files.
 #[pyfunction(contig_end_exclusion = "75", min_identity = "0.97", threads = "1")]
 fn get_coverages(
     py: Python,
@@ -71,7 +73,7 @@ fn get_coverages(
     contig_end_exclusion: u32,
     min_identity: f32,
     threads: usize,
-) -> PyObject {
+) -> (PyObject, PyObject) {
     let min_fraction_covered_bases = 0.;
     let filter_params = FilterParameters {
         flag_filters: FlagFilter {
@@ -127,15 +129,35 @@ fn get_coverages(
             for input_bam in coverages {
                 for coverage_entry in input_bam {
                     if let Some(contig_name) = &entry_names[coverage_entry.entry_index] {
-                        let coverage_vector = contig_coverages.entry(contig_name).or_insert(vec![]);
-                        coverage_vector.push(coverage_entry.coverage);
+                        let contig_coverage_vector =
+                            contig_coverages.entry(contig_name).or_insert(vec![]);
+                        contig_coverage_vector.push(coverage_entry.coverage);
                     }
                 }
             }
         }
         _ => unreachable!(),
     }
-    contig_coverages.into_py(py)
+
+    let mut contig_names_vector = Vec::new();
+    let mut coverage_vector: std::vec::Vec<f32> = Vec::new();
+    for (contig_name, contig_coverage_vector) in contig_coverages.iter() {
+        contig_names_vector.push(*contig_name);
+        coverage_vector.extend(contig_coverage_vector);
+    }
+
+    let coverage_vector = Array2::from_shape_vec(
+        (
+            contig_names_vector.len(),
+            coverage_vector.len() / contig_names_vector.len(),
+        ),
+        coverage_vector,
+    )
+    .unwrap()
+    .to_pyarray(Python::acquire_gil().python())
+    .into_py(py);
+
+    (contig_names_vector.into_py(py), coverage_vector)
 }
 
 #[pymodule]
