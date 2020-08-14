@@ -139,11 +139,11 @@ fn get_coverages(
         _ => unreachable!(),
     }
 
-    let mut contig_names_vector = Vec::new();
     let mut coverage_vector: std::vec::Vec<f32> = Vec::new();
+    let mut contig_names_vector = Vec::new();
     for (contig_name, contig_coverage_vector) in contig_coverages.iter() {
-        contig_names_vector.push(*contig_name);
         coverage_vector.extend(contig_coverage_vector);
+        contig_names_vector.push(*contig_name);
     }
 
     let coverage_vector = Array2::from_shape_vec(
@@ -156,8 +156,9 @@ fn get_coverages(
     .unwrap()
     .to_pyarray(Python::acquire_gil().python())
     .into_py(py);
+    let contig_names_vector = contig_names_vector.into_py(py);
 
-    (contig_names_vector.into_py(py), coverage_vector)
+    (contig_names_vector, coverage_vector)
 }
 
 #[pymodule]
