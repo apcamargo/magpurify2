@@ -46,7 +46,8 @@ struct EstimatorsAndTaker<'a> {
 /// get_coverages(bam_list, contig_end_exclusion=75, min_identity=0.97, threads=1)
 /// --
 ///
-/// Computes the contig mean coverage from sorted BAM files.
+/// Computes contig mean coverages from sorted BAM files. Trimmed means will be
+/// computed if `trim_min` and/or `trim_max` are set to values greater than 0.
 ///
 /// Parameters
 /// ----------
@@ -58,6 +59,12 @@ struct EstimatorsAndTaker<'a> {
 /// min_identity : float, optional
 ///    Exclude reads by overall identity to the reference sequences.
 ///    Default is 0.97.
+/// trim_lower : float, optional
+///    Fraction to exclude from the lower tail of the coverage distribution.
+///    Default is 0.05.
+/// trim_upper : float, optional
+///    Fraction to exclude from the upper tail of the coverage distribution.
+///    Default is 0.05.
 /// threads : int, optional
 ///    Number of threads to use for coverage computation. Default is 1.
 ///
@@ -66,14 +73,23 @@ struct EstimatorsAndTaker<'a> {
 /// tuple
 ///    A tuple whose fist element is a list of the contig names and the second
 ///    one is a numpy matrix of contig coverages in the input BAM files.
-#[pyfunction(contig_end_exclusion = "75", min_identity = "0.97", threads = "1")]
+#[pyfunction(
+    contig_end_exclusion = "75",
+    min_identity = "0.97",
+    trim_lower = "0.05",
+    trim_upper = "0.05",
+    threads = "1"
+)]
 fn get_coverages(
     py: Python,
     bam_list: Vec<&str>,
     contig_end_exclusion: u32,
     min_identity: f32,
+    trim_lower: f32,
+    trim_upper: f32,
     threads: usize,
 ) -> (PyObject, PyObject) {
+    let trim_upper = 1. - trim_upper;
     let min_fraction_covered_bases = 0.;
     let filter_params = FilterParameters {
         flag_filters: FlagFilter {
@@ -88,10 +104,11 @@ fn get_coverages(
         min_percent_identity_pair: 0.,
         min_aligned_percent_pair: 0.,
     };
-    let estimators = vec![CoverageEstimator::new_estimator_mean(
+    let estimators = vec![CoverageEstimator::new_estimator_trimmed_mean(
+        trim_lower,
+        trim_upper,
         min_fraction_covered_bases,
         contig_end_exclusion,
-        false,
     )];
     let taker = CoverageTakerType::new_cached_single_float_coverage_taker(estimators.len());
     let mut estimators_and_taker = EstimatorsAndTaker {
