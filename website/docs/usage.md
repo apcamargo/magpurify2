@@ -1,5 +1,9 @@
 # Using MAGpurify2
 
+## Generating bins
+
+*Recommend binners and DAS Tool.*
+
 ## Quick start
 
 ```bash

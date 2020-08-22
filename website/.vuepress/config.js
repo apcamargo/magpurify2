@@ -14,9 +14,9 @@ module.exports = {
           title: 'Theory',
           collapsable: false,
           children: [
+            'codon-usage-theory',
             'composition-theory',
             'coverage-theory',
-            'codon-usage-theory',
           ]
         },
         'installation',
