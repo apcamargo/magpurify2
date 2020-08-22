@@ -34,6 +34,8 @@ def main(args):
     args.contig_min_fraction = tools.validade_input(
         args.min_identity, "min_identity", [0.0, 1.0]
     )
+    args.trim_lower = tools.validade_input(args.trim_lower, "trim_lower", [0.0, 1.0])
+    args.trim_upper = tools.validade_input(args.trim_upper, "trim_upper", [0.0, 1.0])
     args.min_average_coverage = tools.validade_input(
         args.min_average_coverage, "min_average_coverage", [0, 999]
     )
@@ -79,6 +81,8 @@ def main(args):
         contig_names, coverage_matrix = tools.get_coverages(
             [str(filepath) for filepath in args.bam_files],
             min_identity=args.min_identity,
+            trim_lower=args.trim_lower,
+            trim_upper=args.trim_upper,
             threads=args.threads,
         )
         contig_names = np.array(contig_names)
@@ -89,7 +93,7 @@ def main(args):
     # Build a dictionary where the keys are genome names and the values are numpy matrices
     # of the coverage values
     coverage_dict = Parallel(n_jobs=args.threads)(
-        delayed(lambda x, y, z: z[[np.where(y==i)[0][0] for i in x.contigs]])(
+        delayed(lambda x, y, z: z[[np.where(y == i)[0][0] for i in x.contigs]])(
             mag, contig_names, coverage_matrix,
         )
         for mag in mag_list
