@@ -103,18 +103,13 @@ class CodonUsage:
 
     def compute_codon_usage_scores(self, min_genes):
         contig_delta_cai = defaultdict(list)
-        contig_cai_lengths = defaultdict(list)
-        for cds, cds_sequence, delta_cai in zip(
-            self.cds, self.cds_sequences, self.delta_cai
-        ):
+        for cds, delta_cai in zip(self.cds, self.delta_cai):
             contig, _ = cds.rsplit("_", 1)
             contig_delta_cai[contig].append(delta_cai)
-            contig_cai_lengths[contig].append(len(cds_sequence))
         kept_contigs = np.array(self.contigs)[self.n_genes >= min_genes]
         kept_n_genes = self.n_genes[self.n_genes >= min_genes]
         mean_contig_delta_cai = [
-            np.average(contig_delta_cai[contig], weights=contig_cai_lengths[contig])
-            for contig in kept_contigs
+            np.average(contig_delta_cai[contig]) for contig in kept_contigs
         ]
         # Scale the data and take the average between it and 0.5. This will bring the
         # points closer to the center and will give the KDE some space to breathe.
