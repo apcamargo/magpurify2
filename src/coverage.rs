@@ -60,11 +60,11 @@ struct EstimatorsAndTaker<'a> {
 ///    Exclude reads by overall identity to the reference sequences.
 ///    Default is 0.97.
 /// trim_lower : float, optional
-///    Fraction to exclude from the lower tail of the coverage distribution.
-///    Default is 0.05.
+///    Fraction to trim from the lower tail of the coverage distribution.
+///    Default is 0.0.
 /// trim_upper : float, optional
-///    Fraction to exclude from the upper tail of the coverage distribution.
-///    Default is 0.05.
+///    Fraction to trim from the upper tail of the coverage distribution.
+///    Default is 0.0.
 /// threads : int, optional
 ///    Number of threads to use for coverage computation. Default is 1.
 ///
@@ -76,8 +76,8 @@ struct EstimatorsAndTaker<'a> {
 #[pyfunction(
     contig_end_exclusion = "75",
     min_identity = "0.97",
-    trim_lower = "0.05",
-    trim_upper = "0.05",
+    trim_lower = "0.",
+    trim_upper = "0.",
     threads = "1"
 )]
 fn get_coverages(

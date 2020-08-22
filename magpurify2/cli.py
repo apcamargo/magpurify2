@@ -193,14 +193,14 @@ def coverage_parser(parser):
     )
     options.add_argument(
         "--trim_lower",
-        default=0.1,
+        default=0.05,
         help="Fraction to trim from the lower tail of the coverage distribution to "
         "compute contig mean coverages.",
         type=float,
     )
     options.add_argument(
         "--trim_upper",
-        default=0.1,
+        default=0.05,
         help="Fraction to trim from the upper tail of the coverage distribution to "
         "compute contig mean coverages.",
         type=float,
