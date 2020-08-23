@@ -31,3 +31,13 @@ MAGpurify2 currently does not take into account the length-dependent statistical
 The high dimensional 4-mer frequency data ($q$) is then non-linearly projected into a three dimensional space using the [UMAP](https://umap-learn.readthedocs.io/en/latest/) algorithm, which will bring similar data points together and distance contigs with distinct TNF profiles. Next, [hdbscan](https://hdbscan.readthedocs.io/en/latest/) is used to identify clusters within the UMAP embedding and, if at least one cluster is found, compute the membership level of each contig to the "core cluster". Here, "core cluster" is defined as the cluster that encompassess the largest assembled fraction, that is, the sum of the lengths of all the contigs within the cluster.
 
 As UMAP is a non-deterministic algorithm, MAGpurify2 executes multiple iterations of the dimension reduction and clustering steps. The final contig score correspond to the average of its membership level to the "core cluster" across the iterations.
+
+## GC content
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam id nulla ac velit elementum tempus non eget urna. Etiam placerat leo ac risus semper feugiat ut id nulla. Fusce venenatis magna non feugiat convallis.
+
+![gc-content-hist](./figures/gc-content-hist.svg)
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam id nulla ac velit elementum tempus non eget urna. Etiam placerat leo ac risus semper feugiat ut id nulla. Fusce venenatis magna non feugiat convallis.
+
+![gc-content-scores](./figures/gc-content-scores.svg)

@@ -8,7 +8,7 @@ When read mappings are supplied by the user, MAGpurify2 processes the alignments
 
 - Variations in sequence conservation across species, the presence of repeat regions, sequencing biases, and sampling biases can all cause different regions within the same contig to have very disting read coverages. To prevent large within-contig coverage variations from shifting the estimated contig coverage, MAGpurify2 trims the lower and upper tails of the within coverage distribution (5% of each, by default) before taking the mean.
 
-**INSERT FIGURE HERE**
+![coverage-trimming](./figures/coverage-trimming.svg)
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam id nulla ac velit elementum tempus non eget urna. Etiam placerat leo ac risus semper feugiat ut id nulla. Fusce venenatis magna non feugiat convallis.
 
