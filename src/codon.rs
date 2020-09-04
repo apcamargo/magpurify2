@@ -164,7 +164,7 @@ fn cai_for_gene(seq: &str, index: &HashMap<&str, f64>) -> f64 {
 /// get_codon_index(seq_list, use_pseudocount=True)
 /// --
 ///
-/// Computes the codon usage index from a list of in-frame ORF sequences.
+/// Computes the codon usage index (RSCU) from a list of in-frame ORF sequences.
 ///
 /// Parameters
 /// ----------

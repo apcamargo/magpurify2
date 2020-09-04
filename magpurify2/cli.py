@@ -310,24 +310,29 @@ def taxonomy_parser(parser):
     )
     options.add_argument(
         "--contig_min_fraction",
-        default=0.75,
+        default=0.5,
         type=float,
         help="The contig-level taxonomy must agree with the taxonomy of at least "
-        "`contig_min_fraction` of its genes. This value must be equal to or greater than "
-        "0.5 and less than 1.",
+        "`contig_min_fraction` of its genes (weighted by the bitscore of the alignment). "
+        "The value must be equal to or greater than 0.5 and less than 1.",
     )
     options.add_argument(
         "--genome_min_fraction",
-        default=0.75,
+        default=0.5,
         type=float,
         help="The genome-level taxonomy must agree with the taxonomy of at least "
-        "`genome_min_fraction` of its contigs (weighted by length). This value must be "
-        "equal to or greater than 0.5 and less than 1.",
+        "`genome_min_fraction` of its genes (weighted by the bitscore of the alignment). "
+        "The value must be equal to or greater than 0.5 and less than 1. This parameter "
+        "will not affect the contig scores.",
     )
     options.add_argument(
-        "--allow_genus",
-        help="Allows genus-level taxonomic assignment.",
-        action="store_true",
+        "--min_genus_identity",
+        default=0.83,
+        type=float,
+        help="A given gene will only be assigned up to the genus rank if the value "
+        "obtained from 'alignment identity * target coverage' is equal to or greater "
+        "than `min_genus_identity`. In case this condition is not satisfied, the gene "
+        "will be assigned up to the family rank.",
     )
     other.add_argument(
         "-t",

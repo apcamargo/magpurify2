@@ -36,6 +36,9 @@ def main(args):
     args.genome_min_fraction = tools.validade_input(
         args.genome_min_fraction, "genome_min_fraction", [0.5, 1.0]
     )
+    args.genome_min_fraction = tools.validade_input(
+        args.min_genus_identity, "min_genus_identity", [0.0, 1.0]
+    )
     # Check if Prodigal and MMSeqs2 are executables in the user PATH.
     missing_executables = [
         executable
@@ -62,16 +65,19 @@ def main(args):
 
     mmseqs2_output_directory = args.output_directory.joinpath("mmseqs2")
     mmseqs2_input_file = mmseqs2_output_directory.joinpath("mmseqs2_input.faa")
-    mmseqs2_output_file = mmseqs2_output_directory.joinpath("mmseqs2_output.tsv")
+    mmseqs2_taxonomy_file = mmseqs2_output_directory.joinpath("mmseqs2_taxonomy.tsv")
+    mmseqs2_alignment_file = mmseqs2_output_directory.joinpath("mmseqs2_alignment.tsv")
 
     # Check if MMSeqs2 needs to be executed again. To do that, we check if a MMSeqs2
     # output file exists. If it does, we check if all the input genomes are in it.
     skip_mmseqs = False
     if mmseqs2_output_directory.is_dir():
-        if mmseqs2_output_file.exists():
-            with open(mmseqs2_output_file) as fin:
-                searched_genomes = {line.split("~")[0] for line in fin}
-            if {mag.genome for mag in mag_list}.issubset(searched_genomes):
+        if mmseqs2_taxonomy_file.exists() and mmseqs2_alignment_file.exists():
+            with open(mmseqs2_taxonomy_file) as fin:
+                searched_genomes_taxonomy = {line.split("~")[0] for line in fin}
+            with open(mmseqs2_alignment_file) as fin:
+                searched_genomes_alignment = {line.split("~")[0] for line in fin}
+            if {mag.genome for mag in mag_list}.issubset(searched_genomes_taxonomy):
                 logger.info("Skipping MMSeqs2 search.")
                 skip_mmseqs = True
             else:
@@ -95,15 +101,15 @@ def main(args):
         nodes_dmp=database.nodes_dmp, names_dmp=database.names_dmp, keep_files=True,
     )
     logger.info(f"Reading MMSeqs2 output file.")
-    taxonomy_dict = tools.get_taxonomy_dict(mmseqs2_output_file, taxdb)
+    mmseqs2_dict = tools.get_mmseqs2(str(mmseqs2_taxonomy_file), str(mmseqs2_alignment_file))
     logger.info("Computing contig scores.")
     mag_taxonomy_list = [
         Taxonomy(
             mag,
-            taxonomy_dict,
+            mmseqs2_dict[mag.genome],
             args.contig_min_fraction,
             args.genome_min_fraction,
-            args.allow_genus,
+            args.min_genus_identity,
             taxdb,
         )
         for mag in mag_list

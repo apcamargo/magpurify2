@@ -144,15 +144,20 @@ def mmseqs2(output_directory, database, threads):
     log_file = output_directory.joinpath("mmseqs2.log")
     mmseqs2_output_directory = output_directory.joinpath("mmseqs2")
     mmseqs2_input_file = mmseqs2_output_directory.joinpath("mmseqs2_input.faa")
-    mmseqs2_output_file = mmseqs2_output_directory.joinpath("mmseqs2_output.tsv")
+    mmseqs2_taxonomy_file = mmseqs2_output_directory.joinpath("mmseqs2_taxonomy.tsv")
+    mmseqs2_alignment_file = mmseqs2_output_directory.joinpath("mmseqs2_alignment.tsv")
     querydb_directory = mmseqs2_output_directory.joinpath("querydb")
     querydb_prefix = querydb_directory.joinpath("querydb")
     taxonomydb_directory = mmseqs2_output_directory.joinpath("taxonomydb")
     taxonomydb_prefix = taxonomydb_directory.joinpath("taxonomydb")
+    taxonomydb_aln_prefix = taxonomydb_directory.joinpath("taxonomydb_aln")
+    besthitdb_directory = mmseqs2_output_directory.joinpath("besthitdb")
+    besthitdb_prefix = besthitdb_directory.joinpath("besthitdb")
     tmp_directory = mmseqs2_output_directory.joinpath("tmp")
     # Create intermediate directories.
     querydb_directory.mkdir()
     taxonomydb_directory.mkdir()
+    besthitdb_directory.mkdir()
     tmp_directory.mkdir()
     # Define the MMSeqs2 commands:
     createdb_command = ["mmseqs", "createdb", mmseqs2_input_file, querydb_prefix]
@@ -167,6 +172,10 @@ def mmseqs2(output_directory, database, threads):
         "3.5",
         "--lca-mode",
         "3",
+        "--tax-output-mode",
+        "2",
+        "--sort-results",
+        "1",
         "--threads",
         str(threads),
     ]
@@ -175,10 +184,38 @@ def mmseqs2(output_directory, database, threads):
         "createtsv",
         querydb_prefix,
         taxonomydb_prefix,
-        mmseqs2_output_file,
+        mmseqs2_taxonomy_file,
+    ]
+    best_hit_command = [
+        "mmseqs",
+        "filterdb",
+        taxonomydb_aln_prefix,
+        besthitdb_prefix,
+        "--extract-lines",
+        "1",
+        "--threads",
+        str(threads),
+    ]
+    convertalis_command = [
+        "mmseqs",
+        "convertalis",
+        querydb_prefix,
+        database.mmseqs_db,
+        besthitdb_prefix,
+        mmseqs2_alignment_file,
+        "--format-output",
+        "'query,fident,tcov,bits'",
+        "--threads",
+        str(threads),
     ]
     with open(log_file, "w") as fout:
-        for command in [createdb_command, taxonomy_command, createtsv_command]:
+        for command in [
+            createdb_command,
+            taxonomy_command,
+            createtsv_command,
+            best_hit_command,
+            convertalis_command,
+        ]:
             try:
                 subprocess.run(command, stdout=fout, stderr=fout, check=True)
             except subprocess.CalledProcessError:
@@ -188,4 +225,5 @@ def mmseqs2(output_directory, database, threads):
     # Remove intermediate directories.
     shutil.rmtree(querydb_directory)
     shutil.rmtree(taxonomydb_directory)
+    shutil.rmtree(besthitdb_directory)
     shutil.rmtree(tmp_directory)

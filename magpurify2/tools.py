@@ -37,8 +37,9 @@ import umap
 from Bio import SeqIO, bgzf
 
 from magpurify2._codon import get_cai, get_codon_index
-from magpurify2._coverage import get_coverages
 from magpurify2._composition import get_tnf, get_gc
+from magpurify2._coverage import get_coverages
+from magpurify2._mmseqs2 import get_mmseqs2
 
 logger = logging.getLogger("timestamp")
 
@@ -365,37 +366,6 @@ def write_mmseqs2_input(output_directory):
                 contig.replace("~", "_")
                 fout.write(f">{genome}~{contig}~{gene_number}\n")
                 fout.write(f"{textwrap.fill(sequence, 70)}\n")
-
-
-def get_taxonomy_dict(mmseqs2_output, taxdb):
-    """
-    Parse the MMSeqs2 output and assign a taxon to each contig based on the
-    taxonomic assignment of its genes.
-
-    Parameters
-    ----------
-    mmseqs2_output : Path
-        Path object pointing to the MMSeqs2 output.
-    taxdb : TaxDb
-        A TaxDb object.
-
-    Returns
-    -------
-    dictionary
-        Returns a nested dictionary. In the outer dictionary, the keys are the
-        names of the genomes found in the MMSeqs2 output. In the inner
-        dictionary the keys are the names of the contigs in the genome and the
-        values are lists with Taxon objects for each gene in the contig.
-    """
-    taxonomy_dict = defaultdict(lambda: defaultdict(list))
-    with open(mmseqs2_output) as fin:
-        for line in fin:
-            taxid = line.split()[1]
-            if taxid != "0":
-                taxon = taxopy.Taxon(taxid, taxdb)
-                genome, contig, _ = line.split()[0].split("~")
-                taxonomy_dict[genome][contig].append(taxon)
-    return taxonomy_dict
 
 
 def create_embedding(

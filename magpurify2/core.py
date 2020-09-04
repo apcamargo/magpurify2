@@ -18,6 +18,7 @@
 #
 # Contact: antoniop.camargo@gmail.com
 
+import itertools
 from collections import defaultdict
 
 import numpy as np
@@ -273,10 +274,10 @@ class Taxonomy:
     def __init__(
         self,
         mag,
-        taxonomy_dict,
+        mmseqs2_dict,
         contig_min_fraction,
         genome_min_fraction,
-        allow_genus,
+        min_genus_identity,
         taxdb,
     ):
         self.attributes = ["genome", "contig", "taxonomy_score"]
@@ -284,63 +285,111 @@ class Taxonomy:
         self.contigs = mag.contigs
         self.lengths = mag.lengths
         self.taxdb = taxdb
-        self.gene_taxonomy = [
-            taxonomy_dict[mag.genome].get(contig, [taxopy.Taxon("1", self.taxdb)])
-            for contig in self.contigs
-        ]
-        self.contig_taxonomy = self.get_contig_taxonomy(
-            fraction=contig_min_fraction, allow_genus=allow_genus
+
+        self.contigs_in_mmseqs2 = np.array(
+            [contig for contig in self.contigs if contig in mmseqs2_dict]
         )
+        self.taxid_array = [mmseqs2_dict[contig][0] for contig in self.contigs_in_mmseqs2]
+        self.identity_array = [
+            mmseqs2_dict[contig][1] for contig in self.contigs_in_mmseqs2
+        ]
+        self.bitscore_array = [
+            mmseqs2_dict[contig][2] for contig in self.contigs_in_mmseqs2
+        ]
+        self.gene_taxonomy = self.get_gene_taxonomy(min_genus_identity=min_genus_identity)
+        self.contig_taxonomy = self.get_contig_taxonomy(fraction=contig_min_fraction)
         self.genome_taxonomy = self.get_genome_taxonomy(fraction=genome_min_fraction)
         self.scores = self.compute_gene_agreement()
 
-    def get_contig_taxonomy(self, fraction=0.75, allow_genus=False):
-        contig_taxonomy = []
-        for contig in self.gene_taxonomy:
-            if len(contig) > 1:
-                majority_vote = taxopy.find_majority_vote(contig, self.taxdb, fraction)
-            else:
-                (majority_vote,) = contig
-            if allow_genus and majority_vote.rank == "species":
-                majority_vote = taxopy.Taxon(majority_vote.taxid_lineage[1], self.taxdb)
-            elif majority_vote.rank == "species":
-                majority_vote = taxopy.Taxon(majority_vote.taxid_lineage[2], self.taxdb)
-            elif majority_vote.rank == "genus":
-                majority_vote = taxopy.Taxon(majority_vote.taxid_lineage[1], self.taxdb)
-            contig_taxonomy.append(majority_vote)
-        return contig_taxonomy
+    def get_gene_taxonomy(self, min_genus_identity):
+        gene_taxonomy_array = []
+        for i in range(len(self.taxid_array)):
+            contig_taxa_list = []
+            for j in range(len(self.taxid_array[i])):
+                identity = self.identity_array[i][j]
+                taxon = taxopy.Taxon(str(self.taxid_array[i][j]), self.taxdb)
+                if identity >= min_genus_identity and taxon.rank == "species":
+                    taxon = taxopy.Taxon(taxon.taxid_lineage[1], self.taxdb)
+                elif identity >= min_genus_identity and taxon.rank == "genus":
+                    pass
+                elif taxon.rank == "species":
+                    taxon = taxopy.Taxon(taxon.taxid_lineage[2], self.taxdb)
+                elif taxon.rank == "genus":
+                    taxon = taxopy.Taxon(taxon.taxid_lineage[1], self.taxdb)
+                contig_taxa_list.append(taxon)
+            gene_taxonomy_array.append(contig_taxa_list)
+        return np.array(gene_taxonomy_array)
 
-    def get_genome_taxonomy(self, fraction=0.75):
-        selected_taxon = "1"
-        threshold = fraction * sum(self.lengths)
-        taxa_weights = defaultdict(lambda: defaultdict(int))
-        for taxon, length in zip(self.contig_taxonomy, self.lengths):
-            for rank, taxid in enumerate(reversed(taxon.taxid_lineage)):
-                taxa_weights[rank][taxid] += length
-        for rank in reversed(range(8)):
-            if (
-                taxa_weights[rank].values()
-                and max(taxa_weights[rank].values()) > threshold
-            ):
-                selected_taxon = max(taxa_weights[rank], key=taxa_weights[rank].get)
-                break
-        return taxopy.Taxon(selected_taxon, self.taxdb)
+    def get_contig_taxonomy(self, fraction):
+        contig_taxonomy_array = []
+        contigs_in_mmseqs2_set = set(self.contigs_in_mmseqs2)
+        for contig in self.contigs:
+            if contig in contigs_in_mmseqs2_set:
+                gene_taxonomy = self.gene_taxonomy[
+                    np.where(self.contigs_in_mmseqs2 == contig)[0][0]
+                ]
+                if len(gene_taxonomy) > 1:
+                    genes_bitscore = self.bitscore_array[
+                        np.where(self.contigs_in_mmseqs2 == contig)[0][0]
+                    ]
+                    contig_taxonomy = taxopy.find_majority_vote(
+                        gene_taxonomy,
+                        self.taxdb,
+                        weights=genes_bitscore,
+                        fraction=fraction,
+                    )
+                else:
+                    contig_taxonomy = taxopy.Taxon(gene_taxonomy[0].taxid, self.taxdb)
+            else:
+                contig_taxonomy = taxopy.Taxon("1", self.taxdb)
+            contig_taxonomy_array.append(contig_taxonomy)
+        return np.array(contig_taxonomy_array)
+
+    def get_genome_taxonomy(self, fraction):
+        gene_taxonomy_flatten = list(itertools.chain(*self.gene_taxonomy))
+        if len(gene_taxonomy_flatten) > 1:
+            genome_taxonomy = taxopy.find_majority_vote(
+                gene_taxonomy_flatten,
+                self.taxdb,
+                weights=list(itertools.chain(*self.bitscore_array)),
+                fraction=fraction,
+            )
+        elif len(gene_taxonomy_flatten) == 1:
+            genome_taxonomy = contig_taxonomy = taxopy.Taxon(
+                gene_taxonomy_flatten[0].taxid, self.taxdb
+            )
+        else:
+            genome_taxonomy = contig_taxonomy = taxopy.Taxon("1", self.taxdb)
+        return genome_taxonomy
 
     def compute_gene_agreement(self):
-        gene_agreement = []
-        for gene_taxonomy in self.gene_taxonomy:
-            score = 0
-            for gene in gene_taxonomy:
-                lca = taxopy.find_lca([gene, self.genome_taxonomy], self.taxdb)
-                if len(self.genome_taxonomy.taxid_lineage) <= len(gene.taxid_lineage):
-                    if lca.taxid == self.genome_taxonomy.taxid:
-                        score += 1
-                else:
-                    if lca.taxid == gene.taxid:
-                        score += 1
-            score /= len(gene_taxonomy)
-            gene_agreement.append(score)
-        return gene_agreement
+        scores_array = []
+        contigs_in_mmseqs2_set = set(self.contigs_in_mmseqs2)
+        for contig in self.contigs:
+            if contig in contigs_in_mmseqs2_set:
+                score = 0
+                gene_taxonomy = self.gene_taxonomy[
+                    np.where(self.contigs_in_mmseqs2 == contig)[0][0]
+                ]
+                genes_bitscore = self.bitscore_array[
+                    np.where(self.contigs_in_mmseqs2 == contig)[0][0]
+                ]
+                for i in range(len(gene_taxonomy)):
+                    lca = taxopy.find_lca(
+                        [gene_taxonomy[i], self.genome_taxonomy], self.taxdb
+                    )
+                    if len(self.genome_taxonomy.taxid_lineage) <= len(
+                        gene_taxonomy[i].taxid_lineage
+                    ):
+                        if lca.taxid == self.genome_taxonomy.taxid:
+                            score += genes_bitscore[i] / sum(genes_bitscore)
+                    else:
+                        if lca.taxid == gene_taxonomy[i].taxid:
+                            score += genes_bitscore[i] / sum(genes_bitscore)
+            else:
+                score = 1.0
+            scores_array.append(score)
+        return np.array(scores_array)
 
     def __len__(self):
         return len(self.contigs)

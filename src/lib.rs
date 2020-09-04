@@ -17,5 +17,6 @@
 // Contact: antoniop.camargo@gmail.com
 
 mod codon;
-mod coverage;
 mod composition;
+mod coverage;
+mod mmseqs2;
