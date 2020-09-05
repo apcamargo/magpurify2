@@ -85,6 +85,9 @@ class CodonUsage:
             [self.total_cds_length.get(contig, 0) for contig in self.contigs]
         )
         self.mean_strand_coding_density = self.total_cds_length / (2 * self.lengths)
+        self.mean_strand_coding_density = tools.get_log_ratio_scores(
+            self.mean_strand_coding_density, self.lengths, 2
+        )
         self.mean_strand_coding_density = np.round(self.mean_strand_coding_density, 5)
         self.delta_cai = self.get_delta_cai()
         if len(self) == 1:
