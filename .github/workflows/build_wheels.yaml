@@ -27,7 +27,7 @@ jobs:
     - name: Build wheel
       env:
         CIBW_BEFORE_ALL: "bash .github/workflows/prepare_cibuildwheel.sh"
-        CIBW_BEFORE_BUILD: "pip install setuptools-rust==0.10.6"
+        CIBW_BEFORE_BUILD: "pip install numpy setuptools-rust==0.10.6"
         CIBW_BUILD: "cp37-*" #"cp36-* cp37-* cp38-*"
         CIBW_ENVIRONMENT: PATH="$HOME/.cargo/bin:$PATH"
         CIBW_SKIP: "*_i686"
