@@ -85,7 +85,6 @@ class CodonUsage:
             [self.total_cds_length.get(contig, 0) for contig in self.contigs]
         )
         self.mean_strand_coding_density = self.total_cds_length / (2 * self.lengths)
-        self.mean_strand_coding_density = np.round(self.mean_strand_coding_density, 5)
         if len(self) == 1:
             self.scores = np.array([1.0])
         else:
@@ -112,9 +111,38 @@ class CodonUsage:
         mean_contig_delta_cai = [
             np.average(contig_delta_cai[contig]) for contig in kept_contigs
         ]
+        # Scale the data and take the average between it and 0.5. This will bring the
+        # points closer to the center and will give the KDE some space to breathe.
         mean_contig_delta_cai = np.array(mean_contig_delta_cai)
-        mean_contig_delta_cai = mean_contig_delta_cai - mean_contig_delta_cai.min()
-        kept_scores = tools.get_log_ratio_scores(mean_contig_delta_cai, kept_n_genes, 2)
+        mean_contig_delta_cai = (mean_contig_delta_cai - mean_contig_delta_cai.min()) / (
+            mean_contig_delta_cai.max() - mean_contig_delta_cai.min()
+        )
+        mean_contig_delta_cai = (mean_contig_delta_cai + 0.5) / 2
+        kernel = ss.gaussian_kde(mean_contig_delta_cai)
+        contig_delta_cai_kde = kernel(np.linspace(0, 1, 1000))
+        # Find the deepest valley in the KDE.
+        valleys = find_peaks(-contig_delta_cai_kde, prominence=(0.035, None))
+        if len(valleys[0]):
+            max_valley = valleys[0][np.argmax(valleys[1]["prominences"])] / 1000
+        else:
+            return np.ones(len(self))
+        # Compute the KDE again using the number of genes per contig as weight. Then, find
+        # the highest peak, where the non-contaminant contigs are concentrated.
+        kernel = ss.gaussian_kde(mean_contig_delta_cai, weights=kept_n_genes)
+        contig_delta_cai_kde = kernel(np.linspace(0, 1, 1000))
+        peaks = find_peaks(contig_delta_cai_kde, height=(None, None))
+        if len(peaks[0]) >= 2:
+            max_peak = peaks[0][np.argsort(peaks[1]["peak_heights"])[-1]] / 1000
+            second_peak = peaks[0][np.argsort(peaks[1]["peak_heights"])[-2]] / 1000
+            if np.abs(max_peak - second_peak) < 0.175:
+                return np.ones(len(self))
+        else:
+            return np.ones(len(self))
+        divisor = np.abs(max_peak - max_valley)
+        if max_peak > max_valley:
+            kept_scores = 1 - (max_valley - mean_contig_delta_cai) / divisor
+        else:
+            kept_scores = 1 - (mean_contig_delta_cai - max_valley) / divisor
         contig_score_dict = dict(zip(kept_contigs, kept_scores))
         scores = np.array([contig_score_dict.get(contig, 1.0) for contig in self.contigs])
         scores = np.clip(scores, 0, 1)
@@ -130,7 +158,7 @@ class CodonUsage:
             np.round(self.scores, 5),
             self.n_genes,
             self.total_cds_length,
-            self.mean_strand_coding_density,
+            np.round(self.mean_strand_coding_density, 5),
         )
 
 
