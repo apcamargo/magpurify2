@@ -180,7 +180,6 @@ class Composition:
             "contig",
             "tnf_score",
             "gc_content_score",
-            "gc_skew_score",
             "contig_length",
         ]
         self.genome = mag.genome
@@ -191,7 +190,6 @@ class Composition:
         if len(self) <= 2:
             self.tnf_scores = np.array([1.0] * len(self))
             self.gc_content_scores = np.array([1.0] * len(self))
-            self.gc_skew_scores = np.array([1.0] * len(self))
         else:
             self.tnf_scores = tools.get_cluster_score_from_embedding(
                 data=self.tnf,
@@ -205,17 +203,6 @@ class Composition:
             self.gc_content_scores = tools.get_log_ratio_scores(
                 self.gc_content, self.lengths, 2
             )
-            self.gc_skew_scores = self.compute_gc_skew_scores(mag.sequences)
-
-    def compute_gc_skew_scores(self, sequences):
-        from collections import Counter
-
-        gc_skew_array = []
-        for sequence in sequences:
-            counter = Counter(sequence)
-            gc_skew = (counter["C"] - counter["G"]) / (counter["G"] + counter["C"])
-            gc_skew_array.append(gc_skew)
-        return tools.get_log_ratio_scores(np.abs(gc_skew_array), self.lengths, 2)
 
     def __len__(self):
         return len(self.contigs)
@@ -226,7 +213,6 @@ class Composition:
             self.contigs,
             np.round(self.tnf_scores, 5),
             np.round(self.gc_content_scores, 5),
-            np.round(self.gc_skew_scores, 5),
             self.lengths,
         )
 
