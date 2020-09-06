@@ -84,16 +84,13 @@ class CodonUsage:
         self.total_cds_length = np.array(
             [self.total_cds_length.get(contig, 0) for contig in self.contigs]
         )
+        self.mean_strand_coding_density = self.total_cds_length / (2 * self.lengths)
+        self.mean_strand_coding_density = np.round(self.mean_strand_coding_density, 5)
         if len(self) == 1:
             self.scores = np.array([1.0])
-            self.mean_strand_coding_density = np.array([1.0])
         else:
             self.delta_cai = self.get_delta_cai()
             self.scores = self.compute_codon_usage_scores(min_genes)
-            self.mean_strand_coding_density = self.total_cds_length / (2 * self.lengths)
-            self.mean_strand_coding_density = tools.get_log_ratio_scores(
-                self.mean_strand_coding_density, self.lengths, 2
-            )
 
     def get_delta_cai(self, quantile=0.25):
         cds_sequences = np.array(self.cds_sequences)
@@ -162,7 +159,7 @@ class CodonUsage:
             np.round(self.scores, 5),
             self.n_genes,
             self.total_cds_length,
-            np.round(self.mean_strand_coding_density, 5),
+            self.mean_strand_coding_density,
         )
 
 
@@ -178,7 +175,14 @@ class Composition:
         n_neighbors,
         set_op_mix_ratio,
     ):
-        self.attributes = ["genome", "contig", "tnf_score", "gc_content_score", "gc_skew_score", "contig_length"]
+        self.attributes = [
+            "genome",
+            "contig",
+            "tnf_score",
+            "gc_content_score",
+            "gc_skew_score",
+            "contig_length",
+        ]
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
@@ -198,15 +202,18 @@ class Composition:
                 n_neighbors=n_neighbors,
                 set_op_mix_ratio=set_op_mix_ratio,
             )
-            self.gc_content_scores = tools.get_log_ratio_scores(self.gc_content, self.lengths, 2)
+            self.gc_content_scores = tools.get_log_ratio_scores(
+                self.gc_content, self.lengths, 2
+            )
             self.gc_skew_scores = self.compute_gc_skew_scores(mag.sequences)
 
     def compute_gc_skew_scores(self, sequences):
         from collections import Counter
+
         gc_skew_array = []
         for sequence in sequences:
             counter = Counter(sequence)
-            gc_skew = (counter['C'] - counter['G']) / (counter['G'] + counter['C'])
+            gc_skew = (counter["C"] - counter["G"]) / (counter["G"] + counter["C"])
             gc_skew_array.append(gc_skew)
         return tools.get_log_ratio_scores(np.abs(gc_skew_array), self.lengths, 2)
 
