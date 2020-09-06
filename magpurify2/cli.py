@@ -170,6 +170,8 @@ def composition_parser(parser):
 def coverage_parser(parser):
     parser.set_defaults(func=magpurify2.coverage.main)
     required = parser.add_argument_group("Required arguments")
+    coverage_input = parser.add_argument_group("Coverage data input (required, mutually exclusive)", )
+    coverage_input_mex = coverage_input.add_mutually_exclusive_group(required=True)
     options = parser.add_argument_group("Data processing options")
     other = parser.add_argument_group("Other options")
     required.add_argument(
@@ -178,11 +180,15 @@ def coverage_parser(parser):
     required.add_argument(
         "output_directory", help="Directory to write the output files to.", type=Path,
     )
-    required.add_argument(
+    coverage_input_mex.add_argument(
         "--bam_files",
-        required=True,
         nargs="+",
         help="Input sorted BAM files.",
+        type=Path,
+    )
+    coverage_input_mex.add_argument(
+        "--coverage_file",
+        help="Input a tabular file containing contig coverage data.",
         type=Path,
     )
     options.add_argument(

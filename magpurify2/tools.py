@@ -38,7 +38,7 @@ from Bio import SeqIO, bgzf
 
 from magpurify2._codon import get_cai, get_codon_index
 from magpurify2._composition import get_tnf, get_gc
-from magpurify2._coverage import get_coverages
+from magpurify2._coverage import get_bam_coverages
 from magpurify2._mmseqs2 import get_mmseqs2
 
 logger = logging.getLogger("timestamp")
@@ -240,6 +240,33 @@ def read_fasta(filepath):
     fin.close()
 
 
+def get_tsv_coverages(filepath):
+    """
+    Reads contig coverages from tabular text files. The first column of the
+    coverage file must store the contigs names. The remaining columns should
+    contain the coverage of each contig across multiple samples.
+
+    Parameters
+    ----------
+    filepath : Path
+        Path object pointing tabular text file.
+
+    Returns
+    -------
+    tuple
+        A tuple whose fist element is an numpy array of the contig names and the
+        second one is a numpy matrix of contig coverages in the input BAM files.
+    """
+    with open(filepath) as fin:
+        ncols = len(fin.readline().split("\t"))
+    if ncols < 2:
+        logger.error("The tabular coverage file must have at least two columns.")
+        sys.exit(1)
+    contig_names_vector = np.loadtxt(filepath, dtype=str, usecols=0)
+    coverage_vector = np.loadtxt(filepath, dtype=float, usecols=range(1, ncols))
+    return (contig_names_vector, coverage_vector)
+
+
 def get_weighted_median(data, weights):
     """
     Computes the weighted median of the input data.
@@ -271,7 +298,7 @@ def get_weighted_median(data, weights):
     return w_median
 
 
-def get_log_ratio_scores(data, weights, base, pseudo=1e-5, min=0., max=1.):
+def get_log_ratio_scores(data, weights, base, pseudo=1e-5, min=0.0, max=1.0):
     """
     Computes the deviation from the weighted median as the log of the ratio
     between each data point and the weighted median.
