@@ -4,15 +4,21 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin consectetur rutru
 
 ## How it works
 
-Curabitur eget pellentesque erat. Vivamus et tristique urna. Maecenas non dapibus erat. Phasellus id massa eu erat gravida molestie at in lectus. Etiam vitae semper orci. Donec convallis blandit ornare. Morbi sodales odio orci, eget luctus leo iaculis sed.
+To summarize the genome codon usage bias MAGpurify2 uses the the Relative Synonymous Codon Usage (RSCU)
 
-To summarize the codon usage bias of each gene MAGpurify2 uses the Codon Adaptation Index (CAI), described by [Sharp PM and Li WH](https://pubmed.ncbi.nlm.nih.gov/3547335/).
+and the codon usage adaptation of each gene relative to the rest of the genome is measured using the Codon Adaptation Index (CAI)
+
+described by [Sharp PM and Li WH](https://pubmed.ncbi.nlm.nih.gov/3547335/).
 
 $$
 \mathit{RSCU}_{i,j} = \frac{x_{i,j}}{\frac{1}{n_i}\sum_{j=1}^{n_i}x_{i,j}\:}
 $$
 
 Aliquam nulla mi, commodo sit amet augue quis, mattis scelerisque nisl. Aliquam aliquam gravida odio ac facilisis. Curabitur in nisi egestas, molestie elit et, pellentesque lectus. Curabitur accumsan mollis pretium. In purus elit, bibendum a mauris vitae, finibus posuere justo. Maecenas non porta dui, vitae commodo lectus. Sed et elit non tortor tristique laoreet ac sed felis.
+
+::: tip Codon usage bias in secondary chromosomes
+[Genes on secondary chromosomes exhibited significantly weaker codon usage bias than those on primary chromosomes.](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1000732)
+:::
 
 $$
 w_{i,j} = \frac{\mathit{RSCU}_{i,j}}{\max_{1\le j\le n}\mathit{RSCU}_{i,j}}

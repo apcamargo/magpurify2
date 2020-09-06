@@ -46,10 +46,31 @@ $ bowtie2 --threads 4 -x bt2/metagenome \
   | samtools sort -@ 4 -o sample1.bam -
 ```
 
-We reccomend mapping the reads to the metagenome (superset) and not directly to the MAGs (subsets). This is due to two factors:
+We recommend mapping the reads to the metagenome (superset) and not directly to the MAGs (subsets). This is due to two factors:
 
 - When you map the reads into the MAG a read that was originated from the sequencing of a closely related genome might be erroneously aligned to the MAG (cross-mapping), introducing bias to the coverage estimation.
 - Metagenome-wide mappings can be used to estimate the coverage of all the contigs in the metagenome, thus allowing MAGpurify2 to process multiple MAGs in a single execution.
 
 If the target MAGs are derived from multiple source metagenomes you need input BAM files containing read mappings to each one of them.
 :::
+
+If you don't have access to the raw sequencing data or to previously generated BAM files you can input coverage data stored in a tab-separated values (TSV) file. To do so, you should use the `--coverage_file` argument:
+
+```
+coverage genomes/* output --coverage_file contig_coverages.tsv --threads 4
+```
+
+The first column of the coverage file must store the contigs names. The remaining columns should contain the coverage of each contig across multiple samples, as shown in the example below:
+
+```
+contig_1     15.744    12.605    25.148    3.728    0.000
+contig_2     34.466    48.019    18.222    3.707    4.195
+contig_3      0.000    22.356    21.944    4.479    4.463
+contig_4     14.201     9.993     0.000    0.925    4.608
+contig_5     17.179    12.280    56.643    3.586    4.226
+contig_6      5.239     8.430    5.2070    3.988    0.000
+contig_7     17.737    16.005    29.692    4.039    4.190
+contig_8      0.000    15.866    13.663    0.877    2.269
+contig_9     19.129    15.145    21.249    0.000    2.342
+contig_10    11.074     9.574    19.673    0.934    4.732
+```

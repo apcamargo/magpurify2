@@ -17,6 +17,7 @@ module.exports = {
             'codon-usage-theory',
             'composition-theory',
             'coverage-theory',
+            'contaminant-detection',
           ]
         },
         'installation',
