@@ -24,6 +24,7 @@ from collections import defaultdict
 import numpy as np
 import scipy.stats as ss
 import taxopy
+import xgboost as xgb
 from scipy.signal import find_peaks
 
 from magpurify2 import tools
@@ -403,3 +404,33 @@ class Taxonomy:
 
     def __iter__(self):
         return zip([self.genome] * len(self), self.contigs, np.round(self.scores, 5))
+
+
+class ContigClassifier:
+    def __init__(
+        self,
+        genome_contig_matrix,
+        feature_matrix,
+        model_file,
+        probability_threshold,
+        threads,
+    ):
+        self.attributes = ["genome", "contig", "contaminant_probability"]
+        feature_matrix = xgb.DMatrix(feature_matrix)
+        model = xgb.Booster({"nthread": threads})
+        model.load_model(model_file)
+        self.genomes = genome_contig_matrix[:, 0]
+        self.contigs = genome_contig_matrix[:, 1]
+        self.probabilities = model.predict(feature_matrix)
+        self.flagged_contaminants = probabilities > probability_threshold
+        self.mags_contaminants_dict = defaultdict(dict)
+        for index, contaminant in enumerate(flagged_contaminants):
+            genome = self.genomes[index]
+            contig = self.contigs[index]
+            mags_contaminants[genome][contig] = contaminant
+
+    def __len__(self):
+        return len(self.probabilities)
+
+    def __iter__(self):
+        return zip(self.genomes, self.contigs, np.round(self.probabilities, 5))

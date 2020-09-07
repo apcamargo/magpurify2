@@ -591,29 +591,29 @@ def write_contig_taxonomy_output(mag_taxonomy_list, taxonomy_output_file):
                 )
 
 
-def write_module_output(mag_score_list, score_output_file):
+def write_module_output(score_list, score_output_file):
     """
     Write a file containing the computed attributes for each contig of the input
     genomes.
 
     Parameters
     ----------
-    mag_score_list : list
-        List of objects of the `CodonUsage`, `Composition`, `Coverage` or
-        `Taxonomy` classes.
+    score_list : list
+        List of objects of the `CodonUsage`, `Composition`, `Coverage`,
+        `Taxonomy` or `ContigClassifier` classes.
     score_output_file : Path
         Path object pointing to the output file.
     """
     with open(score_output_file, "w") as fout:
-        header = "\t".join(mag_score_list[0].attributes)
+        header = "\t".join(score_list[0].attributes)
         fout.write(f"{header}\n")
-        for mag_score in mag_score_list:
+        for mag_score in score_list:
             for attributes in mag_score:
                 line = "\t".join(map(str, attributes))
                 fout.write(f"{line}\n")
 
 
-def write_filtered_genome(mag, mags_contaminants, mode, filtered_output_directory):
+def write_filtered_genome(mag, mags_contaminants_dict, filtered_output_directory):
     """
     Writes a FASTA file containing contigs not flagged as contaminants.
 
@@ -621,29 +621,18 @@ def write_filtered_genome(mag, mags_contaminants, mode, filtered_output_director
     ----------
     mag : Mag
         A `Mag` object of a genome.
-    mags_contaminants : dict
-        A nested dictionary. In the outer dictionary, the keys are the names of
-        genomes. In the inner dictionary the keys are the names of the contigs
-        in the genome and the values are boolean lists. Each value in those
-        lists indicates if the contig was flagged as a contaminant by one of the
-        contaminant-detection approaches.
-    mode : str
-        If `"any"`, the contig will be removed if it was flagged as a
-        contaminant by any of the contaminant-detection approaches. If `"all"`,
-        the contig will only be removed if it was flagged by all the approaches.
+    mags_contaminants_dict : dict
+        A dictionary where keys are the names of the contigsand the values are
+        booleans that indicate if the contig was classified as a contaminant.
     filtered_output_directory : Path
         Path object pointing to the directory where the filtered genome will be
         written to.
     """
-    output_fasta = filtered_output_directory.joinpath(mag.genome + ".filtered.fna")
-    if mag.genome in mags_contaminants:
-        with open(output_fasta, "w") as fout:
-            for contig, description, sequence in mag:
-                if mode == "any":
-                    if all(mags_contaminants[mag.genome][contig]):
-                        fout.write(f">{description}\n")
-                        fout.write(f"{textwrap.fill(sequence, 70)}\n")
-                elif mode == "all":
-                    if any(mags_contaminants[mag.genome][contig]):
-                        fout.write(f">{description}\n")
-                        fout.write(f"{textwrap.fill(sequence, 70)}\n")
+    if mag.genome not in mags_contaminants_dict:
+        return
+    output_fasta = filtered_output_directory.joinpath(f"{mag.genome}.filtered.fna")
+    with open(output_fasta, "w") as fout:
+        for contig, description, sequence in mag:
+            if not mags_contaminants_dict[mag.genome][contig]:
+                fout.write(f">{description}\n")
+                fout.write(f"{textwrap.fill(sequence, 70)}\n")

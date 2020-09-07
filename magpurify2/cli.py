@@ -160,17 +160,19 @@ def composition_parser(parser):
         help="Number of threads to use. All by default.",
     )
     other.add_argument(
-        "-q", "--quiet", help="Suppress the logger output", action="store_true"
+        "-q", "--quiet", help="Suppress the logger output", action="store_true",
     )
     other.add_argument(
-        "-h", "--help", action="help", help="Show this help message and exit"
+        "-h", "--help", action="help", help="Show this help message and exit",
     )
 
 
 def coverage_parser(parser):
     parser.set_defaults(func=magpurify2.coverage.main)
     required = parser.add_argument_group("Required arguments")
-    coverage_input = parser.add_argument_group("Coverage data input (required, mutually exclusive)", )
+    coverage_input = parser.add_argument_group(
+        "Coverage data input (required, mutually exclusive)",
+    )
     coverage_input_mex = coverage_input.add_mutually_exclusive_group(required=True)
     options = parser.add_argument_group("Data processing options")
     other = parser.add_argument_group("Other options")
@@ -181,10 +183,7 @@ def coverage_parser(parser):
         "output_directory", help="Directory to write the output files to.", type=Path,
     )
     coverage_input_mex.add_argument(
-        "--bam_files",
-        nargs="+",
-        help="Input sorted BAM files.",
-        type=Path,
+        "--bam_files", nargs="+", help="Input sorted BAM files.", type=Path,
     )
     coverage_input_mex.add_argument(
         "--coverage_file",
@@ -259,10 +258,10 @@ def coverage_parser(parser):
         help="Number of threads to use. All by default.",
     )
     other.add_argument(
-        "-q", "--quiet", help="Suppress the logger output", action="store_true"
+        "-q", "--quiet", help="Suppress the logger output", action="store_true",
     )
     other.add_argument(
-        "-h", "--help", action="help", help="Show this help message and exit"
+        "-h", "--help", action="help", help="Show this help message and exit",
     )
 
 
@@ -293,10 +292,10 @@ def codon_usage_parser(parser):
         help="Number of threads to use. All by default.",
     )
     other.add_argument(
-        "-q", "--quiet", help="Suppress the logger output", action="store_true"
+        "-q", "--quiet", help="Suppress the logger output", action="store_true",
     )
     other.add_argument(
-        "-h", "--help", action="help", help="Show this help message and exit"
+        "-h", "--help", action="help", help="Show this help message and exit",
     )
 
 
@@ -348,10 +347,10 @@ def taxonomy_parser(parser):
         help="Number of threads to use. All by default.",
     )
     other.add_argument(
-        "-q", "--quiet", help="Suppress the logger output", action="store_true"
+        "-q", "--quiet", help="Suppress the logger output", action="store_true",
     )
     other.add_argument(
-        "-h", "--help", action="help", help="Show this help message and exit"
+        "-h", "--help", action="help", help="Show this help message and exit",
     )
 
 
@@ -373,48 +372,22 @@ def filter_parser(parser):
         help="Directory where the filtered MAGs will be written to.",
         type=Path,
     )
-    options.add_argument(
-        "--codon_usage",
-        default=0.8,
-        type=float,
-        help="Minimum score for a contig not to be flagged as a contaminant by the "
-        "'codon_usage' module.",
+    required.add_argument(
+        "model_file", help="Classification model file.", type=Path,
     )
     options.add_argument(
-        "--composition_threshold",
-        default=0.15,
+        "--probability_threshold",
+        default=0.5,
         type=float,
-        help="Minimum score for a contig not to be flagged as a contaminant by the "
-        "'composition' module.",
+        help="Contigs whose estimated probability of being a contaminant is above "
+        "`probability_threshold` will be filtered out. The higher this value, the more "
+        "conservative will be the contig filtering.",
     )
     options.add_argument(
-        "--coverage_threshold",
-        default=0.55,
-        type=float,
-        help="Minimum score for a contig not to be flagged as a contaminant by the "
-        "relative error method of the 'coverage' module.",
-    )
-    options.add_argument(
-        "--coverage_clustering_threshold",
-        default=0.15,
-        type=float,
-        help="Minimum score for a contig not to be flagged as a contaminant by the "
-        "clustering method of the 'coverage' module.",
-    )
-    options.add_argument(
-        "--taxonomy_threshold",
-        default=0.25,
-        type=float,
-        help="Minimum score for a contig not to be flagged as a contaminant by the "
-        "'taxonomy' module.",
-    )
-    options.add_argument(
-        "--mode",
-        default="any",
-        type=str,
-        choices=["any", "all"],
-        help="Remove contigs that were flagged as contaminants by 'any' or by 'all' "
-        "modules",
+        "--fast_mode",
+        help="Use only the outputs of the composition and coverage modules. The "
+        "outputs of the codon_usage and taxonomy modules are not required.",
+        action="store_true",
     )
     other.add_argument(
         "-t",
@@ -424,8 +397,8 @@ def filter_parser(parser):
         help="Number of threads to use. All by default.",
     )
     other.add_argument(
-        "-q", "--quiet", help="Suppress the logger output", action="store_true"
+        "-q", "--quiet", help="Suppress the logger output", action="store_true",
     )
     other.add_argument(
-        "-h", "--help", action="help", help="Show this help message and exit"
+        "-h", "--help", action="help", help="Show this help message and exit",
     )

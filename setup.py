@@ -48,6 +48,7 @@ setup(
         "taxopy",
         "tbb",
         "umap-learn",
+        "xgboost",
     ],
     python_requires=">=3.6",
     entry_points={"console_scripts": ["magpurify2=magpurify2.cli:cli"]},
