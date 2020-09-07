@@ -325,7 +325,7 @@ class Taxonomy:
                     taxon = taxopy.Taxon(taxon.taxid_lineage[1], self.taxdb)
                 contig_taxa_list.append(taxon)
             gene_taxonomy_array.append(contig_taxa_list)
-        return np.array(gene_taxonomy_array)
+        return gene_taxonomy_array
 
     def get_contig_taxonomy(self, fraction):
         contig_taxonomy_array = []
