@@ -23,9 +23,10 @@ import shutil
 import sys
 
 import taxopy
+from joblib import Parallel, delayed
 
 from magpurify2 import external, tools
-from magpurify2.core import Mag, CodonUsage
+from magpurify2.core import CodonUsage, Mag
 
 
 def main(args):
@@ -56,14 +57,14 @@ def main(args):
     prodigal_output_directory = args.output_directory.joinpath("prodigal")
 
     logger.info("Computing contig scores.")
-    mag_codon_usage_list = [
-        CodonUsage(
+    mag_codon_usage_list = Parallel(n_jobs=args.threads)(
+        delayed(CodonUsage)(
             mag,
             args.min_genes,
             prodigal_output_directory.joinpath(mag.genome + "_genes.fna"),
         )
         for mag in mag_list
-    ]
+    )
     # Write contig score file
     logger.info(f"Writing output to: '{codon_usage_score_file}'.")
     tools.write_module_output(mag_codon_usage_list, codon_usage_score_file)
