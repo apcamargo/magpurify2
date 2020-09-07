@@ -204,7 +204,7 @@ def mmseqs2(output_directory, database, threads):
         besthitdb_prefix,
         mmseqs2_alignment_file,
         "--format-output",
-        "'query,fident,tcov,bits'",
+        "query,fident,tcov,bits",
         "--threads",
         str(threads),
     ]
