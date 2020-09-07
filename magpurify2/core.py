@@ -417,7 +417,7 @@ class ContigClassifier:
     ):
         self.attributes = ["genome", "contig", "contaminant_probability"]
         feature_matrix = xgb.DMatrix(feature_matrix)
-        model = xgb.Booster({"nthread": threads})
+        model = xgb.Booster({"booster": "gbtree", "nthread": threads, "verbosity": 0})
         model.load_model(model_file)
         self.genomes = genome_contig_matrix[:, 0]
         self.contigs = genome_contig_matrix[:, 1]
