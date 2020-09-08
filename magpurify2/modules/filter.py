@@ -66,7 +66,9 @@ def main(args):
         if not module_path.exists():
             missing_modules.append(str(module_path))
     if missing_modules:
-        logger.error(f"The following files were not found: '{', '.join(missing_modules)}'.")
+        logger.error(
+            f"The following files were not found: '{', '.join(missing_modules)}'."
+        )
         sys.exit(1)
 
     # Load data from the modules outputs
@@ -118,7 +120,9 @@ def main(args):
 
     logger.info(f"Writing filtered genomes to '{args.filtered_output_directory}'.")
     input_genomes = {mag.genome for mag in mag_list}
-    not_in_mags_contaminants = input_genomes.difference(mags_contaminants.keys())
+    not_in_mags_contaminants = input_genomes.difference(
+        contig_classification.mags_contaminants_dict.keys()
+    )
     if not_in_mags_contaminants:
         logger.warning(
             "The following genomes were not previously analysed by any of MAGpurify2's "
