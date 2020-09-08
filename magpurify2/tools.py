@@ -628,11 +628,10 @@ def write_filtered_genome(mag, mags_contaminants_dict, filtered_output_directory
         Path object pointing to the directory where the filtered genome will be
         written to.
     """
-    if mag.genome not in mags_contaminants_dict:
-        return
-    output_fasta = filtered_output_directory.joinpath(f"{mag.genome}.filtered.fna")
-    with open(output_fasta, "w") as fout:
-        for contig, description, sequence in mag:
-            if not mags_contaminants_dict[mag.genome][contig]:
-                fout.write(f">{description}\n")
-                fout.write(f"{textwrap.fill(sequence, 70)}\n")
+    if mag.genome in mags_contaminants_dict:
+        output_fasta = filtered_output_directory.joinpath(f"{mag.genome}.filtered.fna")
+        with open(output_fasta, "w") as fout:
+            for contig, description, sequence in mag:
+                if not mags_contaminants_dict[mag.genome][contig]:
+                    fout.write(f">{description}\n")
+                    fout.write(f"{textwrap.fill(sequence, 70)}\n")
