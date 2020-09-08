@@ -98,7 +98,7 @@ def main(args):
     feature_matrix[:, 5] = np.clip((feature_matrix[:, 5] / 10), 0, 1)
     if not args.fast_mode:
         # Transform 'n_genes'
-        feature_matrix[:, 7] = np.tanh(np.log10(feature_matrix.loc[:, "n_genes"] + 1))
+        feature_matrix[:, 7] = np.tanh(np.log10(feature_matrix[:, 7] + 1))
         # Transform 'total_cds_length'
         feature_matrix[:, 8] = np.tanh(np.log10(feature_matrix[:, 8] + 1) * 0.2)
 
