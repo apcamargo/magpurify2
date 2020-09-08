@@ -135,7 +135,9 @@ def main(args):
         )
     Parallel(n_jobs=args.threads)(
         delayed(tools.write_filtered_genome)(
-            mag, contig_classification, args.filtered_output_directory
+            mag,
+            contig_classification.mags_contaminants_dict,
+            args.filtered_output_directory,
         )
         for mag in mag_list
     )
