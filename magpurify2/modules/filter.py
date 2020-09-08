@@ -47,6 +47,11 @@ def main(args):
             "MAGpurify2's modules."
         )
         sys.exit(1)
+    if not args.filtered_output_directory.is_dir():
+        logger.warning(
+            f"'{args.filtered_output_directory}' does not exist. Creating it now."
+        )
+        args.filtered_output_directory.mkdir()
     contig_prob_file = scores_directory.joinpath("contamination_probabilities.tsv")
 
     logger.info(f"Reading {len(args.genomes)} genomes.")
