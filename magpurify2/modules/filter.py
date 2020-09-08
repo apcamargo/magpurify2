@@ -88,7 +88,7 @@ def main(args):
             sys.exit(1)
         module_ncol = module_ncol_dict[module]
         module_feature_matrix = np.loadtxt(
-            module_path, dtype=str, skiprows=1, usecols=range(2, module_ncol)
+            module_path, dtype=float, skiprows=1, usecols=range(2, module_ncol)
         )
         feature_matrix.append(module_feature_matrix)
     feature_matrix = np.column_stack(feature_matrix)
