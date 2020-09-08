@@ -52,7 +52,7 @@ def main(args):
     mag_list = [Mag(genome) for genome in args.genomes]
 
     # Determine the required modules and check if their outputs exist
-    if not args.fast_mode:
+    if args.fast_mode:
         module_list = ["composition", "coverage"]
     else:
         module_list = ["composition", "coverage", "codon_usage", "taxonomy"]
@@ -78,7 +78,7 @@ def main(args):
         if (
             np.loadtxt(module_path, dtype=str, skiprows=1, usecols=[0, 1])
             != genome_contig_matrix
-        ):
+        ).all():
             logger.error(
                 "It seems that MAGpurify2's modules were executed with different inputs. "
                 "Please make sure to execute all the modules with the exact same inputs in the "
