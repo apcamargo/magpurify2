@@ -427,7 +427,7 @@ class ContigClassifier:
         for index, contaminant in enumerate(self.flagged_contaminants):
             genome = self.genomes[index]
             contig = self.contigs[index]
-            mags_contaminants[genome][contig] = contaminant
+            self.mags_contaminants_dict[genome][contig] = contaminant
 
     def __len__(self):
         return len(self.probabilities)
