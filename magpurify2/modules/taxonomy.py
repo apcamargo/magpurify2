@@ -106,7 +106,7 @@ def main(args):
     mag_taxonomy_list = [
         Taxonomy(
             mag,
-            mmseqs2_dict[mag.genome],
+            mmseqs2_dict.get(mag.genome, None),
             args.contig_min_fraction,
             args.genome_min_fraction,
             args.min_genus_identity,

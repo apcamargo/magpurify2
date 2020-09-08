@@ -188,8 +188,8 @@ class Composition:
         self.tnf = composition_dict[mag.genome]
         self.gc_content = gc_content
         if len(self) <= 2:
-            self.tnf_scores = np.array([1.0] * len(self))
-            self.gc_content_scores = np.array([1.0] * len(self))
+            self.tnf_scores = np.ones(len(self))
+            self.gc_content_scores = np.ones(len(self))
         else:
             self.tnf_scores = tools.get_cluster_score_from_embedding(
                 data=self.tnf,
@@ -246,8 +246,8 @@ class Coverage:
         )
         self.n_samples = self.selected_samples.sum()
         if len(self) <= 2 or self.n_samples == 0:
-            self.scores = np.array([1.0] * len(self))
-            self.cluster_scores = np.array([1.0] * len(self))
+            self.scores = np.ones(len(self))
+            self.cluster_scores = np.ones(len(self))
         else:
             self.scores = tools.get_log_ratio_scores(
                 self.coverages[:, self.selected_samples], self.lengths, 25
@@ -293,21 +293,29 @@ class Taxonomy:
         self.contigs = mag.contigs
         self.lengths = mag.lengths
         self.taxdb = taxdb
-
-        self.contigs_in_mmseqs2 = np.array(
-            [contig for contig in self.contigs if contig in mmseqs2_dict]
-        )
-        self.taxid_array = [mmseqs2_dict[contig][0] for contig in self.contigs_in_mmseqs2]
-        self.identity_array = [
-            mmseqs2_dict[contig][1] for contig in self.contigs_in_mmseqs2
-        ]
-        self.bitscore_array = [
-            mmseqs2_dict[contig][2] for contig in self.contigs_in_mmseqs2
-        ]
-        self.gene_taxonomy = self.get_gene_taxonomy(min_genus_identity=min_genus_identity)
-        self.contig_taxonomy = self.get_contig_taxonomy(fraction=contig_min_fraction)
-        self.genome_taxonomy = self.get_genome_taxonomy(fraction=genome_min_fraction)
-        self.scores = self.compute_gene_agreement()
+        if mmseqs2_dict:
+            self.contigs_in_mmseqs2 = np.array(
+                [contig for contig in self.contigs if contig in mmseqs2_dict]
+            )
+            self.taxid_array = [
+                mmseqs2_dict[contig][0] for contig in self.contigs_in_mmseqs2
+            ]
+            self.identity_array = [
+                mmseqs2_dict[contig][1] for contig in self.contigs_in_mmseqs2
+            ]
+            self.bitscore_array = [
+                mmseqs2_dict[contig][2] for contig in self.contigs_in_mmseqs2
+            ]
+            self.gene_taxonomy = self.get_gene_taxonomy(
+                min_genus_identity=min_genus_identity
+            )
+            self.contig_taxonomy = self.get_contig_taxonomy(fraction=contig_min_fraction)
+            self.genome_taxonomy = self.get_genome_taxonomy(fraction=genome_min_fraction)
+            self.scores = self.compute_gene_agreement()
+        else:
+            self.contig_taxonomy = np.array([taxopy.Taxon("1", self.taxdb)] * len(self))
+            self.genome_taxonomy = taxopy.Taxon("1", self.taxdb)
+            self.scores = np.zeros(len(self))
 
     def get_gene_taxonomy(self, min_genus_identity):
         gene_taxonomy_array = []
@@ -367,7 +375,7 @@ class Taxonomy:
                 gene_taxonomy_flatten[0].taxid, self.taxdb
             )
         else:
-            genome_taxonomy = contig_taxonomy = taxopy.Taxon("1", self.taxdb)
+            genome_taxonomy = taxopy.Taxon("1", self.taxdb)
         return genome_taxonomy
 
     def compute_gene_agreement(self):
