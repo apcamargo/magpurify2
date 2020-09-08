@@ -19,13 +19,14 @@
 # Contact: antoniop.camargo@gmail.com
 
 import logging
+import sys
 from collections import defaultdict
 
 import numpy as np
 from joblib import Parallel, delayed
 
 from magpurify2 import tools
-from magpurify2.core import Mag, ContigClassifier
+from magpurify2.core import ContigClassifier, Mag
 
 
 def main(args):
