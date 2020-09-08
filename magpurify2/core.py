@@ -422,9 +422,9 @@ class ContigClassifier:
         self.genomes = genome_contig_matrix[:, 0]
         self.contigs = genome_contig_matrix[:, 1]
         self.probabilities = model.predict(feature_matrix)
-        self.flagged_contaminants = probabilities > probability_threshold
+        self.flagged_contaminants = self.probabilities > probability_threshold
         self.mags_contaminants_dict = defaultdict(dict)
-        for index, contaminant in enumerate(flagged_contaminants):
+        for index, contaminant in enumerate(self.flagged_contaminants):
             genome = self.genomes[index]
             contig = self.contigs[index]
             mags_contaminants[genome][contig] = contaminant
