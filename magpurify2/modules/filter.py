@@ -63,7 +63,7 @@ def main(args):
     missing_modules = []
     for module_path in module_path_list:
         if not module_path.exists():
-            missing_modules.append(module_path)
+            missing_modules.append(str(module_path))
     if missing_modules:
         logger.error(f"The following files were not found: {', '.join(missing_modules)}.")
         sys.exit(1)
