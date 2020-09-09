@@ -221,7 +221,7 @@ class Coverage:
     def __init__(
         self,
         mag,
-        coverages,
+        coverage_dict,
         min_average_coverage,
         n_iterations,
         n_components,
