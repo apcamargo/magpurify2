@@ -70,7 +70,7 @@ def main(args):
     skip_coverage = False
     if coverage_data_file.exists():
         with gzip.open(coverage_data_file) as fin:
-            loaded_signatures, contig_names, coverage_matrix = pickle.load(fin)
+            loaded_signatures, coverage_dict = pickle.load(fin)
             if set(signatures).issubset(loaded_signatures):
                 logger.info("Skipping contig coverages computation.")
                 skip_coverage = True
@@ -85,38 +85,29 @@ def main(args):
                 coverage_data_file.unlink()
     if not skip_coverage:
         if args.bam_files:
-            logger.info(f"Computing contig coverages from {len(input_coverage)} BAM files.")
-            contig_names, coverage_matrix = tools.get_bam_coverages(
+            logger.info(
+                f"Computing contig coverages from {len(input_coverage)} BAM files."
+            )
+            coverage_dict = tools.get_bam_coverages(
                 [str(filepath) for filepath in input_coverage],
                 min_identity=args.min_identity,
                 trim_lower=args.trim_lower,
                 trim_upper=args.trim_upper,
                 threads=args.threads,
             )
-            contig_names = np.array(contig_names)
         elif args.coverage_file:
             logger.info(f"Reading contig coverages from '{input_coverage[0]}'.")
-            contig_names, coverage_matrix = tools.get_tsv_coverages(input_coverage[0])
+            coverage_dict = tools.get_tsv_coverages(input_coverage[0])
         logger.info(f"Saving contig coverages data to '{coverage_data_file}'.")
         with gzip.open(coverage_data_file, "wb") as fout:
-            pickle.dump((signatures, contig_names, coverage_matrix), fout)
-
-    # Build a dictionary where the keys are genome names and the values are numpy matrices
-    # of the coverage values
-    coverage_dict = Parallel(n_jobs=args.threads)(
-        delayed(lambda x, y, z: z[[np.where(y == i)[0][0] for i in x.contigs]])(
-            mag, contig_names, coverage_matrix,
-        )
-        for mag in mag_list
-    )
-    coverage_dict = dict(zip([mag.genome for mag in mag_list], coverage_dict))
+            pickle.dump((signatures, coverage_dict), fout)
 
     logger.info("Computing contig scores.")
 
     mag_coverage_list = Parallel(n_jobs=args.threads)(
         delayed(Coverage)(
             mag,
-            coverage_dict[mag.genome],
+            coverage_dict,
             args.min_average_coverage,
             args.n_iterations,
             args.n_components,
