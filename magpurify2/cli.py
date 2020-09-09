@@ -27,6 +27,34 @@ from biolib.logger import logger_setup
 
 import magpurify2
 
+default_values = {
+    "composition": {
+        "n_iterations": 4,
+        "n_components": 3,
+        "min_dist": 0.1,
+        "n_neighbors": 15,
+        "set_op_mix_ratio": 1.0,
+    },
+    "coverage": {
+        "min_identity": 0.97,
+        "trim_lower": 0.05,
+        "trim_upper": 0.05,
+        "min_average_coverage": 1.0,
+        "n_iterations": 4,
+        "n_components": 3,
+        "min_dist": 0.15,
+        "n_neighbors": 15,
+        "set_op_mix_ratio": 0.6,
+    },
+    "codon_usage": {"min_genes": 1,},
+    "taxonomy": {
+        "contig_min_fraction": 0.7,
+        "genome_min_fraction": 0.7,
+        "min_genus_identity": 0.83,
+    },
+    "filter": {"probability_threshold": 0.5,},
+}
+
 
 def cli():
     parser = argparse.ArgumentParser(
@@ -34,14 +62,15 @@ def cli():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         add_help=False,
     )
-    options = parser.add_argument_group("Options")
-    options.add_argument(
-        "--version", action="version", version=f"{parser.prog} v{magpurify2.__version__}",
-    )
-    options.add_argument(
-        "-h", "--help", action="help", help="Show this help message and exit"
-    )
     subparsers = parser.add_subparsers(title="Modules")
+    end_to_end_subcommand = subparsers.add_parser(
+        "end_to_end",
+        help="Execute the complete MAGpurify2 pipeline to identify and remove putative "
+        "contaminants from MAGs.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        add_help=False,
+    )
+    end_to_end_parser(end_to_end_subcommand)
     composition_subcommand = subparsers.add_parser(
         "composition",
         help="Identify putative contaminants using tetranucleotide frequences.",
@@ -77,12 +106,22 @@ def cli():
         add_help=False,
     )
     filter_parser(filter_subcommand)
+    options = parser.add_argument_group("Options")
+    options.add_argument(
+        "--version", action="version", version=f"{parser.prog} v{magpurify2.__version__}",
+    )
+    options.add_argument(
+        "-h", "--help", action="help", help="Show this help message and exit"
+    )
 
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(0)
     elif len(sys.argv) == 2:
-        if sys.argv[1] == "composition":
+        if sys.argv[1] == "end_to_end":
+            end_to_end_subcommand.print_help()
+            sys.exit(0)
+        elif sys.argv[1] == "composition":
             composition_subcommand.print_help()
             sys.exit(0)
         elif sys.argv[1] == "coverage":
@@ -108,6 +147,64 @@ def cli():
     args.func(args)
 
 
+def end_to_end_parser(parser):
+    parser.set_defaults(func=magpurify2.end_to_end.main)
+    required = parser.add_argument_group("Required arguments")
+    coverage_input = parser.add_argument_group(
+        "Coverage data input (required, mutually exclusive arguments)",
+    )
+    coverage_input_mex = coverage_input.add_mutually_exclusive_group(required=True)
+    database = parser.add_argument_group(
+        "Database input (required when not using fast mode)"
+    )
+    options = parser.add_argument_group("Data processing options")
+    other = parser.add_argument_group("Other options")
+    required.add_argument(
+        "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
+    )
+    required.add_argument(
+        "output_directory", help="Directory to write the output files to.", type=Path,
+    )
+    required.add_argument(
+        "filtered_output_directory",
+        help="Directory where the filtered MAGs will be written to.",
+        type=Path,
+    )
+    coverage_input_mex.add_argument(
+        "--bam_files", nargs="+", help="Input sorted BAM files.", type=Path,
+    )
+    coverage_input_mex.add_argument(
+        "--coverage_file",
+        help="Input a tabular file containing contig coverage data.",
+        type=Path,
+    )
+    database.add_argument(
+        "--taxonomy_database",
+        help="Path to the MAGpurify2 taxonomy database directory.",
+        type=Path,
+    )
+    options.add_argument(
+        "--fast_mode",
+        help="Identify contaminants using only the composition and coverage modules. The "
+        "codon_usage and taxonomy modules will not be executed and the `--taxonomy_database` "
+        "parameter is not required.",
+        action="store_true",
+    )
+    other.add_argument(
+        "-t",
+        "--threads",
+        default=multiprocessing.cpu_count(),
+        type=int,
+        help="Number of threads to use. All by default.",
+    )
+    other.add_argument(
+        "-q", "--quiet", help="Suppress the logger output", action="store_true",
+    )
+    other.add_argument(
+        "-h", "--help", action="help", help="Show this help message and exit",
+    )
+
+
 def composition_parser(parser):
     parser.set_defaults(func=magpurify2.composition.main)
     required = parser.add_argument_group("Required arguments")
@@ -121,33 +218,33 @@ def composition_parser(parser):
     )
     options.add_argument(
         "--n_iterations",
-        default=4,
+        default=default_values["composition"]["n_iterations"],
         help="Number of iterations of data embedding and cluster selection with "
         "different seeds.",
         type=int,
     )
     options.add_argument(
         "--n_components",
-        default=3,
+        default=default_values["composition"]["n_components"],
         help="The dimension of the space to embed the data into (UMAP parameter).",
         type=int,
     )
     options.add_argument(
         "--min_dist",
-        default=0.1,
+        default=default_values["composition"]["min_dist"],
         help="The effective minimum distance between embedded points (UMAP parameter).",
         type=float,
     )
     options.add_argument(
         "--n_neighbors",
-        default=15,
+        default=default_values["composition"]["n_neighbors"],
         help="The size of local neighborhood used for manifold approximation "
         "(UMAP parameter).",
         type=int,
     )
     options.add_argument(
         "--set_op_mix_ratio",
-        default=1.0,
+        default=default_values["composition"]["set_op_mix_ratio"],
         help="Interpolate between the union (1.0) and intersection (0.0) to combine the "
         "local simplicial sets (UMAP parameter).",
         type=float,
@@ -171,7 +268,7 @@ def coverage_parser(parser):
     parser.set_defaults(func=magpurify2.coverage.main)
     required = parser.add_argument_group("Required arguments")
     coverage_input = parser.add_argument_group(
-        "Coverage data input (required, mutually exclusive)",
+        "Coverage data input (required, mutually exclusive arguments)",
     )
     coverage_input_mex = coverage_input.add_mutually_exclusive_group(required=True)
     options = parser.add_argument_group("Data processing options")
@@ -192,60 +289,60 @@ def coverage_parser(parser):
     )
     options.add_argument(
         "--min_identity",
-        default=0.97,
+        default=default_values["coverage"]["min_identity"],
         help="Exclude reads by overall identity to the reference sequences.",
         type=float,
     )
     options.add_argument(
         "--trim_lower",
-        default=0.05,
+        default=default_values["coverage"]["trim_lower"],
         help="Fraction to trim from the lower tail of the coverage distribution to "
         "compute contig mean coverages.",
         type=float,
     )
     options.add_argument(
         "--trim_upper",
-        default=0.05,
+        default=default_values["coverage"]["trim_upper"],
         help="Fraction to trim from the upper tail of the coverage distribution to "
         "compute contig mean coverages.",
         type=float,
     )
     options.add_argument(
         "--min_average_coverage",
-        default=1.0,
+        default=default_values["coverage"]["min_average_coverage"],
         help="Do not compute scores using coverage data from samples where the average "
         "genome coverage is less than `min_average_coverage`.",
         type=float,
     )
     options.add_argument(
         "--n_iterations",
-        default=4,
+        default=default_values["coverage"]["n_iterations"],
         help="Number of iterations of data embedding and cluster selection with "
         "different seeds.",
         type=int,
     )
     options.add_argument(
         "--n_components",
-        default=3,
+        default=default_values["coverage"]["n_components"],
         help="The dimension of the space to embed the data into (UMAP parameter).",
         type=int,
     )
     options.add_argument(
         "--min_dist",
-        default=0.15,
+        default=default_values["coverage"]["min_dist"],
         help="The effective minimum distance between embedded points (UMAP parameter).",
         type=float,
     )
     options.add_argument(
         "--n_neighbors",
-        default=15,
+        default=default_values["coverage"]["n_neighbors"],
         help="The size of local neighborhood used for manifold approximation "
         "(UMAP parameter).",
         type=int,
     )
     options.add_argument(
         "--set_op_mix_ratio",
-        default=0.6,
+        default=default_values["coverage"]["set_op_mix_ratio"],
         help="Interpolate between the union (1.0) and intersection (0.0) to combine the "
         "local simplicial sets (UMAP parameter).",
         type=float,
@@ -278,7 +375,7 @@ def codon_usage_parser(parser):
     )
     options.add_argument(
         "--min_genes",
-        default=1,
+        default=default_values["codon_usage"]["min_genes"],
         help="Minimum number of genes in a contig for it to be considered for "
         "contamination detection. Contigs with less than `min_genes` will never be "
         "flagged as contaminants.",
@@ -311,11 +408,13 @@ def taxonomy_parser(parser):
         "output_directory", help="Directory to write the output files to.", type=Path,
     )
     required.add_argument(
-        "database", help="Path to MAGpurify2's database directory.", type=Path,
+        "taxonomy_database",
+        help="Path to the MAGpurify2 taxonomy database directory.",
+        type=Path,
     )
     options.add_argument(
         "--contig_min_fraction",
-        default=0.5,
+        default=default_values["taxonomy"]["contig_min_fraction"],
         type=float,
         help="The contig-level taxonomy must agree with the taxonomy of at least "
         "`contig_min_fraction` of its genes (weighted by the bitscore of the alignment). "
@@ -323,16 +422,15 @@ def taxonomy_parser(parser):
     )
     options.add_argument(
         "--genome_min_fraction",
-        default=0.5,
+        default=default_values["taxonomy"]["genome_min_fraction"],
         type=float,
         help="The genome-level taxonomy must agree with the taxonomy of at least "
         "`genome_min_fraction` of its genes (weighted by the bitscore of the alignment). "
-        "The value must be equal to or greater than 0.5 and less than 1. This parameter "
-        "will not affect the contig scores.",
+        "The value must be equal to or greater than 0.5 and less than 1.",
     )
     options.add_argument(
         "--min_genus_identity",
-        default=0.83,
+        default=default_values["taxonomy"]["min_genus_identity"],
         type=float,
         help="A given gene will only be assigned up to the genus rank if the value "
         "obtained from 'alignment identity * target coverage' is equal to or greater "
@@ -372,12 +470,9 @@ def filter_parser(parser):
         help="Directory where the filtered MAGs will be written to.",
         type=Path,
     )
-    required.add_argument(
-        "model_file", help="Classification model file.", type=Path,
-    )
     options.add_argument(
         "--probability_threshold",
-        default=0.5,
+        default=default_values["filter"]["probability_threshold"],
         type=float,
         help="Contigs whose estimated probability of being a contaminant is above "
         "`probability_threshold` will be filtered out. The higher this value, the more "

@@ -18,12 +18,12 @@
 #
 # Contact: antoniop.camargo@gmail.com
 
+import imp
 import logging
 import sys
-from collections import defaultdict
+from pathlib import Path
 
 import numpy as np
-from joblib import Parallel, delayed
 
 from magpurify2 import tools
 from magpurify2.core import ContigClassifier, Mag
@@ -58,10 +58,13 @@ def main(args):
     mag_list = [Mag(genome) for genome in args.genomes]
 
     # Determine the required modules and check if their outputs exist
+    module_path = imp.find_module("magpurify2")[1]
     if args.fast_mode:
         module_list = ["composition", "coverage"]
+        model_file = Path(module_path).joinpath("models", "reduced_model.json")
     else:
         module_list = ["composition", "coverage", "codon_usage", "taxonomy"]
+        model_file = Path(module_path).joinpath("models", "full_model.json")
     logger.info(f"Reading contig scores from the {', '.join(module_list)} modules.")
     module_path_list = [
         scores_directory.joinpath(f"{module}_scores.tsv") for module in module_list
@@ -115,7 +118,7 @@ def main(args):
     contig_classification = ContigClassifier(
         genome_contig_matrix,
         feature_matrix,
-        args.model_file,
+        model_file,
         args.probability_threshold,
         args.threads,
     )
@@ -133,11 +136,9 @@ def main(args):
             "The following genomes were not previously analysed by any of MAGpurify2's "
             f"modules and will be skipped: {', '.join(not_in_mags_contaminants)}."
         )
-    Parallel(n_jobs=args.threads)(
-        delayed(tools.write_filtered_genome)(
+    for mag in mag_list:
+        tools.write_filtered_genome(
             mag,
             contig_classification.mags_contaminants_dict,
             args.filtered_output_directory,
         )
-        for mag in mag_list
-    )

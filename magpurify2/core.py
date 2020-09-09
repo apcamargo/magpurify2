@@ -362,17 +362,16 @@ class Taxonomy:
         return np.array(contig_taxonomy_array)
 
     def get_genome_taxonomy(self, fraction):
-        gene_taxonomy_flatten = list(itertools.chain(*self.gene_taxonomy))
-        if len(gene_taxonomy_flatten) > 1:
-            genome_taxonomy = taxopy.find_majority_vote(
-                gene_taxonomy_flatten,
+        if len(self) > 1:
+            genome_taxonomy = taxopy.find_m@ajority_vote(
+                self.contig_taxonomy,
                 self.taxdb,
-                weights=list(itertools.chain(*self.bitscore_array)),
+                weights=self.lengths.tolist(),
                 fraction=fraction,
             )
-        elif len(gene_taxonomy_flatten) == 1:
-            genome_taxonomy = contig_taxonomy = taxopy.Taxon(
-                gene_taxonomy_flatten[0].taxid, self.taxdb
+        elif len(self) == 1:
+            genome_taxonomy = taxopy.Taxon(
+                self.contig_taxonomy[0].taxid, self.taxdb
             )
         else:
             genome_taxonomy = taxopy.Taxon("1", self.taxdb)

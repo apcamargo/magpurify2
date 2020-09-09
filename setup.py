@@ -19,6 +19,7 @@
 #
 # Contact: antoniop.camargo@gmail.com
 
+from os import path
 from setuptools import find_packages, setup
 from setuptools_rust import RustExtension
 
@@ -26,6 +27,9 @@ setup(
     name="magpurify2",
     version="0.1.0",
     packages=find_packages(),
+    package_data={
+        path.join("magpurify2", "models"): ["full_model.json", "reduced_model.json"]
+    },
     rust_extensions=[
         RustExtension("magpurify2._codon", debug=False),
         RustExtension("magpurify2._composition", debug=False),

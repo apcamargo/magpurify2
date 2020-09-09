@@ -31,6 +31,7 @@ from magpurify2.core import CodonUsage, Mag
 
 def main(args):
     logger = logging.getLogger("timestamp")
+    logger.info("Executing MAGpurify2 codon usage module.")
     args.min_genes = tools.validade_input(args.min_genes, "min_genes", [1, 999])
     # Check if Prodigal is an executable in the user PATH.
     missing_executables = [

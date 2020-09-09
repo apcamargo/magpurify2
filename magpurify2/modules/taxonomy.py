@@ -30,6 +30,7 @@ from magpurify2.core import Mag, Taxonomy
 
 def main(args):
     logger = logging.getLogger("timestamp")
+    logger.info("Executing MAGpurify2 taxonomy module.")
     args.contig_min_fraction = tools.validade_input(
         args.contig_min_fraction, "contig_min_fraction", [0.5, 1.0]
     )
@@ -51,7 +52,7 @@ def main(args):
             f"{', '.join(missing_executables)}."
         )
         sys.exit(1)
-    database = external.Database(args.database)
+    database = external.Database(args.taxonomy_database)
     logger.info(f"Using database '{database.name}' version {database.version}.")
     tools.check_output_directory(args.output_directory)
     scores_directory = args.output_directory.joinpath("scores")
@@ -100,7 +101,7 @@ def main(args):
     taxdb = taxopy.TaxDb(
         nodes_dmp=database.nodes_dmp, names_dmp=database.names_dmp, keep_files=True,
     )
-    logger.info(f"Reading MMSeqs2 output file.")
+    logger.info(f"Reading MMSeqs2 output files.")
     mmseqs2_dict = tools.get_mmseqs2(str(mmseqs2_taxonomy_file), str(mmseqs2_alignment_file))
     logger.info("Computing contig scores.")
     mag_taxonomy_list = [

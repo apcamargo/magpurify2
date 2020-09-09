@@ -30,6 +30,7 @@ from magpurify2.core import Composition, Mag
 
 def main(args):
     logger = logging.getLogger("timestamp")
+    logger.info("Executing MAGpurify2 composition module.")
     args.n_iterations = tools.validade_input(args.n_iterations, "n_iterations", [1, 999])
     args.n_components = tools.validade_input(args.n_components, "n_components", [1, 999])
     args.n_neighbors = tools.validade_input(args.n_neighbors, "n_neighbors", [1, 999])

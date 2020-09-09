@@ -31,6 +31,7 @@ from magpurify2.core import Coverage, Mag
 
 def main(args):
     logger = logging.getLogger("timestamp")
+    logger.info("Executing MAGpurify2 coverage module.")
     args.contig_min_fraction = tools.validade_input(
         args.min_identity, "min_identity", [0.0, 1.0]
     )
