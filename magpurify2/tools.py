@@ -431,8 +431,6 @@ def create_embedding(
     ndarray
         Embedding of the training data in low-dimensional space.
     """
-    os.environ["NUMBA_NUM_THREADS"] = "1"
-    os.environ["THREADING_LAYER"] = "tbb"
     init = (
         "random"
         if data.shape[1] <= n_components or data.shape[0] <= n_components + 1

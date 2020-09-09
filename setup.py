@@ -50,7 +50,6 @@ setup(
         "numpy",
         "scipy",
         "taxopy",
-        "tbb",
         "umap-learn",
         "xgboost",
     ],
