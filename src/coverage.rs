@@ -23,8 +23,6 @@ use coverm::{
     mosdepth_genome_coverage_estimators::*,
     FlagFilter,
 };
-use ndarray::Array2;
-use numpy::convert::ToPyArray;
 use pyo3::{prelude::*, wrap_pyfunction};
 use std::collections::HashMap;
 
@@ -88,7 +86,7 @@ fn get_bam_coverages(
     trim_lower: f32,
     trim_upper: f32,
     threads: usize,
-) -> (PyObject, PyObject) {
+) -> PyObject {
     let trim_upper = 1. - trim_upper;
     let min_fraction_covered_bases = 0.;
     let filter_params = FilterParameters {
@@ -146,36 +144,15 @@ fn get_bam_coverages(
             for input_bam in coverages {
                 for coverage_entry in input_bam {
                     if let Some(contig_name) = &entry_names[coverage_entry.entry_index] {
-                        let contig_coverage_vector =
-                            contig_coverages.entry(contig_name).or_insert(vec![]);
-                        contig_coverage_vector.push(coverage_entry.coverage);
+                        let coverage_vector = contig_coverages.entry(contig_name).or_insert(vec![]);
+                        coverage_vector.push(coverage_entry.coverage);
                     }
                 }
             }
         }
         _ => unreachable!(),
     }
-
-    let mut coverage_vector: std::vec::Vec<f32> = Vec::new();
-    let mut contig_names_vector = Vec::new();
-    for (contig_name, contig_coverage_vector) in contig_coverages.iter() {
-        coverage_vector.extend(contig_coverage_vector);
-        contig_names_vector.push(*contig_name);
-    }
-
-    let coverage_vector = Array2::from_shape_vec(
-        (
-            contig_names_vector.len(),
-            coverage_vector.len() / contig_names_vector.len(),
-        ),
-        coverage_vector,
-    )
-    .unwrap()
-    .to_pyarray(Python::acquire_gil().python())
-    .into_py(py);
-    let contig_names_vector = contig_names_vector.into_py(py);
-
-    (contig_names_vector, coverage_vector)
+    contig_coverages.into_py(py)
 }
 
 #[pymodule]
