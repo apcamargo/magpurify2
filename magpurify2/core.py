@@ -246,8 +246,8 @@ class Coverage:
         )
         self.n_samples = self.selected_samples.sum()
         if len(self) <= 2 or self.n_samples == 0:
-            self.scores = np.array([1.0] * len(self))
-            self.cluster_scores = np.array([1.0] * len(self))
+            self.scores = np.ones(len(self))
+            self.cluster_scores = np.ones(len(self))
         else:
             self.scores = tools.get_log_ratio_scores(
                 self.coverages[:, self.selected_samples], self.lengths, 25

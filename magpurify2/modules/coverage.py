@@ -31,6 +31,7 @@ from magpurify2.core import Coverage, Mag
 
 def main(args):
     logger = logging.getLogger("timestamp")
+    logger.info("Executing MAGpurify2 coverage module.")
     args.contig_min_fraction = tools.validade_input(
         args.min_identity, "min_identity", [0.0, 1.0]
     )
@@ -45,17 +46,23 @@ def main(args):
     args.set_op_mix_ratio = tools.validade_input(
         args.set_op_mix_ratio, "set_op_mix_ratio", [0.0, 1.0]
     )
-    tools.check_bam_files(args.bam_files)
     tools.check_output_directory(args.output_directory)
     scores_directory = args.output_directory.joinpath("scores")
     scores_directory.mkdir(exist_ok=True)
     coverage_score_file = scores_directory.joinpath("coverage_scores.tsv")
 
+    # Check if coverages were provided as BAMs or a tabular file
+    if args.bam_files:
+        tools.check_bam_files(args.bam_files)
+        input_coverage = args.bam_files
+    else:
+        input_coverage = [args.coverage_file]
+
     # Read input genomes
     logger.info(f"Reading {len(args.genomes)} genomes.")
     mag_list = [Mag(genome, store_sequences=False) for genome in args.genomes]
     coverage_data_file = args.output_directory.joinpath("coverages.pickle.gz")
-    bam_signatures = [tools.get_file_signature(filepath) for filepath in args.bam_files]
+    signatures = [tools.get_file_signature(filepath) for filepath in input_coverage]
 
     # Check if the coverage computation needs to be executed again. To do that, we check
     # if a pickle dump exists. If it does, we check if the signatures of all input BAM
@@ -63,32 +70,36 @@ def main(args):
     skip_coverage = False
     if coverage_data_file.exists():
         with gzip.open(coverage_data_file) as fin:
-            loaded_bam_signatures, contig_names, coverage_matrix = pickle.load(fin)
-            if set(bam_signatures).issubset(loaded_bam_signatures):
+            loaded_signatures, contig_names, coverage_matrix = pickle.load(fin)
+            if set(signatures).issubset(loaded_signatures):
                 logger.info("Skipping contig coverages computation.")
                 skip_coverage = True
                 # If the number of input BAM files is less than the number of input BAM
                 # files, select the coverage data of the input BAMs.
-                if len(loaded_bam_signatures) > len(bam_signatures):
-                    selected_bams = [
-                        signature in bam_signatures for signature in loaded_bam_signatures
+                if len(loaded_signatures) > len(signatures):
+                    selected_input_files = [
+                        signature in signatures for signature in loaded_signatures
                     ]
-                    coverage_matrix = coverage_matrix[:, selected_bams]
+                    coverage_matrix = coverage_matrix[:, selected_input_files]
             else:
                 coverage_data_file.unlink()
     if not skip_coverage:
-        logger.info(f"Computing contig coverages from {len(args.bam_files)} BAM files.")
-        contig_names, coverage_matrix = tools.get_bam_coverages(
-            [str(filepath) for filepath in args.bam_files],
-            min_identity=args.min_identity,
-            trim_lower=args.trim_lower,
-            trim_upper=args.trim_upper,
-            threads=args.threads,
-        )
-        contig_names = np.array(contig_names)
+        if args.bam_files:
+            logger.info(f"Computing contig coverages from {len(input_coverage)} BAM files.")
+            contig_names, coverage_matrix = tools.get_bam_coverages(
+                [str(filepath) for filepath in input_coverage],
+                min_identity=args.min_identity,
+                trim_lower=args.trim_lower,
+                trim_upper=args.trim_upper,
+                threads=args.threads,
+            )
+            contig_names = np.array(contig_names)
+        elif args.coverage_file:
+            logger.info(f"Reading contig coverages from '{input_coverage[0]}'.")
+            contig_names, coverage_matrix = tools.get_tsv_coverages(input_coverage[0])
         logger.info(f"Saving contig coverages data to '{coverage_data_file}'.")
         with gzip.open(coverage_data_file, "wb") as fout:
-            pickle.dump((bam_signatures, contig_names, coverage_matrix), fout)
+            pickle.dump((signatures, contig_names, coverage_matrix), fout)
 
     # Build a dictionary where the keys are genome names and the values are numpy matrices
     # of the coverage values
