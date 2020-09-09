@@ -85,7 +85,9 @@ def main(args):
                 coverage_data_file.unlink()
     if not skip_coverage:
         if args.bam_files:
-            logger.info(f"Computing contig coverages from {len(input_coverage)} BAM files.")
+            logger.info(
+                f"Computing contig coverages from {len(input_coverage)} BAM files."
+            )
             contig_names, coverage_matrix = tools.get_bam_coverages(
                 [str(filepath) for filepath in input_coverage],
                 min_identity=args.min_identity,
@@ -103,12 +105,10 @@ def main(args):
 
     # Build a dictionary where the keys are genome names and the values are numpy matrices
     # of the coverage values
-    coverage_dict = Parallel(n_jobs=args.threads)(
-        delayed(lambda x, y, z: z[[np.where(y == i)[0][0] for i in x.contigs]])(
-            mag, contig_names, coverage_matrix,
-        )
+    coverage_dict = [
+        coverage_matrix[[np.where(contig_names == i)[0][0] for i in mag.contigs]]
         for mag in mag_list
-    )
+    ]
     coverage_dict = dict(zip([mag.genome for mag in mag_list], coverage_dict))
 
     logger.info("Computing contig scores.")
