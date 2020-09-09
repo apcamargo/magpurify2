@@ -240,7 +240,7 @@ def read_fasta(filepath):
     fin.close()
 
 
-def get_tsv_coverages(filepath):
+def get_tsv_coverages(filepath, contig_set=None):
     """
     Reads contig coverages from tabular text files. The first column of the
     coverage file must store the contigs names. The remaining columns should
@@ -250,6 +250,9 @@ def get_tsv_coverages(filepath):
     ----------
     filepath : Path
         Path object pointing tabular text file.
+    contig_set : set, optional
+       If provided, only the coverages of the contigs within `contig_set` will
+       returned. Default is None (return the coverages of all contigs).
 
     Returns
     -------
@@ -264,6 +267,10 @@ def get_tsv_coverages(filepath):
         sys.exit(1)
     contig_names_vector = np.loadtxt(filepath, dtype=str, usecols=0)
     coverage_vector = np.loadtxt(filepath, dtype=float, usecols=range(1, ncols))
+    if contig_set:
+        mask = np.array([contig in contig_set for contig in contig_names_vector])
+        contig_names_vector = contig_names_vector[mask]
+        coverage_vector = coverage_vector[mask, :]
     return (contig_names_vector, coverage_vector)
 
 
