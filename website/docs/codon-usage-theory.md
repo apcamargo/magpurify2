@@ -24,7 +24,7 @@ $$
 w_{i,j} = \frac{\mathit{RSCU}_{i,j}}{\max_{1\le j\le n}\mathit{RSCU}_{i,j}}
 $$
 
-Nullam rhoncus dui eu iaculis congue. Sed elit neque, ultricies eu venenatis nec, vehicula et nisl. Nullam tincidunt dapibus leo, faucibus venenatis justo rutrum et. In hac habitasse platea dictumst. Ut nunc risus, faucibus bibendum gravida vitae, bibendum vel ex. Maecenas quis eros augue. Morbi ornare suscipit magna sodales rutrum.
+Nullam rhoncus dui eu iaculis congue. Sed elit neque, ultricies eu venenatis nec, vehicula et nisl. Nullam tincidunt dapibus leo, faucibus venenatis justo rutrum et. In hac habitasse platea dictumst. Ut nunc risus, faucibus bibendum gravida vitae, bibendum vel ex.
 
 $$
 \mathit{CAI} = \left(\prod \:_{k=1}^Lw_k\right)^{\frac{1}{L}}
