@@ -43,7 +43,7 @@ struct EstimatorsAndTaker<'a> {
     taker: CoverageTakerType<'a>,
 }
 
-/// get_coverages(bam_list, contig_end_exclusion=75, min_identity=0.97, threads=1)
+/// get_bam_coverages(bam_list, contig_end_exclusion=75, min_identity=0.97, threads=1)
 /// --
 ///
 /// Computes contig mean coverages from sorted BAM files. Trimmed means will be
@@ -80,7 +80,7 @@ struct EstimatorsAndTaker<'a> {
     trim_upper = "0.",
     threads = "1"
 )]
-fn get_coverages(
+fn get_bam_coverages(
     py: Python,
     bam_list: Vec<&str>,
     contig_end_exclusion: u32,
@@ -180,6 +180,6 @@ fn get_coverages(
 
 #[pymodule]
 fn _coverage(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_wrapped(wrap_pyfunction!(get_coverages))?;
+    m.add_wrapped(wrap_pyfunction!(get_bam_coverages))?;
     Ok(())
 }

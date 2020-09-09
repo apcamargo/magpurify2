@@ -78,7 +78,7 @@ def main(args):
                 coverage_data_file.unlink()
     if not skip_coverage:
         logger.info(f"Computing contig coverages from {len(args.bam_files)} BAM files.")
-        contig_names, coverage_matrix = tools.get_coverages(
+        contig_names, coverage_matrix = tools.get_bam_coverages(
             [str(filepath) for filepath in args.bam_files],
             min_identity=args.min_identity,
             trim_lower=args.trim_lower,
