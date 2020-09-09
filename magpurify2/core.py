@@ -221,7 +221,7 @@ class Coverage:
     def __init__(
         self,
         mag,
-        coverage_dict,
+        coverages,
         min_average_coverage,
         n_iterations,
         n_components,
@@ -239,22 +239,15 @@ class Coverage:
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
-        self.coverages = np.array(
-            [
-                coverage_dict[contig]
-                if contig in coverage_dict
-                else [0.0] * len(list(coverage_dict.values())[0])
-                for contig in self.contigs
-            ]
-        )
+        self.coverages = coverages
         self.selected_samples = (
             np.average(self.coverages, axis=0, weights=self.lengths)
             >= min_average_coverage
         )
         self.n_samples = self.selected_samples.sum()
         if len(self) <= 2 or self.n_samples == 0:
-            self.scores = np.ones(len(self))
-            self.cluster_scores = np.ones(len(self))
+            self.scores = np.array([1.0] * len(self))
+            self.cluster_scores = np.array([1.0] * len(self))
         else:
             self.scores = tools.get_log_ratio_scores(
                 self.coverages[:, self.selected_samples], self.lengths, 25
