@@ -26,7 +26,7 @@ use coverm::{
 use ndarray::Array2;
 use numpy::convert::ToPyArray;
 use pyo3::{prelude::*, wrap_pyfunction};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 struct FilterParameters {
     flag_filters: FlagFilter,
@@ -65,6 +65,10 @@ struct EstimatorsAndTaker<'a> {
 /// trim_upper : float, optional
 ///    Fraction to trim from the upper tail of the coverage distribution.
 ///    Default is 0.0.
+/// contig_set : set, optional
+///    If provided, only the coverages of the contigs within `contig_set` will
+///    returned.
+///    Default is None (return the coverages of all contigs).
 /// threads : int, optional
 ///    Number of threads to use for coverage computation. Default is 1.
 ///
@@ -78,6 +82,7 @@ struct EstimatorsAndTaker<'a> {
     min_identity = "0.97",
     trim_lower = "0.",
     trim_upper = "0.",
+    contig_set = "None",
     threads = "1"
 )]
 fn get_bam_coverages(
@@ -87,6 +92,7 @@ fn get_bam_coverages(
     min_identity: f32,
     trim_lower: f32,
     trim_upper: f32,
+    contig_set: Option<HashSet<&str>>,
     threads: usize,
 ) -> (PyObject, PyObject) {
     let trim_upper = 1. - trim_upper;
@@ -133,6 +139,7 @@ fn get_bam_coverages(
         filter_params.flag_filters,
         threads,
     );
+
     let mut contig_coverages = HashMap::new();
     match &estimators_and_taker.taker {
         CoverageTakerType::CachedSingleFloatCoverageTaker {
@@ -156,11 +163,26 @@ fn get_bam_coverages(
         _ => unreachable!(),
     }
 
+    let (filter_contigs, contig_set) = match contig_set {
+        Some(_) => (true, contig_set.unwrap()),
+        None => (false, HashSet::new()),
+    };
+
     let mut coverage_vector: std::vec::Vec<f32> = Vec::new();
     let mut contig_names_vector = Vec::new();
-    for (contig_name, contig_coverage_vector) in contig_coverages.iter() {
-        coverage_vector.extend(contig_coverage_vector);
-        contig_names_vector.push(*contig_name);
+
+    if filter_contigs {
+        for (contig_name, contig_coverage_vector) in contig_coverages.iter() {
+            if contig_set.contains(contig_name.as_str()) {
+                coverage_vector.extend(contig_coverage_vector);
+                contig_names_vector.push(*contig_name);
+            }
+        }
+    } else {
+        for (contig_name, contig_coverage_vector) in contig_coverages.iter() {
+            coverage_vector.extend(contig_coverage_vector);
+            contig_names_vector.push(*contig_name);
+        }
     }
 
     let coverage_vector = Array2::from_shape_vec(

@@ -21,6 +21,7 @@
 import gzip
 import logging
 import pickle
+from functools import reduce
 
 import numpy as np
 from joblib import Parallel, delayed
@@ -91,6 +92,7 @@ def main(args):
                 min_identity=args.min_identity,
                 trim_lower=args.trim_lower,
                 trim_upper=args.trim_upper,
+                contig_set=reduce(lambda x, y: x.union(y.contigs), mag_list, set()),
                 threads=args.threads,
             )
             contig_names = np.array(contig_names)
