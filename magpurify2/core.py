@@ -239,7 +239,14 @@ class Coverage:
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
-        self.coverages = coverages
+        self.coverages = np.array(
+            [
+                coverage_dict[contig]
+                if contig in coverage_dict
+                else [0.0] * len(list(coverage_dict.values())[0])
+                for contig in self.contigs
+            ]
+        )
         self.selected_samples = (
             np.average(self.coverages, axis=0, weights=self.lengths)
             >= min_average_coverage

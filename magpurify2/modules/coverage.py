@@ -102,17 +102,6 @@ def main(args):
         with gzip.open(coverage_data_file, "wb") as fout:
             pickle.dump((signatures, coverage_dict), fout)
 
-    # Build a dictionary where the keys are genome names and the values are numpy arrays
-    # of the coverage values
-    coverage_dict = Parallel(n_jobs=args.threads)(
-        delayed(lambda x, y: np.array([y[i] for i in x.contigs]))(
-            mag,
-            coverage_dict,
-        )
-        for mag in mag_list
-    )
-    coverage_dict = dict(zip([mag.genome for mag in mag_list], coverage_dict))
-
     logger.info("Computing contig scores.")
 
     mag_coverage_list = Parallel(n_jobs=args.threads)(
