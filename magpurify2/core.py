@@ -363,7 +363,7 @@ class Taxonomy:
 
     def get_genome_taxonomy(self, fraction):
         if len(self) > 1:
-            genome_taxonomy = taxopy.find_m@ajority_vote(
+            genome_taxonomy = taxopy.find_majority_vote(
                 self.contig_taxonomy,
                 self.taxdb,
                 weights=self.lengths.tolist(),
