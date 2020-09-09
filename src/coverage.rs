@@ -163,6 +163,10 @@ fn get_bam_coverages(
         _ => unreachable!(),
     }
 
+    // If `contig_set` is `None`, the coverage of every contig found within the input BAM files
+    // will be stored. If `contig_set` is a set containing contig names, only the coverages of those
+    // contigs will be stored.
+
     let (filter_contigs, contig_set) = match contig_set {
         Some(_) => (true, contig_set.unwrap()),
         None => (false, HashSet::new()),
