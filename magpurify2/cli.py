@@ -48,8 +48,8 @@ default_values = {
     },
     "codon_usage": {"min_genes": 1,},
     "taxonomy": {
-        "contig_min_fraction": 0.7,
-        "genome_min_fraction": 0.7,
+        "contig_min_fraction": 0.5,
+        "genome_min_fraction": 0.5,
         "min_genus_identity": 0.83,
     },
     "filter": {"probability_threshold": 0.5,},

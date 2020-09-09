@@ -84,7 +84,7 @@ def main(args):
         module_path_list[0], dtype=str, skiprows=1, usecols=[0, 1]
     )
     feature_matrix = []
-    module_ncol_dict = {"composition": 5, "coverage": 5, "codon_usage": 6, "taxonomy": 3}
+    module_ncol_dict = {"composition": 5, "coverage": 5, "codon_usage": 6, "taxonomy": 4}
     for module, module_path in zip(module_list, module_path_list):
         if (
             np.loadtxt(module_path, dtype=str, skiprows=1, usecols=[0, 1])
@@ -111,6 +111,8 @@ def main(args):
         feature_matrix[:, 7] = np.tanh(np.log10(feature_matrix[:, 7] + 1))
         # Transform 'total_cds_length'
         feature_matrix[:, 8] = np.tanh(np.log10(feature_matrix[:, 8] + 1) * 0.2)
+        # Transform 'assigned_rank'
+        feature_matrix[:, 11] = feature_matrix[:, 11] / 6
 
     logger.info(
         f"Estimating contamination probabilities and identifying contaminant contigs."

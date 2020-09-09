@@ -288,7 +288,7 @@ class Taxonomy:
         min_genus_identity,
         taxdb,
     ):
-        self.attributes = ["genome", "contig", "taxonomy_score"]
+        self.attributes = ["genome", "contig", "taxonomy_score", "assigned_rank"]
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
@@ -316,6 +316,7 @@ class Taxonomy:
             self.contig_taxonomy = np.array([taxopy.Taxon("1", self.taxdb)] * len(self))
             self.genome_taxonomy = taxopy.Taxon("1", self.taxdb)
             self.scores = np.zeros(len(self))
+        self.assigned_rank = len(self.genome_taxonomy.taxid_lineage) - 1
 
     def get_gene_taxonomy(self, min_genus_identity):
         gene_taxonomy_array = []
@@ -370,9 +371,7 @@ class Taxonomy:
                 fraction=fraction,
             )
         elif len(self) == 1:
-            genome_taxonomy = taxopy.Taxon(
-                self.contig_taxonomy[0].taxid, self.taxdb
-            )
+            genome_taxonomy = taxopy.Taxon(self.contig_taxonomy[0].taxid, self.taxdb)
         else:
             genome_taxonomy = taxopy.Taxon("1", self.taxdb)
         return genome_taxonomy
@@ -410,7 +409,12 @@ class Taxonomy:
         return len(self.contigs)
 
     def __iter__(self):
-        return zip([self.genome] * len(self), self.contigs, np.round(self.scores, 5))
+        return zip(
+            [self.genome] * len(self),
+            self.contigs,
+            np.round(self.scores, 5),
+            [self.assigned_rank] * len(self),
+        )
 
 
 class ContigClassifier:
