@@ -107,7 +107,7 @@ def main(args):
     mag_coverage_list = Parallel(n_jobs=args.threads)(
         delayed(Coverage)(
             mag,
-            coverage_dict[mag.genome],
+            coverage_dict,
             args.min_average_coverage,
             args.n_iterations,
             args.n_components,
