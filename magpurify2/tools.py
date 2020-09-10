@@ -265,8 +265,12 @@ def get_tsv_coverages(filepath, contig_set=None):
     if ncols < 2:
         logger.error("The tabular coverage file must have at least two columns.")
         sys.exit(1)
-    contig_names_vector = np.loadtxt(filepath, dtype=str, usecols=0)
-    coverage_vector = np.loadtxt(filepath, dtype=float, usecols=range(1, ncols))
+    contig_names_vector = np.genfromtxt(
+        filepath, dtype=str, comments=None, delimiter="\t", susecols=0
+    )
+    coverage_vector = np.genfromtxt(
+        filepath, dtype=float, comments=None, delimiter="\t", usecols=range(1, ncols)
+    )
     if contig_set:
         mask = np.array([contig in contig_set for contig in contig_names_vector])
         contig_names_vector = contig_names_vector[mask]

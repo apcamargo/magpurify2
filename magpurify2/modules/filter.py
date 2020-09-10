@@ -80,14 +80,26 @@ def main(args):
         sys.exit(1)
 
     # Load data from the modules outputs
-    genome_contig_matrix = np.loadtxt(
-        module_path_list[0], dtype=str, skiprows=1, usecols=[0, 1]
+    genome_contig_matrix = np.genfromtxt(
+        module_path_list[0],
+        dtype=str,
+        skip_header=1,
+        comments=None,
+        delimiter="\t",
+        usecols=[0, 1],
     )
     feature_matrix = []
     module_ncol_dict = {"composition": 5, "coverage": 5, "codon_usage": 6, "taxonomy": 4}
     for module, module_path in zip(module_list, module_path_list):
         if not (
-            np.loadtxt(module_path, dtype=str, skiprows=1, usecols=[0, 1])
+            np.genfromtxt(
+                module_path,
+                dtype=str,
+                skip_header=1,
+                comments=None,
+                delimiter="\t",
+                usecols=[0, 1],
+            )
             == genome_contig_matrix
         ).all():
             logger.error(
@@ -97,8 +109,13 @@ def main(args):
             )
             sys.exit(1)
         module_ncol = module_ncol_dict[module]
-        module_feature_matrix = np.loadtxt(
-            module_path, dtype=float, skiprows=1, usecols=range(2, module_ncol)
+        module_feature_matrix = np.genfromtxt(
+            module_path,
+            dtype=float,
+            skip_header=1,
+            comments=None,
+            delimiter="\t",
+            usecols=range(2, module_ncol),
         )
         feature_matrix.append(module_feature_matrix)
     feature_matrix = np.column_stack(feature_matrix)
