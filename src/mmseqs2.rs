@@ -86,17 +86,19 @@ fn get_mmseqs2(
         HashMap::new();
     for (query, _) in &gene_identity_dict {
         let taxid = *gene_taxonomy_dict.get(query).unwrap();
-        let identity = *gene_identity_dict.get(query).unwrap();
-        let bitscore = *gene_bitscore_dict.get(query).unwrap();
-        let v: Vec<&str> = query.rsplitn(3, "~").collect();
-        if let [_, contig, genome] = &v[..] {
-            let genome_dictionary = mmseqs2_dict.entry(genome).or_insert(HashMap::new());
-            let contig_tuple = genome_dictionary
-                .entry(contig)
-                .or_insert((vec![], vec![], vec![]));
-            contig_tuple.0.push(taxid);
-            contig_tuple.1.push(identity);
-            contig_tuple.2.push(bitscore);
+        if taxid != 0 {
+            let identity = *gene_identity_dict.get(query).unwrap();
+            let bitscore = *gene_bitscore_dict.get(query).unwrap();
+            let v: Vec<&str> = query.rsplitn(3, "~").collect();
+            if let [_, contig, genome] = &v[..] {
+                let genome_dictionary = mmseqs2_dict.entry(genome).or_insert(HashMap::new());
+                let contig_tuple = genome_dictionary
+                    .entry(contig)
+                    .or_insert((vec![], vec![], vec![]));
+                contig_tuple.0.push(taxid);
+                contig_tuple.1.push(identity);
+                contig_tuple.2.push(bitscore);
+            }
         }
     }
     mmseqs2_dict.into_py(py)
