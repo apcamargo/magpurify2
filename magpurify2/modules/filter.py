@@ -86,9 +86,9 @@ def main(args):
     feature_matrix = []
     module_ncol_dict = {"composition": 5, "coverage": 5, "codon_usage": 6, "taxonomy": 4}
     for module, module_path in zip(module_list, module_path_list):
-        if (
+        if not (
             np.loadtxt(module_path, dtype=str, skiprows=1, usecols=[0, 1])
-            != genome_contig_matrix
+            == genome_contig_matrix
         ).all():
             logger.error(
                 "It seems that MAGpurify2's modules were executed with different inputs. "
