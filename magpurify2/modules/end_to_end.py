@@ -47,6 +47,7 @@ def main(args):
         magpurify2.taxonomy.main(
             Namespace(**magpurify2.cli.default_values["taxonomy"], **vars(args))
         )
+    magpurify2.cli.default_values["filter"].pop("probability_threshold")
     magpurify2.filter.main(
         Namespace(**magpurify2.cli.default_values["filter"], **vars(args))
     )

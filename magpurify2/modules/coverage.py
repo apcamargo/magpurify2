@@ -86,7 +86,9 @@ def main(args):
                 coverage_data_file.unlink()
     if not skip_coverage:
         if args.bam_files:
-            logger.info(f"Computing contig coverages from {len(input_coverage)} BAM files.")
+            logger.info(
+                f"Computing contig coverages from {len(input_coverage)} BAM files."
+            )
             contig_names, coverage_matrix = tools.get_bam_coverages(
                 [str(filepath) for filepath in input_coverage],
                 min_identity=args.min_identity,
@@ -98,7 +100,10 @@ def main(args):
             contig_names = np.array(contig_names)
         elif args.coverage_file:
             logger.info(f"Reading contig coverages from '{input_coverage[0]}'.")
-            contig_names, coverage_matrix = tools.get_tsv_coverages(input_coverage[0])
+            contig_names, coverage_matrix = tools.get_tsv_coverages(
+                input_coverage[0],
+                contig_set=reduce(lambda x, y: x.union(y.contigs), mag_list, set()),
+            )
         logger.info(f"Saving contig coverages data to '{coverage_data_file}'.")
         with gzip.open(coverage_data_file, "wb") as fout:
             pickle.dump((signatures, contig_names, coverage_matrix), fout)

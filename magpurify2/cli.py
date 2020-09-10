@@ -184,6 +184,14 @@ def end_to_end_parser(parser):
         type=Path,
     )
     options.add_argument(
+        "--probability_threshold",
+        default=default_values["filter"]["probability_threshold"],
+        type=float,
+        help="Contigs whose estimated probability of being a contaminant is above "
+        "`probability_threshold` will be filtered out. The higher this value, the more "
+        "conservative will be the contig filtering.",
+    )
+    options.add_argument(
         "--fast_mode",
         help="Identify contaminants using only the composition and coverage modules. The "
         "codon_usage and taxonomy modules will not be executed and the `--taxonomy_database` "
