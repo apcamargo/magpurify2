@@ -8,13 +8,13 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
    sodipodi:docname="tnf-embedding.svg"
    id="svg3006"
-   width="1728pt"
-   viewBox="0 0 1728 1152"
+   width="2028pt"
+   viewBox="0 0 2028 1192"
    version="1.1"
-   height="1152pt">
+   height="1192pt">
   <metadata
      id="metadata3010">
     <rdf:RDF>
@@ -28,14 +28,14 @@
     </rdf:RDF>
   </metadata>
   <sodipodi:namedview
-     inkscape:current-layer="axes_2"
+     inkscape:current-layer="figure_1"
      inkscape:window-maximized="1"
      inkscape:window-y="30"
      inkscape:window-x="0"
-     inkscape:cy="697.88045"
-     inkscape:cx="1018.7924"
-     inkscape:zoom="0.54184993"
-     fit-margin-bottom="0"
+     inkscape:cy="312.69789"
+     inkscape:cx="1685.459"
+     inkscape:zoom="0.25592707"
+     fit-margin-bottom="40"
      fit-margin-right="0"
      fit-margin-left="0"
      fit-margin-top="0"
@@ -50,7 +50,8 @@
      objecttolerance="10"
      borderopacity="1"
      bordercolor="#666666"
-     pagecolor="#ffffff" />
+     pagecolor="#ffffff"
+     inkscape:document-rotation="0" />
   <defs
      id="defs4">
     <style
@@ -60,9 +61,10 @@
   </style>
   </defs>
   <g
-     id="figure_1">
+     id="figure_1"
+     transform="translate(149.99999)">
     <g
-       transform="scale(4)"
+       transform="matrix(4.6944444,0,0,4.1388888,-149.99999,5.1706056e-6)"
        id="patch_1">
       <path
          id="path6"
