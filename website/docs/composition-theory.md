@@ -1,18 +1,16 @@
 # Composition module
 
-Contigs assembled from reads derived from the same genome or from genomes of closely related organisms tend to display a similar sequence composition profile, represented as k-mer frequencies. Metagenomic binners exploit this property to cluster contigs into putative genomic bins using 4-mer frequencies, or tetranucleotide frequencies (TNFs).
+Contigs assembled from reads derived from the same genome or from genomes of closely related organisms tend to display a similar sequence composition profile, represented as tetranucleotide frequencies and GC-content. MAGpurify2 exploits this property to find contigs with outlier sequence composition profiles in relation to the rest of the genome and flag them as putative contaminants.
+
+## Tetranucleotide frequencies
+
+Metagenomic binners use 4-mer frequencies, or tetranucleotide frequencies (TNFs), to cluster contigs into genomic bins. Whether or not two given contigs will be clustered into the same genomic bin does not depend exclusively on their TNF profiles. In most modern clustering algorithms local relationships are influenced by other data points, meaning that a given pair of contigs may end up in the same bin or not, depending on the full set contigs that is being clustered. Moreover, most binners also use sequencing coverage information in addition to TNF data to cluster contigs, which may lead to genomic bins that encompass contigs with distinct TNF profiles.
 
 ::: tip Genomic islands and plasmids
 Mobile genetic elements such as genomic islands and plasmids usually have a 4-mer composition that is distinct from most of the genome, making them problematic for binning algorithms. Consequently, these elements are usually not retrieved in genomic bins.
 :::
 
-Whether or not two given contigs will be clustered into the same genomic bin does not depend exclusively on their TNF profiles. In most modern clustering algorithms local relationships are influenced by other data points, meaning that a given pair of contigs may end up in the same bin or not, depending on the full set contigs that is being clustered. Moreover, most binners also use sequencing coverage information in addition to TNF data to cluster contigs, which may lead to genomic bins that encompass contigs with distinct TNF profiles.
-
-MAGpurify2 processes each genomic bin individually and finds potential contaminants with respect to TNF profile by identifying contigs that fall outside of the "core cluster" within the bin.
-
-## How it works
-
-To identify putative contaminants within a genomic bin, MAGpurify2: (1) computes the TNF profile of each contig, (2) embbeds data points into a low-dimentional space using a non-linear transformation, and (3) finds the "core cluster" and computes each contig score.
+To find potential contaminants with respect to the TNF profile, MAGpurify2 processes each genomic bin individually and identifies contigs that fall outside of the bin's "core TNF cluster". This is performed in three steps: (1) MAGpurify2 computes the TNF profile of each contig, (2) embbeds data points into a low-dimentional space using a non-linear transformation, and (3) finds the "core TNF cluster" and computes each contig score.
 
 ![tnf-embedding](./figures/tnf-embedding.svg)
 

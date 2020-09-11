@@ -163,7 +163,8 @@ def end_to_end_parser(parser):
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
     required.add_argument(
-        "output_directory", help="Directory to write the output files to.", type=Path,
+        "output_directory", help="Directory where the logs, temporary and supporting data, and "
+        "final score files will be written to.", type=Path,
     )
     required.add_argument(
         "filtered_output_directory",
@@ -222,7 +223,8 @@ def composition_parser(parser):
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
     required.add_argument(
-        "output_directory", help="Directory to write the output files to.", type=Path,
+        "output_directory", help="Directory where the logs, temporary and supporting data, and "
+        "final score files will be written to.", type=Path,
     )
     options.add_argument(
         "--n_iterations",
@@ -285,7 +287,8 @@ def coverage_parser(parser):
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
     required.add_argument(
-        "output_directory", help="Directory to write the output files to.", type=Path,
+        "output_directory", help="Directory where the logs, temporary and supporting data, and "
+        "final score files will be written to.", type=Path,
     )
     coverage_input_mex.add_argument(
         "--bam_files", nargs="+", help="Input sorted BAM files.", type=Path,
@@ -379,7 +382,8 @@ def codon_usage_parser(parser):
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
     required.add_argument(
-        "output_directory", help="Directory to write the output files to.", type=Path,
+        "output_directory", help="Directory where the logs, temporary and supporting data, and "
+        "final score files will be written to.", type=Path,
     )
     options.add_argument(
         "--min_genes",
@@ -413,7 +417,8 @@ def taxonomy_parser(parser):
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
     required.add_argument(
-        "output_directory", help="Directory to write the output files to.", type=Path,
+        "output_directory", help="Directory where the logs, temporary and supporting data, and "
+        "final score files will be written to.", type=Path,
     )
     required.add_argument(
         "taxonomy_database",
@@ -469,9 +474,8 @@ def filter_parser(parser):
         "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
     )
     required.add_argument(
-        "output_directory",
-        help="Directory with the outputs of the contaminant identification modules.",
-        type=Path,
+        "output_directory", help="Directory where the logs, temporary and supporting data, and "
+        "final score files will be written to.", type=Path,
     )
     required.add_argument(
         "filtered_output_directory",

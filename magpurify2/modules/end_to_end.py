@@ -47,6 +47,8 @@ def main(args):
         magpurify2.taxonomy.main(
             Namespace(**magpurify2.cli.default_values["taxonomy"], **vars(args))
         )
+    # Because both the `end_to_end` and the `filter` modules have a `probability_threshold`
+    # parameter, the value is removed from the later to avoid conflict
     magpurify2.cli.default_values["filter"].pop("probability_threshold")
     magpurify2.filter.main(
         Namespace(**magpurify2.cli.default_values["filter"], **vars(args))
