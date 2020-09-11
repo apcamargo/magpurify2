@@ -271,6 +271,8 @@ def get_tsv_coverages(filepath, contig_set=None):
     coverage_vector = np.genfromtxt(
         filepath, dtype=float, comments=None, delimiter="\t", usecols=range(1, ncols)
     )
+    if coverage_vector.ndim == 1:
+        coverage_vector = coverage_vector.reshape(-1, 1)
     if contig_set:
         mask = np.array([contig in contig_set for contig in contig_names_vector])
         contig_names_vector = contig_names_vector[mask]
