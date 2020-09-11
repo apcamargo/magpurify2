@@ -52,7 +52,7 @@ default_values = {
         "genome_min_fraction": 0.5,
         "min_genus_identity": 0.83,
     },
-    "filter": {"probability_threshold": 0.4,},
+    "filter": {"probability_threshold": 0.35,},
 }
 
 
