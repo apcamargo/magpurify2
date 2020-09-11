@@ -1,6 +1,6 @@
 # Composition module
 
-Contigs assembled from reads derived from the same genome or from genomes of closely related organisms tend to display a similar sequence composition profile, represented as tetranucleotide frequencies and GC-content. MAGpurify2 exploits this property to find contigs with outlier sequence composition profiles in relation to the rest of the genome and flag them as putative contaminants.
+Contigs assembled from reads derived from the same genome or from genomes of closely related organisms tend to display a similar sequence composition profile, assessed as tetranucleotide frequencies and GC-content. MAGpurify2 exploits this property to find contigs with outlier sequence composition profiles in relation to the rest of the genome and flag them as putative contaminants.
 
 ## Tetranucleotide frequencies
 
@@ -23,7 +23,7 @@ $$
 ::: tip TNF profile of short contigs
 Short contigs contain a reduced number of 4-mers and therefore provide less reliable estimations of the underlying genomic TNF profile than longer contigs. This is one of the reasons why most binners filter out contigs shorter than a set threshold (usually around 2,000 bp) before clustering.
 
-MAGpurify2 currently does not take into account the length-dependent statistical uncertainty of the TNF estimation when identifying putative contaminants.
+MAGpurify2 currently does not explicitly the length-dependent statistical uncertainty of the TNF estimation when identifying putative contaminants. However, [contig length is taken into account to compute the final score of each contig](contaminant-detection.md).
 :::
 
 The high dimensional 4-mer frequency data ($q$) is then non-linearly projected into a three dimensional space using the [UMAP](https://umap-learn.readthedocs.io/en/latest/) algorithm, which will bring similar data points together and distance contigs with distinct TNF profiles. Next, [hdbscan](https://hdbscan.readthedocs.io/en/latest/) is used to identify clusters within the UMAP embedding and, if at least one cluster is found, compute the membership level of each contig to the "core cluster". Here, "core cluster" is defined as the cluster that encompassess the largest assembled fraction, that is, the sum of the lengths of all the contigs within the cluster.
