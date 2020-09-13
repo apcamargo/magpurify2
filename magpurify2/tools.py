@@ -32,12 +32,11 @@ from pathlib import Path
 
 import hdbscan
 import numpy as np
-import taxopy
 import umap
 from Bio import SeqIO, bgzf
 
 from magpurify2._codon import get_cai, get_codon_index
-from magpurify2._composition import get_tnf, get_gc
+from magpurify2._composition import get_gc, get_tnf
 from magpurify2._coverage import get_bam_coverages
 from magpurify2._mmseqs2 import get_mmseqs2
 
@@ -45,8 +44,8 @@ logger = logging.getLogger("timestamp")
 
 
 class Compression(Enum):
-    gzip = auto()
     bzip2 = auto()
+    gzip = auto()
     xz = auto()
     noncompressed = auto()
 
@@ -133,7 +132,7 @@ def is_compressed(filepath):
     -------
     Compression
         Returns a `Compression` enum with one of the following attributes:
-        `gzip`, `bzip2`, `xz`, or `noncompressed`
+        `bzip2`, `gzip`, `xz`, or `noncompressed`
     """
     with open(filepath, "rb") as fin:
         signature = fin.peek(8)[:8]
