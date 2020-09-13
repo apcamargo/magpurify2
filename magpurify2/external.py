@@ -169,7 +169,7 @@ def mmseqs2(output_directory, database, threads):
         taxonomydb_prefix,
         tmp_directory,
         "-s",
-        "3.5",
+        "3.0",
         "--lca-mode",
         "3",
         "--tax-output-mode",
