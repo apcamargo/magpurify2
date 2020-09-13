@@ -160,11 +160,17 @@ def end_to_end_parser(parser):
     options = parser.add_argument_group("Data processing options")
     other = parser.add_argument_group("Other options")
     required.add_argument(
-        "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
+        "genomes",
+        nargs="+",
+        help="Input genomes in the FASTA format. '.bz2', '.gz' and '.xz' compressed "
+        "files are also supported.",
+        type=Path,
     )
     required.add_argument(
-        "output_directory", help="Directory where the logs, temporary and supporting data, and "
-        "final score files will be written to.", type=Path,
+        "output_directory",
+        help="Directory where the logs, temporary and supporting data, and "
+        "final score files will be written to.",
+        type=Path,
     )
     required.add_argument(
         "filtered_output_directory",
@@ -220,11 +226,17 @@ def composition_parser(parser):
     options = parser.add_argument_group("Data processing options")
     other = parser.add_argument_group("Other options")
     required.add_argument(
-        "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
+        "genomes",
+        nargs="+",
+        help="Input genomes in the FASTA format. '.bz2', '.gz' and '.xz' compressed "
+        "files are also supported.",
+        type=Path,
     )
     required.add_argument(
-        "output_directory", help="Directory where the logs, temporary and supporting data, and "
-        "final score files will be written to.", type=Path,
+        "output_directory",
+        help="Directory where the logs, temporary and supporting data, and "
+        "final score files will be written to.",
+        type=Path,
     )
     options.add_argument(
         "--n_iterations",
@@ -284,11 +296,17 @@ def coverage_parser(parser):
     options = parser.add_argument_group("Data processing options")
     other = parser.add_argument_group("Other options")
     required.add_argument(
-        "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
+        "genomes",
+        nargs="+",
+        help="Input genomes in the FASTA format. '.bz2', '.gz' and '.xz' compressed "
+        "files are also supported.",
+        type=Path,
     )
     required.add_argument(
-        "output_directory", help="Directory where the logs, temporary and supporting data, and "
-        "final score files will be written to.", type=Path,
+        "output_directory",
+        help="Directory where the logs, temporary and supporting data, and "
+        "final score files will be written to.",
+        type=Path,
     )
     coverage_input_mex.add_argument(
         "--bam_files", nargs="+", help="Input sorted BAM files.", type=Path,
@@ -379,11 +397,17 @@ def codon_usage_parser(parser):
     options = parser.add_argument_group("Data processing options")
     other = parser.add_argument_group("Other options")
     required.add_argument(
-        "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
+        "genomes",
+        nargs="+",
+        help="Input genomes in the FASTA format. '.bz2', '.gz' and '.xz' compressed "
+        "files are also supported.",
+        type=Path,
     )
     required.add_argument(
-        "output_directory", help="Directory where the logs, temporary and supporting data, and "
-        "final score files will be written to.", type=Path,
+        "output_directory",
+        help="Directory where the logs, temporary and supporting data, and "
+        "final score files will be written to.",
+        type=Path,
     )
     options.add_argument(
         "--min_genes",
@@ -414,11 +438,17 @@ def taxonomy_parser(parser):
     options = parser.add_argument_group("Data processing options")
     other = parser.add_argument_group("Other options")
     required.add_argument(
-        "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
+        "genomes",
+        nargs="+",
+        help="Input genomes in the FASTA format. '.bz2', '.gz' and '.xz' compressed "
+        "files are also supported.",
+        type=Path,
     )
     required.add_argument(
-        "output_directory", help="Directory where the logs, temporary and supporting data, and "
-        "final score files will be written to.", type=Path,
+        "output_directory",
+        help="Directory where the logs, temporary and supporting data, and "
+        "final score files will be written to.",
+        type=Path,
     )
     required.add_argument(
         "taxonomy_database",
@@ -471,11 +501,17 @@ def filter_parser(parser):
     options = parser.add_argument_group("Data processing options")
     other = parser.add_argument_group("Other options")
     required.add_argument(
-        "genomes", nargs="+", help="Input genomes in the FASTA format.", type=Path,
+        "genomes",
+        nargs="+",
+        help="Input genomes in the FASTA format. '.bz2', '.gz' and '.xz' compressed "
+        "files are also supported.",
+        type=Path,
     )
     required.add_argument(
-        "output_directory", help="Directory where the logs, temporary and supporting data, and "
-        "final score files will be written to.", type=Path,
+        "output_directory",
+        help="Directory where the logs, temporary and supporting data, and "
+        "final score files will be written to.",
+        type=Path,
     )
     required.add_argument(
         "filtered_output_directory",
