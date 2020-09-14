@@ -451,7 +451,7 @@ class ContigClassifier:
                         "for the genomes not found in it."
                     )
                 threshold_dict = {
-                    genome: 0.06 - 0.007 * (1 - np.exp(1) ** (0.05 * score))
+                    genome: 0.066 - 0.0125 * (1 - np.exp(1) ** (0.037 * score))
                     for genome, score in checkm_score_dict.items()
                 }
                 self.probability_threshold = np.array(
