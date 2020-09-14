@@ -32,7 +32,9 @@ As UMAP is a non-deterministic algorithm, MAGpurify2 executes multiple iteration
 
 ## GC content
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam id nulla ac velit elementum tempus non eget urna. Etiam placerat leo ac risus semper feugiat ut id nulla. Fusce venenatis magna non feugiat convallis.
+A simpler descriptor of sequence composition is the GC-content, which represents the relative amount of guanine (G) and cytosine (C) relative to the total amount of nucleotides in the sequence. In prokaryotes there is a large variability in genomic GC-content across different species, which is at least partially caused by evolutionary pressures. Despite the heterogeneity in GC-content even within genomes, this measure has been successfully used for contig binning and contamint identification in situations where the underlying genomes exhibited diverging GC-content levels.
+
+MAGpurify2 processes each genomic bin to find contigs
 
 ![gc-content-hist](./figures/gc-content-hist.svg)
 
