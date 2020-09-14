@@ -440,23 +440,31 @@ class ContigClassifier:
         self.probabilities = model.predict(feature_matrix)
         if checkm_file:
             checkm_score_dict = tools.get_checkm_scores(checkm_file)
-            if len(set(self.genomes)) > len(checkm_score_dict):
-                logging.warning(
-                    "The input CheckM tabular file does not contain all the "
-                    "genomes being filtered. The default probability threshold will be used "
-                    "for the genomes not found in it."
+            if checkm_score_dict:
+                logger.info(
+                    "Using completeness and contamination estimates to set dynamic thresholds."
                 )
-            threshold_dict = {
-                genome: 0.09 - 0.003 * (1 - np.exp() ** (0.06 * score))
-                for genome, score in checkm_score_dict.items()
-            }
-            self.probability_threshold = np.array(
-                [
-                    threshold_dict.get(genome, probability_threshold)
-                    for genome in self.genomes
-                ]
-            )
-            self.probability_threshold = np.clip(self.probability_threshold, 0.07, 0.4)
+                if len(set(self.genomes)) > len(checkm_score_dict):
+                    logging.warning(
+                        "The input CheckM tabular file does not contain all the "
+                        "genomes being filtered. The default probability threshold will be used "
+                        "for the genomes not found in it."
+                    )
+                threshold_dict = {
+                    genome: 0.09 - 0.003 * (1 - np.exp() ** (0.06 * score))
+                    for genome, score in checkm_score_dict.items()
+                }
+                self.probability_threshold = np.array(
+                    [
+                        threshold_dict.get(genome, probability_threshold)
+                        for genome in self.genomes
+                    ]
+                )
+                self.probability_threshold = np.clip(
+                    self.probability_threshold, 0.07, 0.4
+                )
+            else:
+                self.probability_threshold = probability_threshold
         else:
             self.probability_threshold = probability_threshold
         self.flagged_contaminants = self.probabilities > self.probability_threshold
