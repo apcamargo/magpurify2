@@ -191,6 +191,14 @@ def end_to_end_parser(parser):
         type=Path,
     )
     options.add_argument(
+        "--checkm_file",
+        type=Path,
+        help="CheckM tabular file (i.e. the output of `checkm qa --tab_table …`) used "
+        "to define thresholds as a function of MAG quality (MAGs with higher "
+        "contamination levels will undergo less conservative filtering). "
+        "Overrides `--probability_threshold`.",
+    )
+    options.add_argument(
         "--probability_threshold",
         default=default_values["filter"]["probability_threshold"],
         type=float,
@@ -517,6 +525,14 @@ def filter_parser(parser):
         "filtered_output_directory",
         help="Directory where the filtered MAGs will be written to.",
         type=Path,
+    )
+    options.add_argument(
+        "--checkm_file",
+        type=Path,
+        help="CheckM tabular file (i.e. the output of `checkm qa --tab_table …`) used "
+        "to define thresholds as a function of MAG quality (MAGs with higher "
+        "contamination levels will undergo less conservative filtering). "
+        "Overrides `--probability_threshold`.",
     )
     options.add_argument(
         "--probability_threshold",

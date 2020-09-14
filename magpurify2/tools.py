@@ -19,6 +19,7 @@
 # Contact: antoniop.camargo@gmail.com
 
 import bz2
+import csv
 import gzip
 import hashlib
 import logging
@@ -621,6 +622,52 @@ def write_module_output(score_list, score_output_file):
             for attributes in mag_score:
                 line = "\t".join(map(str, attributes))
                 fout.write(f"{line}\n")
+
+
+def get_checkm_scores(filepath):
+    """
+    Reads a CheckM tabular file (i.e. the output of `checkm qa --tab_table …`)
+    and returns a dictionary where the keys are genome names and the values are
+    scores computed as 'completeness - 5 * contamination'.
+
+    Parameters
+    ----------
+    filepath : Path
+        Path object pointing to a CheckM tabular file.
+
+    Returns
+    -------
+    dict
+        A dictionary where the keys are genome names and the values are scores
+        computed as 'completeness - 5 * contamination'.
+    """
+    if filepath.exists():
+        with open(filepath) as fin:
+            csvreader = csv.reader(fin, delimiter="\t")
+            fields = next(csvreader)
+            if set(["Bin Id", "Completeness", "Contamination"]).issubset(fields):
+                bin_id_col = fields.index("Bin Id")
+                completeness_col = fields.index("Completeness")
+                contamination_col = fields.index("Contamination")
+                checkm_score_dict = {}
+                for row in csvreader:
+                    genome = row[bin_id_col]
+                    completeness = float(row[completeness_col])
+                    contamination = float(row[contamination_col])
+                    checkm_score_dict[genome] = completeness - 5 * contamination
+                return checkm_score_dict
+            else:
+                logger.warning(
+                    "The supplied CheckM tabular file is not correctly formatted. The "
+                    "default probability threshold value will be used instead."
+                )
+                return None
+    else:
+        logger.warning(
+            "The supplied CheckM tabular file was not found. The default probability "
+            "threshold value will be used instead."
+        )
+        return None
 
 
 def write_filtered_genome(mag, mags_contaminants_dict, filtered_output_directory):

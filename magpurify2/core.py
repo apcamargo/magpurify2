@@ -18,6 +18,7 @@
 #
 # Contact: antoniop.camargo@gmail.com
 
+import logging
 from collections import defaultdict
 
 import numpy as np
@@ -28,12 +29,14 @@ from scipy.signal import find_peaks
 
 from magpurify2 import tools
 
+logger = logging.getLogger("timestamp")
+
 
 class Mag:
     def __init__(self, filepath, store_sequences=True):
         self.genome = filepath.stem
         if tools.is_compressed(filepath) != tools.Compression.noncompressed:
-            self.genome = self.genome.rsplit('.', 1)[0]
+            self.genome = self.genome.rsplit(".", 1)[0]
         self.contigs = []
         self.descriptions = []
         self.sequences = []
@@ -425,6 +428,7 @@ class ContigClassifier:
         feature_matrix,
         model_file,
         probability_threshold,
+        checkm_file,
         threads,
     ):
         self.attributes = ["genome", "contig", "contaminant_probability"]
@@ -434,7 +438,28 @@ class ContigClassifier:
         self.genomes = genome_contig_matrix[:, 0]
         self.contigs = genome_contig_matrix[:, 1]
         self.probabilities = model.predict(feature_matrix)
-        self.flagged_contaminants = self.probabilities > probability_threshold
+        if checkm_file:
+            checkm_score_dict = tools.get_checkm_scores(checkm_file)
+            if len(set(self.genomes)) > len(checkm_score_dict):
+                logging.warning(
+                    "The input CheckM tabular file does not contain all the "
+                    "genomes being filtered. The default probability threshold will be used "
+                    "for the genomes not found in it."
+                )
+            threshold_dict = {
+                genome: 0.09 - 0.003 * (1 - np.exp() ** (0.06 * score))
+                for genome, score in checkm_score_dict.items()
+            }
+            self.probability_threshold = np.array(
+                [
+                    threshold_dict.get(genome, probability_threshold)
+                    for genome in self.genomes
+                ]
+            )
+            self.probability_threshold = np.clip(self.probability_threshold, 0.07, 0.4)
+        else:
+            self.probability_threshold = probability_threshold
+        self.flagged_contaminants = self.probabilities > self.probability_threshold
         self.mags_contaminants_dict = defaultdict(dict)
         for index, contaminant in enumerate(self.flagged_contaminants):
             genome = self.genomes[index]

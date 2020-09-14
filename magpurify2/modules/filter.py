@@ -139,6 +139,7 @@ def main(args):
         feature_matrix,
         model_file,
         args.probability_threshold,
+        args.checkm_file,
         args.threads,
     )
 
