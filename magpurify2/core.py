@@ -18,7 +18,6 @@
 #
 # Contact: antoniop.camargo@gmail.com
 
-import itertools
 from collections import defaultdict
 
 import numpy as np
@@ -33,6 +32,8 @@ from magpurify2 import tools
 class Mag:
     def __init__(self, filepath, store_sequences=True):
         self.genome = filepath.stem
+        if tools.is_compressed(filepath) != tools.Compression.noncompressed:
+            self.genome = self.genome.rsplit('.', 1)[0]
         self.contigs = []
         self.descriptions = []
         self.sequences = []
