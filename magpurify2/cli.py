@@ -46,7 +46,13 @@ default_values = {
         "n_neighbors": 15,
         "set_op_mix_ratio": 0.6,
     },
-    "codon_usage": {"min_genes": 1,},
+    "codon_usage": {
+        "n_iterations": 4,
+        "n_components": 3,
+        "min_dist": 0.15,
+        "n_neighbors": 15,
+        "set_op_mix_ratio": 0.6,
+    },
     "taxonomy": {
         "contig_min_fraction": 0.5,
         "genome_min_fraction": 0.5,
@@ -418,12 +424,37 @@ def codon_usage_parser(parser):
         type=Path,
     )
     options.add_argument(
-        "--min_genes",
-        default=default_values["codon_usage"]["min_genes"],
-        help="Minimum number of genes in a contig for it to be considered for "
-        "contamination detection. Contigs with less than `min_genes` will never be "
-        "flagged as contaminants.",
+        "--n_iterations",
+        default=default_values["codon_usage"]["n_iterations"],
+        help="Number of iterations of data embedding and cluster selection with "
+        "different seeds.",
         type=int,
+    )
+    options.add_argument(
+        "--n_components",
+        default=default_values["codon_usage"]["n_components"],
+        help="The dimension of the space to embed the data into (UMAP parameter).",
+        type=int,
+    )
+    options.add_argument(
+        "--min_dist",
+        default=default_values["codon_usage"]["min_dist"],
+        help="The effective minimum distance between embedded points (UMAP parameter).",
+        type=float,
+    )
+    options.add_argument(
+        "--n_neighbors",
+        default=default_values["codon_usage"]["n_neighbors"],
+        help="The size of local neighborhood used for manifold approximation "
+        "(UMAP parameter).",
+        type=int,
+    )
+    options.add_argument(
+        "--set_op_mix_ratio",
+        default=default_values["codon_usage"]["set_op_mix_ratio"],
+        help="Interpolate between the union (1.0) and intersection (0.0) to combine the "
+        "local simplicial sets (UMAP parameter).",
+        type=float,
     )
     other.add_argument(
         "-t",

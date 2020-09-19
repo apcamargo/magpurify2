@@ -32,7 +32,12 @@ from magpurify2.core import CodonUsage, Mag
 def main(args):
     logger = logging.getLogger("timestamp")
     logger.info("Executing MAGpurify2 codon usage module.")
-    args.min_genes = tools.validade_input(args.min_genes, "min_genes", [1, 999])
+    args.n_iterations = tools.validade_input(args.n_iterations, "n_iterations", [1, 999])
+    args.n_components = tools.validade_input(args.n_components, "n_components", [1, 999])
+    args.n_neighbors = tools.validade_input(args.n_neighbors, "n_neighbors", [1, 999])
+    args.set_op_mix_ratio = tools.validade_input(
+        args.set_op_mix_ratio, "set_op_mix_ratio", [0.0, 1.0]
+    )
     # Check if Prodigal is an executable in the user PATH.
     missing_executables = [
         executable
@@ -61,7 +66,11 @@ def main(args):
     mag_codon_usage_list = Parallel(n_jobs=args.threads)(
         delayed(CodonUsage)(
             mag,
-            args.min_genes,
+            args.n_iterations,
+            args.n_components,
+            args.min_dist,
+            args.n_neighbors,
+            args.set_op_mix_ratio,
             prodigal_output_directory.joinpath(mag.genome + "_genes.fna"),
         )
         for mag in mag_list
