@@ -103,6 +103,7 @@ def prodigal(genomes, output_directory, threads):
             for filepath in genomes_without_prediction:
                 genome = filepath.stem
                 if tools.is_compressed(filepath) != tools.Compression.noncompressed:
+                    genome = genome.rsplit(".", 1)[0]
                     filepath_compression = tools.is_compressed(filepath)
                     extraction_output = extracted_genomes_directory.joinpath(
                         f"{genome}.fna"

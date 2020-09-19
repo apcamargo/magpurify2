@@ -375,6 +375,8 @@ def check_prediction(genome_list, output_directory):
     genomes_without_prediction = []
     for filepath in genome_list:
         genome_name = filepath.stem
+        if is_compressed(filepath) != Compression.noncompressed:
+            genome_name = genome_name.rsplit(".", 1)[0]
         genome_faa = prodigal_output_directory.joinpath(f"{genome_name}_genes.faa")
         if not genome_faa.exists():
             genomes_without_prediction.append(filepath)
