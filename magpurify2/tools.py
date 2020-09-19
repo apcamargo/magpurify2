@@ -36,7 +36,7 @@ import numpy as np
 import umap
 from Bio import SeqIO, bgzf
 
-from magpurify2._codon import get_cai, get_codon_index
+from magpurify2._codon import get_codon_usage_profile, get_cai, get_codon_index
 from magpurify2._composition import get_gc, get_tnf
 from magpurify2._coverage import get_bam_coverages
 from magpurify2._mmseqs2 import get_mmseqs2

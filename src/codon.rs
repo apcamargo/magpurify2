@@ -17,10 +17,10 @@
 // Contact: antoniop.camargo@gmail.com
 
 use lazy_static::lazy_static;
-use ndarray::Array1;
+use ndarray::{Array1, Array2};
 use numpy::convert::ToPyArray;
 use pyo3::{prelude::*, wrap_pyfunction};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::iter;
 
 lazy_static! {
@@ -237,9 +237,96 @@ fn get_cai(py: Python, seq_list: Vec<&str>, codon_index: HashMap<&str, f64>) -> 
         .into_py(py)
 }
 
+/// get_codon_usage_profile(seq_list)
+/// --
+///
+/// Computes five features that summarize the codon usage profile of an ORF
+/// sequence (Hughes, A. L., & Langley, K. J. (2007)).
+///
+/// Parameters
+/// ----------
+/// seq_list : list
+///    In-frame DNA sequences of the ORFs that will be used to compute the index.
+///
+/// Returns
+/// -------
+/// ndarray
+///    An array containing the five descriptor features (pA4, pC4, pG4, pC2, and
+///    pG2) for each input ORF.
+#[pyfunction]
+fn get_codon_usage_profile(py: Python, seq_list: Vec<&str>) -> PyObject {
+    let n4_set: HashSet<&str> = vec![
+        "GCT", "GCC", "GCA", "GCG", "CGT", "CGC", "CGA", "CGG", "GGT", "GGC", "GGA", "GGG", "CTT",
+        "CTC", "CTA", "CTG", "CCT", "CCC", "CCA", "CCG", "TCT", "TCC", "TCA", "TCG", "ACT", "ACC",
+        "ACA", "ACG", "GTT", "GTC", "GTA", "GTG",
+    ]
+    .into_iter()
+    .collect();
+    let ag2_set: HashSet<&str> = vec![
+        "AGA", "AGG", "CAA", "CAG", "GAA", "GAG", "TTA", "TTG", "AAA", "AAG", "AGT", "AGC", "TAT",
+        "TAC",
+    ]
+    .into_iter()
+    .collect();
+    let tc2_set: HashSet<&str> = vec![
+        "AAT", "AAC", "GAT", "GAC", "TGT", "TGC", "CAT", "CAC", "TTT", "TTC",
+    ]
+    .into_iter()
+    .collect();
+
+    let mut feature_vector = vec![];
+    for seq in &seq_list {
+        let mut n4 = 0;
+        let mut ag2 = 0;
+        let mut tc2 = 0;
+        let mut pa4 = 0;
+        let mut pc4 = 0;
+        let mut pg4 = 0;
+        let mut pc2 = 0;
+        let mut pg2 = 0;
+        let n_codons = seq.len() / 3;
+        for i in 0..n_codons {
+            let codon = &seq[i * 3..i * 3 + 3];
+            let last_base = codon.chars().last().unwrap();
+            if n4_set.contains(codon) {
+                n4 += 1;
+                match last_base {
+                    'A' => pa4 += 1,
+                    'C' => pc4 += 1,
+                    'G' => pg4 += 1,
+                    _ => (),
+                }
+            } else if ag2_set.contains(codon) {
+                ag2 += 1;
+                match last_base {
+                    'G' => pg2 += 1,
+                    _ => (),
+                }
+            } else if tc2_set.contains(codon) {
+                tc2 += 1;
+                match last_base {
+                    'C' => pc2 += 1,
+                    _ => (),
+                }
+            }
+        }
+        let pa4: f64 = (pa4 as f64 + 1.0) / (n4 as f64 + 1.0);
+        let pc4: f64 = (pc4 as f64 + 1.0) / (n4 as f64 + 1.0);
+        let pg4: f64 = (pg4 as f64 + 1.0) / (n4 as f64 + 1.0);
+        let pc2: f64 = (pc2 as f64 + 1.0) / (tc2 as f64 + 1.0);
+        let pg2: f64 = (pg2 as f64 + 1.0) / (ag2 as f64 + 1.0);
+        feature_vector.extend(vec![pa4, pc4, pg4, pc2, pg2]);
+    }
+    let feature_vector = Array2::from_shape_vec((seq_list.len(), 5), feature_vector).unwrap();
+    feature_vector
+        .to_pyarray(Python::acquire_gil().python())
+        .into_py(py)
+}
+
 #[pymodule]
 fn _codon(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(get_codon_index))?;
     m.add_wrapped(wrap_pyfunction!(get_cai))?;
+    m.add_wrapped(wrap_pyfunction!(get_codon_usage_profile))?;
     Ok(())
 }

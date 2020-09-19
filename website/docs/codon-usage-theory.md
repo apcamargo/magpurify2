@@ -2,6 +2,8 @@
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin consectetur rutrum tellus sit amet egestas. Aliquam faucibus condimentum mauris vitae rhoncus. Praesent laoreet rutrum purus, sed sodales neque. Quisque ut tincidunt erat, at rhoncus orci. Aliquam condimentum eget libero sed suscipit. Duis nec eros nec augue porta malesuada. Nulla nec nisl justo. Mauris eget augue a leo laoreet aliquam.
 
+Assumes the [standard genetic code](https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi#SG1), which is true for the majority of bacterial genomes/genes.
+
 ## How it works
 
 To summarize the genome codon usage bias MAGpurify2 uses the the Relative Synonymous Codon Usage (RSCU)

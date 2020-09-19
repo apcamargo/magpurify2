@@ -26,6 +26,7 @@ import scipy.stats as ss
 import taxopy
 import xgboost as xgb
 from scipy.signal import find_peaks
+from sklearn.decomposition import PCA
 
 from magpurify2 import tools
 
@@ -67,7 +68,8 @@ class CodonUsage:
         self.attributes = [
             "genome",
             "contig",
-            "codon_usage_score",
+            "codon_usage_profile_score",
+            "cai_score",
             "n_genes",
             "total_cds_length",
             "mean_strand_coding_density",
@@ -91,10 +93,50 @@ class CodonUsage:
         )
         self.mean_strand_coding_density = self.total_cds_length / (2 * self.lengths)
         if len(self) == 1:
-            self.scores = np.array([1.0])
+            self.codon_usage_profile_scores = np.array([1.0])
+            self.cai_scores = np.array([1.0])
         else:
+            self.codon_usage_profile_scores = self.compute_codon_usage_profile_scores(
+                min_genes
+            )
             self.delta_cai = self.get_delta_cai()
-            self.scores = self.compute_codon_usage_scores(min_genes)
+            self.cai_scores = self.compute_cai_scores(min_genes)
+
+    def compute_codon_usage_profile_scores(self, min_genes):
+        cds_codon_usage_profile = tools.get_codon_usage_profile(self.cds_sequences)
+        cds_codon_usage_profile = (
+            PCA(n_components=1).fit_transform(cds_codon_usage_profile).flatten()
+        )
+        cds_codon_usage_profile -= cds_codon_usage_profile.min()
+        cds_contig_name_list, cds_length_list = [], []
+        for cds_name, cds_seq in zip(self.cds, self.cds_sequences):
+            contig_name = cds_name.rsplit("_", 1)[0]
+            cds_contig_name_list.append(contig_name)
+            cds_length_list.append(len(cds_seq))
+        cds_contig_name_list = np.array(cds_contig_name_list)
+        cds_length_list = np.array(cds_length_list)
+        contig_codon_usage_profile, contig_length_list, contig_name_list = [], [], []
+        for contig_name, contig_length in zip(self.contigs, self.lengths):
+            mask = np.where(cds_contig_name_list == contig_name)[0]
+            if mask.sum():
+                profile = np.average(
+                    cds_codon_usage_profile[mask], weights=cds_length_list[mask]
+                )
+                contig_codon_usage_profile.append(profile)
+                contig_length_list.append(contig_length)
+                contig_name_list.append(contig_name)
+        contig_codon_usage_profile = np.array(contig_codon_usage_profile)
+
+        codon_usage_profile_scores = tools.get_log_ratio_scores(
+            contig_codon_usage_profile, contig_length_list, 3
+        )
+        codon_usage_profile_scores = dict(
+            zip(contig_name_list, codon_usage_profile_scores)
+        )
+        codon_usage_profile_scores = [
+            codon_usage_profile_scores.get(i, 1.0) for i in self.contigs
+        ]
+        return np.array(codon_usage_profile_scores)
 
     def get_delta_cai(self, quantile=0.25):
         cds_sequences = np.array(self.cds_sequences)
@@ -106,7 +148,7 @@ class CodonUsage:
         new_cai_list = tools.get_cai(cds_sequences, new_codon_index)
         return new_cai_list - cai_list
 
-    def compute_codon_usage_scores(self, min_genes):
+    def compute_cai_scores(self, min_genes):
         contig_delta_cai = defaultdict(list)
         for cds, delta_cai in zip(self.cds, self.delta_cai):
             contig, _ = cds.rsplit("_", 1)
@@ -160,7 +202,8 @@ class CodonUsage:
         return zip(
             [self.genome] * len(self),
             self.contigs,
-            np.round(self.scores, 5),
+            np.round(self.codon_usage_profile_scores, 5),
+            np.round(self.cai_scores, 5),
             self.n_genes,
             self.total_cds_length,
             np.round(self.mean_strand_coding_density, 5),
