@@ -100,10 +100,9 @@ class CodonUsage:
             [self.total_cds_length.get(contig, 0) for contig in self.contigs]
         )
         self.mean_strand_coding_density = self.total_cds_length / (2 * self.lengths)
-        if len(self) == 1:
-            self.codon_usage_cluster_scores = np.array([1.0])
-            self.explained_variance_ratio = np.array([0.0])
-            self.cai_scores = np.array([1.0])
+        if len(self) <= 2:
+            self.codon_usage_cluster_scores = np.ones(len(self))
+            self.cai_scores = np.ones(len(self))
         else:
             self.codon_usage_cluster_scores = self.compute_codon_usage_profile_scores(
                 n_iterations, n_components, min_dist, n_neighbors, set_op_mix_ratio
