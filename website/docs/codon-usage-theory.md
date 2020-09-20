@@ -10,9 +10,7 @@ To summarize the genome codon usage bias MAGpurify2 uses the the Relative Synony
 
 and the codon usage adaptation of each gene relative to the rest of the genome is measured using the Codon Adaptation Index (CAI)
 
-described by [Sharp PM and Li WH](https://pubmed.ncbi.nlm.nih.gov/3547335/).
-
-described by Sharp PM and Li WH[^1]
+described by Sharp PM and Li WH [^1].
 
 $$
 \mathit{RSCU}_{i,j} = \frac{x_{i,j}}{\frac{1}{n_i}\sum_{j=1}^{n_i}x_{i,j}\:}
