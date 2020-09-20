@@ -211,7 +211,7 @@ class CodonUsage:
 
     def __iter__(self):
         return zip(
-            [self.genome] * len(self),
+            np.repeat(self.genome, len(self)),
             self.contigs,
             np.round(self.codon_usage_cluster_scores, 5),
             np.round(self.cai_scores, 5),
@@ -267,7 +267,7 @@ class Composition:
 
     def __iter__(self):
         return zip(
-            [self.genome] * len(self),
+            np.repeat(self.genome, len(self)),
             self.contigs,
             np.round(self.tnf_scores, 5),
             np.round(self.gc_content_scores, 5),
@@ -328,11 +328,11 @@ class Coverage:
 
     def __iter__(self):
         return zip(
-            [self.genome] * len(self),
+            np.repeat(self.genome, len(self)),
             self.contigs,
             np.round(self.scores, 5),
             np.round(self.cluster_scores, 5),
-            [self.n_samples] * len(self),
+            np.repeat(self.n_samples, len(self)),
         )
 
 
@@ -346,7 +346,13 @@ class Taxonomy:
         min_genus_identity,
         taxdb,
     ):
-        self.attributes = ["genome", "contig", "taxonomy_score", "assigned_rank"]
+        self.attributes = [
+            "genome",
+            "contig",
+            "taxonomy_score",
+            "genome_rank",
+            "contig_rank",
+        ]
         self.genome = mag.genome
         self.contigs = mag.contigs
         self.lengths = mag.lengths
@@ -374,7 +380,8 @@ class Taxonomy:
             self.contig_taxonomy = np.array([taxopy.Taxon("1", self.taxdb)] * len(self))
             self.genome_taxonomy = taxopy.Taxon("1", self.taxdb)
             self.scores = np.zeros(len(self))
-        self.assigned_rank = len(self.genome_taxonomy.taxid_lineage) - 1
+        self.genome_rank = len(self.genome_taxonomy.taxid_lineage) - 1
+        self.contig_rank = np.array([len(i.taxid_lineage) - 1 for i in self.contig_taxonomy])
 
     def get_gene_taxonomy(self, min_genus_identity):
         gene_taxonomy_array = []
@@ -468,10 +475,11 @@ class Taxonomy:
 
     def __iter__(self):
         return zip(
-            [self.genome] * len(self),
+            np.repeat(self.genome, len(self)),
             self.contigs,
             np.round(self.scores, 5),
-            [self.assigned_rank] * len(self),
+            np.repeat(self.genome_rank, len(self)),
+            self.contig_rank,
         )
 
 
