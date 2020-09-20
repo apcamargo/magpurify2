@@ -594,7 +594,7 @@ def write_contig_taxonomy_output(mag_taxonomy_list, taxonomy_output_file):
             genome_taxonomy_str = ";".join(
                 reversed(mag_taxonomy.genome_taxonomy.name_lineage)
             )
-            for index, (genome, contig, _, _) in enumerate(mag_taxonomy):
+            for index, (genome, contig, _, _, _) in enumerate(mag_taxonomy):
                 contig_taxonomy_str = ";".join(
                     reversed(mag_taxonomy.contig_taxonomy[index].name_lineage)
                 )
