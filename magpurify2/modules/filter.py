@@ -89,7 +89,7 @@ def main(args):
         usecols=[0, 1],
     )
     feature_matrix = []
-    module_ncol_dict = {"composition": 5, "coverage": 5, "codon_usage": 6, "taxonomy": 4}
+    module_ncol_dict = {"composition": 5, "coverage": 5, "codon_usage": 7, "taxonomy": 4}
     for module, module_path in zip(module_list, module_path_list):
         if not (
             np.genfromtxt(
@@ -125,11 +125,11 @@ def main(args):
     feature_matrix[:, 5] = np.clip((feature_matrix[:, 5] / 10), 0, 1)
     if not args.fast_mode:
         # Transform 'n_genes'
-        feature_matrix[:, 7] = np.tanh(np.log10(feature_matrix[:, 7] + 1))
+        feature_matrix[:, 8] = np.tanh(np.log10(feature_matrix[:, 8] + 1))
         # Transform 'total_cds_length'
-        feature_matrix[:, 8] = np.tanh(np.log10(feature_matrix[:, 8] + 1) * 0.2)
+        feature_matrix[:, 9] = np.tanh(np.log10(feature_matrix[:, 9] + 1) * 0.2)
         # Transform 'assigned_rank'
-        feature_matrix[:, 11] = feature_matrix[:, 11] / 6
+        feature_matrix[:, 12] = feature_matrix[:, 12] / 6
 
     logger.info(
         f"Estimating contamination probabilities and identifying contaminant contigs."
