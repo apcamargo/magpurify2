@@ -37,7 +37,7 @@ def main(args):
     args.genome_min_fraction = tools.validade_input(
         args.genome_min_fraction, "genome_min_fraction", [0.01, 0.99]
     )
-    args.genome_min_fraction = tools.validade_input(
+    args.min_genus_identity = tools.validade_input(
         args.min_genus_identity, "min_genus_identity", [0.0, 1.0]
     )
     # Check if Prodigal and MMSeqs2 are executables in the user PATH.
