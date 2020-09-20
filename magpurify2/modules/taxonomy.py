@@ -35,7 +35,7 @@ def main(args):
         args.contig_min_fraction, "contig_min_fraction", [0.5, 1.0]
     )
     args.genome_min_fraction = tools.validade_input(
-        args.genome_min_fraction, "genome_min_fraction", [0.5, 1.0]
+        args.genome_min_fraction, "genome_min_fraction", [0.01, 0.99]
     )
     args.genome_min_fraction = tools.validade_input(
         args.min_genus_identity, "min_genus_identity", [0.0, 1.0]
