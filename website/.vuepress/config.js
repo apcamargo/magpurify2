@@ -25,6 +25,11 @@ module.exports = {
       ]
     }
   },
+  markdown: {
+    extendMarkdown: md => {
+      md.use(require('markdown-it-footnote'))
+    }
+  },
   plugins: [
     [
       '@maginapp/vuepress-plugin-katex',

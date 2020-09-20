@@ -55,7 +55,7 @@ default_values = {
     },
     "taxonomy": {
         "contig_min_fraction": 0.5,
-        "genome_min_fraction": 0.5,
+        "genome_min_fraction": 0.3,
         "min_genus_identity": 0.83,
     },
     "filter": {"probability_threshold": 0.25,},
