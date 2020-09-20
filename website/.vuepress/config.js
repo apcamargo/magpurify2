@@ -26,7 +26,7 @@ module.exports = {
     }
   },
   markdown: {
-    extendMarkdown: md => {
+    config: md => {
       md.use(require('markdown-it-footnote'))
     }
   },
