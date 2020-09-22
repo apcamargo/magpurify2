@@ -435,6 +435,13 @@ class Taxonomy:
                 weights=self.lengths.tolist(),
                 fraction=fraction,
             )
+            if len(genome_taxonomy.taxid_lineage) <= 2:
+                genome_taxonomy = taxopy.find_majority_vote(
+                    self.contig_taxonomy,
+                    self.taxdb,
+                    weights=self.lengths.tolist(),
+                    fraction=fraction - 0.2,
+                )
         elif len(self) == 1:
             genome_taxonomy = taxopy.Taxon(self.contig_taxonomy[0].taxid, self.taxdb)
         else:
