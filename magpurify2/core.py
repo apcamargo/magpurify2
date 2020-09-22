@@ -381,7 +381,9 @@ class Taxonomy:
             self.genome_taxonomy = taxopy.Taxon("1", self.taxdb)
             self.scores = np.zeros(len(self))
         self.genome_rank = len(self.genome_taxonomy.taxid_lineage) - 1
-        self.contig_rank = np.array([len(i.taxid_lineage) - 1 for i in self.contig_taxonomy])
+        self.contig_rank = np.array(
+            [len(i.taxid_lineage) - 1 for i in self.contig_taxonomy]
+        )
 
     def get_gene_taxonomy(self, min_genus_identity):
         gene_taxonomy_array = []
