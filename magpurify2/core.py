@@ -420,6 +420,13 @@ class Taxonomy:
                         weights=genes_bitscore,
                         fraction=fraction,
                     )
+                    if len(contig_taxonomy.taxid_lineage) <= 2:
+                        contig_taxonomy = taxopy.find_majority_vote(
+                            gene_taxonomy,
+                            self.taxdb,
+                            weights=genes_bitscore,
+                            fraction=fraction - 0.1,
+                        )
                 else:
                     contig_taxonomy = taxopy.Taxon(gene_taxonomy[0].taxid, self.taxdb)
             else:
@@ -441,6 +448,13 @@ class Taxonomy:
                     self.taxdb,
                     weights=self.lengths.tolist(),
                     fraction=fraction - 0.2,
+                )
+            if len(genome_taxonomy.taxid_lineage) == 3:
+                genome_taxonomy = taxopy.find_majority_vote(
+                    self.contig_taxonomy,
+                    self.taxdb,
+                    weights=self.lengths.tolist(),
+                    fraction=fraction - 0.1,
                 )
         elif len(self) == 1:
             genome_taxonomy = taxopy.Taxon(self.contig_taxonomy[0].taxid, self.taxdb)
