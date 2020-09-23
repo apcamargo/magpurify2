@@ -547,7 +547,7 @@ class ContigClassifier:
                     ]
                 )
                 self.probability_threshold = np.clip(
-                    self.probability_threshold, 0.08, 0.4
+                    self.probability_threshold, 0.025, 0.4
                 )
             else:
                 self.probability_threshold = probability_threshold
