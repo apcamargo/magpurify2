@@ -48,7 +48,7 @@ def main(args):
         )
         sys.exit(1)
     if not args.filtered_output_directory.is_dir():
-        logger.warning(
+        logger.info(
             f"'{args.filtered_output_directory}' does not exist. Creating it now."
         )
         args.filtered_output_directory.mkdir()
