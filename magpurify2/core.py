@@ -537,7 +537,7 @@ class ContigClassifier:
                     )
                 # THIS FORMULA WAS COMPUTED ONLY FOR THE FULL MODEL. IT WON'T WORK WELL WITH FAST MODE
                 threshold_dict = {
-                    genome: 0.035 - 0.01 * (1 - np.exp(1) ** (0.05 * score))
+                    genome: 0.03 - 0.01 * (1 - np.exp(1) ** (0.05 * score))
                     for genome, score in checkm_score_dict.items()
                 }
                 self.probability_threshold = np.array(
