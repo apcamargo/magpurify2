@@ -672,7 +672,7 @@ def get_checkm_scores(filepath):
         return None
 
 
-def write_filtered_genome(mag, mags_contaminants_dict, filtered_output_directory):
+def write_filtered_genome(mag, mags_contaminants_dict, filtered_output_directory, suffix):
     """
     Writes a FASTA file containing contigs not flagged as contaminants.
 
@@ -686,10 +686,15 @@ def write_filtered_genome(mag, mags_contaminants_dict, filtered_output_directory
     filtered_output_directory : Path
         Path object pointing to the directory where the filtered genome will be
         written to.
+    suffix : str
+        Suffix to be added to the filenames of the filtered genomes.
     """
     if mag.genome in mags_contaminants_dict:
-        output_fasta = filtered_output_directory.joinpath(f"{mag.genome}.filtered.fna")
-        with open(output_fasta, "w") as fout:
+        if suffix:
+            output_fna = filtered_output_directory.joinpath(f"{mag.genome}.{suffix}.fna")
+        else:
+            output_fna = filtered_output_directory.joinpath(f"{mag.genome}.fna")
+        with open(output_fna, "w") as fout:
             for contig, description, sequence in mag:
                 if not mags_contaminants_dict[mag.genome][contig]:
                     fout.write(f">{description}\n")

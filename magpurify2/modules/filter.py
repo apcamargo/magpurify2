@@ -163,4 +163,5 @@ def main(args):
             mag,
             contig_classification.mags_contaminants_dict,
             args.filtered_output_directory,
+            args.suffix,
         )

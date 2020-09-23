@@ -58,7 +58,7 @@ default_values = {
         "genome_min_fraction": 0.5,
         "min_genus_identity": 0.83,
     },
-    "filter": {"probability_threshold": 0.25,},
+    "filter": {"probability_threshold": 0.25, "suffix": "filtered"},
 }
 
 
@@ -218,6 +218,13 @@ def end_to_end_parser(parser):
         "codon_usage and taxonomy modules will not be executed and the `--taxonomy_database` "
         "parameter is not required.",
         action="store_true",
+    )
+    options.add_argument(
+        "--suffix",
+        default=default_values["filter"]["suffix"],
+        type=str,
+        help="Suffix to be added to the filenames of the filtered genomes, before "
+        "the file extension (e.g.: 'genome.suffix.fna').",
     )
     other.add_argument(
         "-t",
@@ -578,6 +585,13 @@ def filter_parser(parser):
         help="Use only the outputs of the composition and coverage modules. The "
         "outputs of the codon_usage and taxonomy modules are not required.",
         action="store_true",
+    )
+    options.add_argument(
+        "--suffix",
+        default=default_values["filter"]["suffix"],
+        type=str,
+        help="Suffix to be added to the filenames of the filtered genomes, before "
+        "the file extension (e.g.: 'genome.suffix.fna').",
     )
     other.add_argument(
         "-t",
