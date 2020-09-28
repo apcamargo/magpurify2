@@ -42,7 +42,7 @@ BAM files store read alignment information to the target metagenome (or MAG) and
 # Create a Bowtie 2 index for your metagenome inside the 'bt2' directory:
 $ mkdir bt2
 $ bowtie2-build --threads 4 metagenome.fna bt2/metagenome
-# Map the reads to the metagenome, sort the output and save it to 'sample1.bam':
+# Map the reads, sort the output and save it to 'sample1.bam':
 $ bowtie2 --threads 4 -x bt2/metagenome \
   -1 sample1_R1.fastq.gz -2 sample1_R2.fastq.gz \
   | samtools sort -@ 4 -o sample1.bam -

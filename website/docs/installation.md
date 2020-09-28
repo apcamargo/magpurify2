@@ -54,6 +54,6 @@ curl -Lb /tmp/cookie "https://drive.google.com/uc?export=download&confirm=${code
 tar zxfv magpurify2DB.v1.0.tar.gz
 ```
 
-[^1]: Hyatt, Doug, et al. ["Prodigal: prokaryotic gene recognition and translation initiation site identification."](https://pubmed.ncbi.nlm.nih.gov/20211023/) *BMC bioinformatics* 11.1 (2010): 119.
+[^1]: Hyatt, Doug, et al. ["Prodigal: prokaryotic gene recognition and translation initiation site identification."](https://pubmed.ncbi.nlm.nih.gov/20211023/) *BMC Bioinformatics* 11.1 (2010): 119.
 
 [^2]: Steinegger, Martin, and Johannes Söding. ["MMseqs2 enables sensitive protein sequence searching for the analysis of massive data sets."](https://pubmed.ncbi.nlm.nih.gov/29035372/) *Nature Biotechnology* 35.11 (2017): 1026-1028.
