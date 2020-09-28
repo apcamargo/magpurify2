@@ -5,6 +5,7 @@
 MAGpurify2 can be installed using `pip` or `conda`. Alternatively, you can execute it via [Docker](./#docker).
 
 <code-group>
+
 <code-block title="pip">
 ```bash
 pip install magpurify2
