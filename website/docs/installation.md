@@ -2,7 +2,7 @@
 
 ## Installing MAGpurify2
 
-MAGpurify2 can be installed using `pip` or `conda`. Alternatively, you can execute it via [Docker](./installation/#docker).
+MAGpurify2 can be installed using `pip` or `conda`. Alternatively, you can execute it via [Docker](./installation/#Docker).
 
 <code-group>
 <code-block title="pip">
