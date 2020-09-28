@@ -2,6 +2,7 @@ module.exports = {
   title: "MAGpurify2",
   base: "/magpurify2/",
   themeConfig: {
+    logo: '/logo_only_type.svg',
     nav: [
       { text: 'Repository', link: 'https://github.com/apcamargo/magpurify2' },
     ],
