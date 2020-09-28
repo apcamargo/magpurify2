@@ -36,19 +36,21 @@ optional arguments:
 ## The `coverage` module
 
 ::: tip How to generate the BAM files
-BAM files store read alignment information to the target metagenome (or MAG) and are processed by MAGpurify2 to estimate the coverage of each contig. To generate the BAM required by MAGpurify2 you should first map your reads to the complete metagenome using a proper tool (such as [Bowtie 2](https://github.com/BenLangmead/bowtie2), [minimap2](https://github.com/lh3/minimap2) or [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2)) and then convert and sort the output using [samtools](https://github.com/samtools/samtools).
+BAM files store read alignment information to the target metagenome (or MAG) and used by MAGpurify2 to estimate the coverage of each contig. To generate the BAM inputs to MAGpurify2 you should first map your reads to the complete metagenome using a proper tool (such as [Bowtie 2](https://github.com/BenLangmead/bowtie2), [minimap2](https://github.com/lh3/minimap2) or [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2)) and then convert and sort the output using [samtools](https://github.com/samtools/samtools). For example:
 
 ```bash
+# Create a Bowtie 2 index for your metagenome inside the 'bt2' directory:
 $ mkdir bt2
 $ bowtie2-build --threads 4 metagenome.fna bt2/metagenome
+# Map the reads to the metagenome, sort the output and save it to 'sample1.bam':
 $ bowtie2 --threads 4 -x bt2/metagenome \
   -1 sample1_R1.fastq.gz -2 sample1_R2.fastq.gz \
   | samtools sort -@ 4 -o sample1.bam -
 ```
 
-We recommend mapping the reads to the metagenome (superset) and not directly to the MAGs (subsets). This is due to two factors:
+We recommend mapping the reads to the metagenome (superset) and not directly to the MAGs retrieved from it (subsets). There are two main reasons for that:
 
-- When you map the reads into the MAG a read that was originated from the sequencing of a closely related genome might be erroneously aligned to the MAG (cross-mapping), introducing bias to the coverage estimation.
+- When you map the reads to the MAG there's a chance that reads that were originated from the sequencing of a closely related genome will be erroneously aligned to the MAG (cross-mapping), introducing bias to the coverage estimation.
 - Metagenome-wide mappings can be used to estimate the coverage of all the contigs in the metagenome, thus allowing MAGpurify2 to process multiple MAGs in a single execution.
 
 If the target MAGs are derived from multiple source metagenomes you need input BAM files containing read mappings to each one of them.
