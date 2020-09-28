@@ -2,14 +2,16 @@
 
 ## Installing MAGpurify2
 
+MAGpurify2 can be installed using `pip` or `conda`. Alternatively, you can execute it via [Docker](./#docker).
+
 <code-group>
-<code-block title="PIP">
+<code-block title="pip">
 ```bash
 pip install magpurify2
 ```
 </code-block>
 
-<code-block title="CONDA" active>
+<code-block title="conda" active>
 ```bash
 conda install -c conda-forge -c bioconda magpurify2
 ```
@@ -17,7 +19,7 @@ conda install -c conda-forge -c bioconda magpurify2
 
 </code-group>
 
-If you install MAGpurify2 via `pip`, make sure that you have also installed the third-party dependencies: [Prodigal](https://github.com/hyattpd/Prodigal) and [MMseqs2](https://github.com/soedinglab/MMseqs2). The `conda` install method will automatically download and install these software.
+If you choose install MAGpurify2 via `pip`, make sure that you have also installed the third-party dependencies: [Prodigal](https://github.com/hyattpd/Prodigal) and [MMseqs2](https://github.com/soedinglab/MMseqs2). The `conda` install method will automatically download and install these software.
 
 ## Download test data and database
 
@@ -43,8 +45,6 @@ curl -Lb /tmp/cookie "https://drive.google.com/uc?export=download&confirm=${code
 tar zxfv magpurify2DB.v1.0.tar.gz
 ```
 
-## External dependencies
+## Docker
 
-CheckV depends on…
-
-If you installed MAGpurify2 via Conda the dependencies should have been installed automatically.
+Foo.
