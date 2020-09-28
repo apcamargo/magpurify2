@@ -14,6 +14,7 @@ pip install magpurify2
 conda install -c conda-forge -c bioconda magpurify2
 ```
 </code-block>
+
 </code-group>
 
 If you install MAGpurify2 via `pip`, make sure that you have also installed the third-party dependencies: [Prodigal](https://github.com/hyattpd/Prodigal) and [MMseqs2](https://github.com/soedinglab/MMseqs2). The `conda` install method will automatically download and install these software.
