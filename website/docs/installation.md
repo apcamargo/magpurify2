@@ -23,7 +23,7 @@ conda install -c conda-forge -c bioconda magpurify2
 If you choose install MAGpurify2 via `pip`, make sure that you have also installed the third-party dependencies: [Prodigal](https://github.com/hyattpd/Prodigal) [^1] and [MMseqs2](https://github.com/soedinglab/MMseqs2) [^2]. The `conda` install method will automatically download and install these software for you.
 
 ::: tip External dependencies are not needed in fast mode
-If you are executting MAGpurify2 with the `--fast_mode` parameter you don't need to install Progidal or MMseqs2, as they are conly used in the `codon_usage` and `taxonomy` modules.
+If you are executing MAGpurify2 with the `--fast_mode` parameter you don't need to install Progidal or MMseqs2. These software are only required to run the `codon_usage` and `taxonomy` modules.
 :::
 
 ## Docker
