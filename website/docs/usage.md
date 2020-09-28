@@ -58,7 +58,7 @@ If the target MAGs are derived from multiple source metagenomes you need input B
 
 If you don't have access to the raw sequencing data or to previously generated BAM files you can input coverage data stored in a tab-separated values (TSV) file. To do so, you should use the `--coverage_file` argument:
 
-```
+```bash
 coverage genomes/* output --coverage_file contig_coverages.tsv --threads 4
 ```
 
