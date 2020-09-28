@@ -54,4 +54,4 @@ Duis nisl ex, tempus ultrices mauris consectetur, convallis sagittis tellus. Nam
 The RSCU is not the only method to summarize the codon usage bias of an organism. [Hughes AL and Langley KJ](https://pubmed.ncbi.nlm.nih.gov/17000138/) proposed an alternative representation that encodes codon usage bias into five variables and this approach was succesfully applied to metagenomic binning by [Yu G et al](https://pubmed.ncbi.nlm.nih.gov/29947757/).
 :::
 
-[^1]: Sharp, Paul M., and Wen-Hsiung Li. ["The codon adaptation index-a measure of directional synonymous codon usage bias, and its potential applications."](https://pubmed.ncbi.nlm.nih.gov/3547335/) *Nucleic acids research* 15.3 (1987): 1281-1295.
+[^1]: Sharp, Paul M., and Wen-Hsiung Li. ["The codon adaptation index-a measure of directional synonymous codon usage bias, and its potential applications."](https://pubmed.ncbi.nlm.nih.gov/3547335/) *Nucleic Acids Research* 15.3 (1987): 1281-1295.

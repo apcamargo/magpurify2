@@ -18,9 +18,19 @@ conda install -c conda-forge -c bioconda magpurify2
 </code-block>
 </code-group>
 
-If you choose install MAGpurify2 via `pip`, make sure that you have also installed the third-party dependencies: [Prodigal](https://github.com/hyattpd/Prodigal) and [MMseqs2](https://github.com/soedinglab/MMseqs2). The `conda` install method will automatically download and install these software.
+### External dependencies
 
-## Download test data and database
+If you choose install MAGpurify2 via `pip`, make sure that you have also installed the third-party dependencies: [Prodigal](https://github.com/hyattpd/Prodigal) [^1] and [MMseqs2](https://github.com/soedinglab/MMseqs2) [^2]. The `conda` install method will automatically download and install these software for you.
+
+::: tip External dependencies are not needed in fast mode
+If you are executting MAGpurify2 with the `--fast_mode` parameter you don't need to install Progidal or MMseqs2, as they are conly used in the `codon_usage` and `taxonomy` modules.
+:::
+
+## Docker
+
+Foo.
+
+## Test the installation
 
 - Download test data:
 
@@ -44,6 +54,6 @@ curl -Lb /tmp/cookie "https://drive.google.com/uc?export=download&confirm=${code
 tar zxfv magpurify2DB.v1.0.tar.gz
 ```
 
-## Docker
+[^1]: Hyatt, Doug, et al. ["Prodigal: prokaryotic gene recognition and translation initiation site identification."](https://pubmed.ncbi.nlm.nih.gov/20211023/) *BMC bioinformatics* 11.1 (2010): 119.
 
-Foo.
+[^2]: Steinegger, Martin, and Johannes Söding. ["MMseqs2 enables sensitive protein sequence searching for the analysis of massive data sets."](https://pubmed.ncbi.nlm.nih.gov/29035372/) *Nature Biotechnology* 35.11 (2017): 1026-1028.
