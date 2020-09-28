@@ -2,11 +2,21 @@
 
 ## Installing MAGpurify2
 
+<code-group>
+<code-block title="PIP">
 ```bash
-conda create -n magpurify2 -c conda-forge -c bioconda python=3.8 prodigal mmseqs2
-conda activate magpurify2
-pip install magpurify2-0.1.0-cp38-cp38-manylinux2010_x86_64.whl
+pip install magpurify2
 ```
+</code-block>
+
+<code-block title="CONDA" active>
+```bash
+conda install -c conda-forge -c bioconda magpurify2
+```
+</code-block>
+</code-group>
+
+If you install MAGpurify2 via `pip`, make sure that you have also installed the third-party dependencies: [Prodigal](https://github.com/hyattpd/Prodigal) and [MMseqs2](https://github.com/soedinglab/MMseqs2). The `conda` install method will automatically download and install these software.
 
 ## Download test data and database
 

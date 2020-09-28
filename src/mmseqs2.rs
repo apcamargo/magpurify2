@@ -3,7 +3,7 @@ use pyo3::{prelude::*, wrap_pyfunction};
 use std::collections::HashMap;
 use std::error::Error;
 
-/// Parses the content of the MMSeqs2 taxonomy output file and returns a dictionary where the keys
+/// Parses the content of the MMseqs2 taxonomy output file and returns a dictionary where the keys
 /// are the query ids and the values are their assigned taxids.
 fn parse_mmseqs2_taxonomy(
     mmseqs2_taxonomy_output: &str,
@@ -24,7 +24,7 @@ fn parse_mmseqs2_taxonomy(
     Ok(gene_taxonomy_dict)
 }
 
-/// Parses the content of the MMSeqs2 alignment output file and returns two dictionaries. In the
+/// Parses the content of the MMseqs2 alignment output file and returns two dictionaries. In the
 /// first, the keys are the query ids and the values are 'alignment identity * bitscore'. In the
 /// seconda, the keys are the query ids and the values are the alignment bitscores.
 fn parse_mmseqs2_alignment(
@@ -55,16 +55,16 @@ fn parse_mmseqs2_alignment(
 /// get_mmseqs2(mmseqs2_taxonomy_output, mmseqs2_alignment_output)
 /// --
 ///
-/// Parses the taxonomy and alignment of a MMSeqs2 execution and returns a
+/// Parses the taxonomy and alignment of a MMseqs2 execution and returns a
 /// nested dictionary containing the assigned taxonomy and alignment details for
 /// each gene that had a match in the database search.
 ///
 /// Parameters
 /// ----------
 /// mmseqs2_taxonomy_output : str
-///    Path to the MMSeqs2 taxonomy output file.
+///    Path to the MMseqs2 taxonomy output file.
 /// mmseqs2_alignment_output : str
-///    Path to the MMSeqs2 alignment output file.
+///    Path to the MMseqs2 alignment output file.
 ///
 /// Returns
 /// -------

@@ -40,7 +40,7 @@ def main(args):
     args.min_genus_identity = tools.validade_input(
         args.min_genus_identity, "min_genus_identity", [0.0, 1.0]
     )
-    # Check if Prodigal and MMSeqs2 are executables in the user PATH.
+    # Check if Prodigal and MMseqs2 are executables in the user PATH.
     missing_executables = [
         executable
         for executable in ["prodigal", "mmseqs"]
@@ -69,7 +69,7 @@ def main(args):
     mmseqs2_taxonomy_file = mmseqs2_output_directory.joinpath("mmseqs2_taxonomy.tsv")
     mmseqs2_alignment_file = mmseqs2_output_directory.joinpath("mmseqs2_alignment.tsv")
 
-    # Check if MMSeqs2 needs to be executed again. To do that, we check if a MMSeqs2
+    # Check if MMseqs2 needs to be executed again. To do that, we check if a MMseqs2
     # output file exists. If it does, we check if all the input genomes are in it.
     skip_mmseqs = False
     if mmseqs2_output_directory.is_dir():
@@ -79,7 +79,7 @@ def main(args):
             with open(mmseqs2_alignment_file) as fin:
                 searched_genomes_alignment = {line.split("~")[0] for line in fin}
             if {mag.genome for mag in mag_list}.issubset(searched_genomes_taxonomy):
-                logger.info("Skipping MMSeqs2 search.")
+                logger.info("Skipping MMseqs2 search.")
                 skip_mmseqs = True
             else:
                 shutil.rmtree(mmseqs2_output_directory)
@@ -92,16 +92,16 @@ def main(args):
 
     if not skip_mmseqs:
         external.prodigal(args.genomes, args.output_directory, args.threads)
-        logger.info(f"Writing MMSeqs2 input file to: '{mmseqs2_input_file}'.")
+        logger.info(f"Writing MMseqs2 input file to: '{mmseqs2_input_file}'.")
         tools.write_mmseqs2_input(args.output_directory)
-        logger.info("Running MMSeqs2 for gene taxonomic assignment.")
+        logger.info("Running MMseqs2 for gene taxonomic assignment.")
         external.mmseqs2(args.output_directory, database, args.threads)
 
     # Create a TaxDb object containing GTDB's taxonomic data.
     taxdb = taxopy.TaxDb(
         nodes_dmp=database.nodes_dmp, names_dmp=database.names_dmp, keep_files=True,
     )
-    logger.info(f"Reading MMSeqs2 output files.")
+    logger.info(f"Reading MMseqs2 output files.")
     mmseqs2_dict = tools.get_mmseqs2(str(mmseqs2_taxonomy_file), str(mmseqs2_alignment_file))
     logger.info("Computing contig scores.")
     mag_taxonomy_list = [

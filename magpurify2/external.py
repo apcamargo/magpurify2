@@ -160,7 +160,7 @@ def mmseqs2(output_directory, database, threads):
     taxonomydb_directory.mkdir()
     besthitdb_directory.mkdir()
     tmp_directory.mkdir()
-    # Define the MMSeqs2 commands:
+    # Define the MMseqs2 commands:
     createdb_command = ["mmseqs", "createdb", mmseqs2_input_file, querydb_prefix]
     taxonomy_command = [
         "mmseqs",

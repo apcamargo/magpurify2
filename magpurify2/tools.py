@@ -387,7 +387,7 @@ def check_prediction(genome_list, output_directory):
 
 def write_mmseqs2_input(output_directory):
     """
-    Prepare the FASTA input for MMSeqs2 by the concatenation of Prodigal
+    Prepare the FASTA input for MMseqs2 by the concatenation of Prodigal
     outputs. The header of each record in the FASTA is formatted as
     ">genome~contig~gene" so that the results for each contig in each genome can
     be identified in downstream steps.
