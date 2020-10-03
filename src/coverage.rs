@@ -47,7 +47,8 @@ struct EstimatorsAndTaker<'a> {
 /// --
 ///
 /// Computes contig mean coverages from sorted BAM files. Trimmed means will be
-/// computed if `trim_min` and/or `trim_max` are set to values greater than 0.
+/// computed if `trim_lower` and/or `trim_upper` are set to values greater than
+/// 0.
 ///
 /// Parameters
 /// ----------
