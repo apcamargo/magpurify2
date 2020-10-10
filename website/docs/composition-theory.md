@@ -7,7 +7,7 @@ Contigs assembled from reads derived from the same genome or from genomes of clo
 Metagenomic binners use 4-mer frequencies, or tetranucleotide frequencies (TNFs), to cluster contigs into genomic bins. Whether or not two given contigs will be clustered into the same genomic bin does not depend exclusively on their TNF profiles. In most modern clustering algorithms local relationships are influenced by other data points, meaning that a given pair of contigs may end up in the same bin or not, depending on the full set contigs that is being clustered. Moreover, most binners also use sequencing coverage information in addition to TNF data to cluster contigs, which may lead to genomic bins that encompass contigs with distinct TNF profiles.
 
 ::: tip Genomic islands and plasmids
-Mobile genetic elements such as genomic islands and plasmids usually have a 4-mer composition that is distinct from most of the genome, making them problematic for binning algorithms. Consequently, these elements are usually not retrieved in genomic bins.
+Mobile genetic elements such as genomic islands and plasmids usually have a 4-mer composition that is distinct from most of the genome, making them problematic for binning algorithms. Consequently, these elements are usually not retrieved in genomic bins [^1].
 :::
 
 To find potential contaminants with respect to the TNF profile, MAGpurify2 processes each genomic bin individually and identifies contigs that fall outside of the bin's "core TNF cluster". This is performed in three steps: (1) MAGpurify2 computes the TNF profile of each contig, (2) embbeds data points into a low-dimentional space using a non-linear transformation, and (3) finds the "core TNF cluster" and computes each contig score.
@@ -41,3 +41,5 @@ MAGpurify2 processes each genomic bin to find contigs
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam id nulla ac velit elementum tempus non eget urna. Etiam placerat leo ac risus semper feugiat ut id nulla. Fusce venenatis magna non feugiat convallis.
 
 ![gc-content-scores](./figures/gc-content-scores.svg)
+
+[^1]: Maguire, Finlay, et al. ["Metagenome-Assembled Genome Binning Methods with Short Reads Disproportionately Fail for Plasmids and Genomic Islands."](https://www.biorxiv.org/content/10.1101/2020.03.31.997171v2) *bioRxiv* (2020).
