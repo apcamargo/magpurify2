@@ -61,7 +61,7 @@ def main(args):
     package_path = imp.find_module("magpurify2")[1]
     if args.fast_mode:
         module_list = ["composition", "coverage"]
-        model_file = Path(package_path).joinpath("models", "reduced_model.json")
+        model_file = Path(package_path).joinpath("models", "fast_model.json")
     else:
         module_list = ["composition", "coverage", "codon_usage", "taxonomy"]
         model_file = Path(package_path).joinpath("models", "full_model.json")
@@ -69,10 +69,12 @@ def main(args):
     module_path_list = [
         scores_directory.joinpath(f"{module}_scores.tsv") for module in module_list
     ]
-    missing_modules = []
-    for module_path in module_path_list:
-        if not module_path.exists():
-            missing_modules.append(str(module_path))
+    missing_modules = [
+        str(module_path)
+        for module_path in module_path_list
+        if not module_path.exists()
+    ]
+
     if missing_modules:
         logger.error(
             f"The following files were not found: '{', '.join(missing_modules)}'."
