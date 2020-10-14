@@ -555,7 +555,7 @@ class ContigClassifier:
         if not self.fast_mode:
             f = lambda score: 0.02 + 0.01 * (np.exp(0.05 * score) - 1)
         else:
-            f = lambda score: 0.02 + 0.01 * (np.exp(0.033 * score) - 1)
+            f = lambda score: 0.02 + 0.01 * (np.exp(0.032 * score) - 1)
         threshold_dict = {genome: f(score) for genome, score in checkm_scores.items()}
         probability_threshold = np.array(
             [
