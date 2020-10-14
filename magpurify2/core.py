@@ -564,9 +564,9 @@ class ContigClassifier:
             ]
         )
         if not self.fast_mode:
-            probability_threshold = np.clip(self.probability_threshold, 0.02, 0.3)
+            probability_threshold = np.clip(probability_threshold, 0.02, 0.3)
         else:
-            probability_threshold = np.clip(self.probability_threshold, 0.015, 0.1)
+            probability_threshold = np.clip(probability_threshold, 0.015, 0.1)
         return probability_threshold
 
     def __len__(self):
