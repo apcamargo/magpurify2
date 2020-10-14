@@ -140,6 +140,7 @@ def main(args):
         genome_contig_matrix,
         feature_matrix,
         model_file,
+        args.fast_mode,
         args.probability_threshold,
         args.checkm_file,
         args.threads,

@@ -512,11 +512,14 @@ class ContigClassifier:
         genome_contig_matrix,
         feature_matrix,
         model_file,
+        fast_mode,
         probability_threshold,
         checkm_file,
         threads,
     ):
         self.attributes = ["genome", "contig", "contaminant_probability"]
+        self.fast_mode = fast_mode
+        self.base_probability_threshold = probability_threshold
         feature_matrix = xgb.DMatrix(feature_matrix)
         model = xgb.Booster({"booster": "gbtree", "nthread": threads, "verbosity": 0})
         model.load_model(model_file)
@@ -524,31 +527,19 @@ class ContigClassifier:
         self.contigs = genome_contig_matrix[:, 1]
         self.probabilities = model.predict(feature_matrix)
         if checkm_file:
-            checkm_score_dict = tools.get_checkm_scores(checkm_file)
-            if checkm_score_dict:
+            checkm_scores = tools.get_checkm_scores(checkm_file)
+            if checkm_scores:
                 logger.info(
                     "Using completeness and contamination estimates to set dynamic thresholds."
                 )
-                if len(set(self.genomes)) > len(checkm_score_dict):
+                if len(set(self.genomes)) > len(checkm_scores):
                     logging.warning(
                         "The input CheckM tabular file does not contain all the "
-                        "genomes being filtered. The default probability threshold will be used "
-                        "for the genomes not found in it."
+                        "genomes being filtered. The default probability threshold "
+                        f"({self.base_probability_threshold}) will be used for the "
+                        "genomes not found in it."
                     )
-                # THIS FORMULA WAS COMPUTED ONLY FOR THE FULL MODEL. IT WON'T WORK WELL WITH FAST MODE
-                threshold_dict = {
-                    genome: 0.02 - 0.01 * (1 - np.exp(1) ** (0.05 * score))
-                    for genome, score in checkm_score_dict.items()
-                }
-                self.probability_threshold = np.array(
-                    [
-                        threshold_dict.get(genome, probability_threshold)
-                        for genome in self.genomes
-                    ]
-                )
-                self.probability_threshold = np.clip(
-                    self.probability_threshold, 0.02, 0.3
-                )
+                self.probability_threshold = self.get_dynamic_thresholds(checkm_scores)
             else:
                 self.probability_threshold = probability_threshold
         else:
@@ -559,6 +550,22 @@ class ContigClassifier:
             genome = self.genomes[index]
             contig = self.contigs[index]
             self.mags_contaminants_dict[genome][contig] = contaminant
+
+    def get_dynamic_thresholds(self, checkm_scores):
+        if not self.fast_mode:
+            f = lambda score: 0.02 + 0.01 * (np.exp(0.05 * score) - 1)
+        else:
+            # FORMULA FOR FAST MODE
+            f = lambda score: score
+        threshold_dict = {genome: f(score) for genome, score in checkm_scores.items()}
+        probability_threshold = np.array(
+            [
+                threshold_dict.get(genome, self.base_probability_threshold)
+                for genome in self.genomes
+            ]
+        )
+        probability_threshold = np.clip(self.probability_threshold, 0.02, 0.3)
+        return probability_threshold
 
     def __len__(self):
         return len(self.probabilities)
