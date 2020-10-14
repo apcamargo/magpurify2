@@ -555,8 +555,7 @@ class ContigClassifier:
         if not self.fast_mode:
             f = lambda score: 0.02 + 0.01 * (np.exp(0.05 * score) - 1)
         else:
-            # FORMULA FOR FAST MODE
-            f = lambda score: score
+            f = lambda score: 0.02 + 0.01 * (np.exp(0.034 * score) - 1)
         threshold_dict = {genome: f(score) for genome, score in checkm_scores.items()}
         probability_threshold = np.array(
             [
@@ -564,7 +563,10 @@ class ContigClassifier:
                 for genome in self.genomes
             ]
         )
-        probability_threshold = np.clip(self.probability_threshold, 0.02, 0.3)
+        if not self.fast_mode:
+            probability_threshold = np.clip(self.probability_threshold, 0.02, 0.3)
+        else:
+            probability_threshold = np.clip(self.probability_threshold, 0.015, 0.1)
         return probability_threshold
 
     def __len__(self):
