@@ -552,7 +552,7 @@ class ContigClassifier:
             self.mags_contaminants_dict[genome][contig] = contaminant
 
     def get_dynamic_thresholds(self, checkm_scores):
-        f = lambda score: 0.15 + 0.35 * (np.exp(0.014 * score) - 1)
+        f = lambda score: 0.15 + 0.35 * (np.exp(0.013 * score) - 1)
         threshold_dict = {genome: f(score) for genome, score in checkm_scores.items()}
         probability_threshold = np.array(
             [
