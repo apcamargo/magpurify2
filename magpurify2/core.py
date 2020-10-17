@@ -560,7 +560,7 @@ class ContigClassifier:
                 for genome in self.genomes
             ]
         )
-        probability_threshold = np.clip(probability_threshold, 0.15, 0.5)
+        probability_threshold = np.clip(probability_threshold, 0.125, 0.5)
         return probability_threshold
 
     def __len__(self):
