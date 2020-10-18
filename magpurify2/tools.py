@@ -626,11 +626,11 @@ def write_module_output(score_list, score_output_file):
                 fout.write(f"{line}\n")
 
 
-def get_checkm_scores(filepath):
+def get_checkm_contamination(filepath):
     """
     Reads a CheckM tabular file (i.e. the output of `checkm qa --tab_table …`)
     and returns a dictionary where the keys are genome names and the values are
-    scores computed as 'completeness - 5 * contamination'.
+    the estimated contamination values.
 
     Parameters
     ----------
@@ -640,8 +640,8 @@ def get_checkm_scores(filepath):
     Returns
     -------
     dict
-        A dictionary where the keys are genome names and the values are scores
-        computed as 'completeness - 5 * contamination'.
+        A dictionary where the keys are genome names and the values are the
+        estimated contamination values.
     """
     if filepath.exists():
         with open(filepath) as fin:
@@ -651,13 +651,11 @@ def get_checkm_scores(filepath):
                 bin_id_col = fields.index("Bin Id")
                 completeness_col = fields.index("Completeness")
                 contamination_col = fields.index("Contamination")
-                checkm_score_dict = {}
+                checkm_cont_dict = {}
                 for row in csvreader:
                     genome = row[bin_id_col]
-                    completeness = float(row[completeness_col])
-                    contamination = float(row[contamination_col])
-                    checkm_score_dict[genome] = contamination
-                return checkm_score_dict
+                    checkm_cont_dict[genome] = float(row[contamination_col])
+                return checkm_cont_dict
             else:
                 logger.warning(
                     "The supplied CheckM tabular file is not correctly formatted. The "

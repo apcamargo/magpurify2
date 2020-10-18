@@ -527,7 +527,7 @@ class ContigClassifier:
         self.contigs = genome_contig_matrix[:, 1]
         self.probabilities = model.predict(feature_matrix)
         if checkm_file:
-            checkm_scores = tools.get_checkm_scores(checkm_file)
+            checkm_scores = tools.get_checkm_contamination(checkm_file)
             if checkm_scores:
                 logger.info(
                     "Using completeness and contamination estimates to set dynamic thresholds."
