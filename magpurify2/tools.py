@@ -656,7 +656,7 @@ def get_checkm_scores(filepath):
                     genome = row[bin_id_col]
                     completeness = float(row[completeness_col])
                     contamination = float(row[contamination_col])
-                    checkm_score_dict[genome] = completeness - 5 * contamination
+                    checkm_score_dict[genome] = contamination
                 return checkm_score_dict
             else:
                 logger.warning(
