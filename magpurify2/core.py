@@ -477,16 +477,13 @@ class Taxonomy:
                     np.where(self.contigs_in_mmseqs2 == contig)[0][0]
                 ]
                 for i in range(len(gene_taxonomy)):
-                    lca = taxopy.find_lca(
-                        [gene_taxonomy[i], self.genome_taxonomy], self.taxdb
-                    )
                     if len(self.genome_taxonomy.taxid_lineage) <= len(
                         gene_taxonomy[i].taxid_lineage
                     ):
-                        if lca.taxid == self.genome_taxonomy.taxid:
+                        if self.genome_taxonomy.taxid in gene_taxonomy[i].taxid_lineage:
                             score += genes_bitscore[i] / sum(genes_bitscore)
                     else:
-                        if lca.taxid == gene_taxonomy[i].taxid:
+                        if gene_taxonomy[i].taxid in self.genome_taxonomy.taxid_lineage:
                             score += genes_bitscore[i] / sum(genes_bitscore)
             else:
                 score = 1.0
