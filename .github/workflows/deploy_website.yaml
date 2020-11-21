@@ -9,7 +9,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2.0.0
       - name: Setup Node.js
-        uses: actions/setup-node@v1.1.0
+        uses: actions/setup-node@v2.1.2
       - name: Build
         shell: bash
         run: bash .github/workflows/build_website.sh
