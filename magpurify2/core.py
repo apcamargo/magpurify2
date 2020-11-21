@@ -352,6 +352,7 @@ class Taxonomy:
             "taxonomy_score",
             "genome_rank",
             "contig_rank",
+            "average_protein_identity"
         ]
         self.genome = mag.genome
         self.contigs = mag.contigs
@@ -384,6 +385,7 @@ class Taxonomy:
         self.contig_rank = np.array(
             [len(i.taxid_lineage) - 1 for i in self.contig_taxonomy]
         )
+        self.average_protein_identity = self.get_average_protein_identity()
 
     def get_gene_taxonomy(self, min_genus_identity):
         gene_taxonomy_array = []
@@ -422,6 +424,8 @@ class Taxonomy:
                         weights=genes_bitscore,
                         fraction=fraction,
                     )
+                    # If the contig taxonomic rank is really high, get a new taxonomy with less
+                    # conservative parameters
                     if len(contig_taxonomy.taxid_lineage) <= 2:
                         contig_taxonomy = taxopy.find_majority_vote(
                             gene_taxonomy,
@@ -490,6 +494,18 @@ class Taxonomy:
             scores_array.append(score)
         return np.array(scores_array)
 
+    def get_average_protein_identity(self):
+        average_protein_identity_dict = []
+        for identity, bitscore in zip(self.identity_array, self.bitscore_array):
+            average_protein_identity = np.average(identity, weights=bitscore)
+            average_protein_identity_dict.append(get_average_protein_identity_array)
+        get_average_protein_identity_dict = dict(
+            zip(self.contigs_in_mmseqs2, average_protein_identity_dict)
+        )
+        return np.array(
+            [average_protein_identity_dict.get(contig, 0.0) for contig in self.contigs]
+        )
+
     def __len__(self):
         return len(self.contigs)
 
@@ -500,6 +516,7 @@ class Taxonomy:
             np.round(self.scores, 5),
             np.repeat(self.genome_rank, len(self)),
             self.contig_rank,
+            self.average_protein_identity
         )
 
 
