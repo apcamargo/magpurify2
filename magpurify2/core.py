@@ -499,7 +499,7 @@ class Taxonomy:
         for identity, bitscore in zip(self.identity_array, self.bitscore_array):
             average_protein_identity = np.average(identity, weights=bitscore)
             average_protein_identity_dict.append(average_protein_identity)
-        get_average_protein_identity_dict = dict(
+        average_protein_identity_dict = dict(
             zip(self.contigs_in_mmseqs2, average_protein_identity_dict)
         )
         return np.array(
