@@ -516,7 +516,7 @@ class Taxonomy:
             np.round(self.scores, 5),
             np.repeat(self.genome_rank, len(self)),
             self.contig_rank,
-            self.average_protein_identity
+            np.round(self.average_protein_identity, 5),
         )
 
 
