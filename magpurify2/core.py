@@ -377,15 +377,16 @@ class Taxonomy:
             self.contig_taxonomy = self.get_contig_taxonomy(fraction=contig_min_fraction)
             self.genome_taxonomy = self.get_genome_taxonomy(fraction=genome_min_fraction)
             self.scores = self.compute_gene_agreement()
+            self.average_protein_identity = self.get_average_protein_identity()
         else:
             self.contig_taxonomy = np.array([taxopy.Taxon("1", self.taxdb)] * len(self))
             self.genome_taxonomy = taxopy.Taxon("1", self.taxdb)
             self.scores = np.zeros(len(self))
+            self.average_protein_identity = np.zeros(len(self))
         self.genome_rank = len(self.genome_taxonomy.taxid_lineage) - 1
         self.contig_rank = np.array(
             [len(i.taxid_lineage) - 1 for i in self.contig_taxonomy]
         )
-        self.average_protein_identity = self.get_average_protein_identity()
 
     def get_gene_taxonomy(self, min_genus_identity):
         gene_taxonomy_array = []
