@@ -91,7 +91,7 @@ def main(args):
         usecols=[0, 1],
     )
     feature_matrix = []
-    module_ncol_dict = {"composition": 5, "coverage": 5, "codon_usage": 7, "taxonomy": 5}
+    module_ncol_dict = {"composition": 5, "coverage": 5, "codon_usage": 7, "taxonomy": 6}
     for module, module_path in zip(module_list, module_path_list):
         if not (
             np.genfromtxt(
