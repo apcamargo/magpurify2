@@ -32,9 +32,9 @@ As UMAP is a non-deterministic algorithm, MAGpurify2 executes multiple iteration
 
 ## GC content
 
-A simpler descriptor of sequence composition is the GC-content, which represents the relative amount of guanine (G) and cytosine (C) relative to the total amount of nucleotides in the sequence. In prokaryotes there is a large variability in genomic GC-content across different species, which is at least partially caused by evolutionary pressures. Despite the heterogeneity in GC-content even within genomes, this measure has been successfully used for contig binning and contamint identification in situations where the underlying genomes exhibited diverging GC-content levels.
+A simpler descriptor of sequence composition is the GC-content, which represents the relative amount of guanine (G) and cytosine (C) relative to the total amount of nucleotides in the sequence. In prokaryotes there is a large variability in genomic GC-content across different lineages, which is at least partially caused by evolutionary pressures. Despite the heterogeneity in GC-content even within genomes, this measure has been successfully used for contig binning and contamint identification in cases where the underlying genomes exhibited diverging GC-content levels [^1].
 
-MAGpurify2 processes each genomic bin to find contigs
+MAGpurify2 processes each genomic bin to find contigs with GC content that diverges from the bin's median value, weigthed by contig length.
 
 ![gc-content-hist](./figures/gc-content-hist.svg)
 
@@ -42,4 +42,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam id nulla ac velit e
 
 ![gc-content-scores](./figures/gc-content-scores.svg)
 
-[^1]: Maguire, Finlay, et al. ["Metagenome-Assembled Genome Binning Methods with Short Reads Disproportionately Fail for Plasmids and Genomic Islands."](https://www.biorxiv.org/content/10.1101/2020.03.31.997171v2) *bioRxiv* (2020).
+[^1]: Maguire, Finlay, et al. ["Metagenome-assembled genome binning methods with short reads disproportionately fail for plasmids and genomic islands."](https://www.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000436) *Microbial Genomics* (2020).
+
+[^2]: Tyson, Gene W., et al. ["Community structure and metabolism through reconstruction of microbial genomes from the environment."](https://www.nature.com/articles/nature02340) *Nature* (2004).
