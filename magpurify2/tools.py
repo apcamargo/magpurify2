@@ -299,8 +299,8 @@ def get_weighted_median(data, weights):
     data, weights = np.array(data).squeeze(), np.array(weights).squeeze()
     s_data, s_weights = map(np.array, zip(*sorted(zip(data, weights))))
     midpoint = 0.5 * sum(s_weights)
-    if any(weights > midpoint):
-        w_median = (data[weights == np.max(weights)])[0]
+    if np.any(weights > midpoint):
+        w_median = data[weights == np.max(weights)][0]
     else:
         cs_weights = np.cumsum(s_weights)
         idx = np.where(cs_weights <= midpoint)[0][-1]
