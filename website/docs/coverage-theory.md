@@ -2,8 +2,8 @@
 
 Contigs originated from the same genome are physically linked, so it is expected that they have a similar abundances (quantified as the average sequencing coverage) within a sample and correlated relative abundances across multiple samples. MAGpurify2 identifies putative contaminants by findings contigs with outlier coverage values in relation to the bin's profile.
 
-::: tip Uneven coverage across the genome
-Even though metagenome binners assume a approximately uniform sequencing coverage across the genomes, there are factors of both technical and biological nature that lead to uneven coverage of contigs originated from the same genome. Three major causes of nonuniform genome coverage are: (1) GC content sequencing bias, that cause a coverage reduction in GC-rich regions; (2) repeat genomic regions, that exhibit copy number-dependent coverage; and differences in replication rates. Regarding the latter, regions of the genome that are closer to the replication origin tend to have higher coverage than origin-distal sequences and the magnitude of this gradient depends on the genomic replication rate [^1].
+::: tip Uneven coverage across a single genome
+Even though metagenome binners assume a approximately uniform sequencing coverage across the genomes, there are factors of both technical and biological nature that lead to uneven coverage of contigs originated from the same genome. Three major causes of nonuniform genome coverage are: (1) GC content sequencing bias, that cause a coverage reduction in GC-rich regions; (2) repeat genomic regions, that exhibit copy number-dependent coverage; and (3) differences in replication rates. Regarding the latter, regions of the genome that are closer to the replication origin tend to have higher coverage than origin-distal sequences and the magnitude of this gradient depends on the genomic replication rate [^1].
 :::
 
 ## Computing the relative contig average coverage
@@ -27,8 +27,10 @@ $$
 To account for differences in sequence depth between different samples, the relative coverage ($c$) of each contig in each sample computed by dividing its absolute coverage by the sample's total coverage:
 
 $$
-c_{i,j} = \frac{a_{i,j}}_i}{\sum_{i=1}^{\mathit{No contigs}_j}\:a_{i,j}}
+c_{i,j} = \frac{a_{i,j}}{\sum_{i=1}^{\mathit{N\underline{o}\:contigs}}\:a_{i,j}}
 $$
+
+## Lorem ipsum
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam id nulla ac velit elementum tempus non eget urna. Etiam placerat leo ac risus semper feugiat ut id nulla. Fusce venenatis magna non feugiat convallis. Maecenas hendrerit orci quis elit pretium aliquet. Nulla lorem lectus, tempus ut sollicitudin nec, ultricies eu ex. Morbi at fringilla nunc, eget facilisis enim. Nullam a iaculis massa. Sed faucibus leo sed consectetur convallis. Aenean diam neque, imperdiet et mauris nec, mollis dignissim sapien. Vestibulum imperdiet magna a erat pellentesque, porta laoreet enim dapibus. Quisque vitae egestas enim. Donec in lacus volutpat dolor malesuada aliquet. Maecenas eget blandit ipsum. Vivamus eget posuere tortor.
 
