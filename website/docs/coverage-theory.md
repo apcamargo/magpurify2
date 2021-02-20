@@ -2,7 +2,7 @@
 
 Contigs originated from the same genome are physically linked, so it is expected that they have a similar abundances (quantified as the average sequencing coverage) within a sample and correlated relative abundances across multiple samples. MAGpurify2 identifies putative contaminants by findings contigs with outlier coverage values in relation to the bin's profile.
 
-::: tip Uneven coverage across a single genome
+::: tip Uneven coverage across a genome
 Even though metagenome binners assume a approximately uniform sequencing coverage across the genomes, there are factors of both technical and biological nature that lead to uneven coverage of contigs originated from the same genome. Three major causes of nonuniform genome coverage are: (1) GC content sequencing bias, that cause a coverage reduction in GC-rich regions; (2) repeat genomic regions, that exhibit copy number-dependent coverage; and (3) differences in replication rates. Regarding the latter, regions of the genome that are closer to the replication origin tend to have higher coverage than origin-distal sequences and the magnitude of this gradient depends on the genomic replication rate [^1].
 :::
 
@@ -21,7 +21,7 @@ When read mappings are supplied by the user, MAGpurify2 processes the alignments
 After performing read filtering, MAGpurify computes the absolute average coverage ($a$) of each contig ($i$) in each sample ($j$):
 
 $$
-a_{i,j} = \frac{\mathit{Read count}_i}{\mathit{Length}_i - 2 * 75}
+a_{i,j} = \frac{\mathit{Read\:count}_i}{\mathit{Length}_i - 2 * 75}
 $$
 
 To account for differences in sequence depth between different samples, the relative coverage ($c$) of each contig in each sample computed by dividing its absolute coverage by the sample's total coverage:
