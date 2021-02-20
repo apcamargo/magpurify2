@@ -38,10 +38,10 @@ MAGpurify2 processes each genomic bin and scores contigs according with their di
 
 ![gc-content-hist](./figures/gc-content-hist.svg)
 
-The score of each contig is computed as follows:
+The score of each contig ($s_i$) is computed as follows:
 
 $$
-s_i = \log_2\left(\frac{\mathit{GC}_i + 10^{-5}}{$m_{\mathit{GC}}$ + 10^{-5}}\right)
+s_i = \left|\log_2\left(\frac{\mathit{GC}_i + 10^{-5}}{m_{\mathit{GC}} + 10^{-5}}\right)\right|
 $$
 
 ![gc-content-scores](./figures/gc-content-scores.svg)
