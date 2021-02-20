@@ -36,7 +36,7 @@ optional arguments:
 ## The `coverage` module
 
 ::: tip How to generate the BAM files
-BAM files store read alignment information to the target metagenome (or MAG) and used by MAGpurify2 to estimate the coverage of each contig. To generate the BAM inputs to MAGpurify2 you should first map your reads to the complete metagenome using a proper tool (such as [Bowtie 2](https://github.com/BenLangmead/bowtie2), [minimap2](https://github.com/lh3/minimap2) or [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2)) and then convert and sort the output using [samtools](https://github.com/samtools/samtools). For example:
+BAM files store read alignment information to the target metagenome (or MAG) and used by MAGpurify2 to estimate the coverage of each contig. To generate the BAM inputs to MAGpurify2 you should first map your reads to the complete metagenome using a proper tool (such as [Bowtie 2](https://github.com/BenLangmead/bowtie2), [minimap2](https://github.com/lh3/minimap2) or [BWA-MEM2](https://github.com/bwa-mem2/bwa-mem2)) and then sort the output using [samtools](https://github.com/samtools/samtools). For example:
 
 ```bash
 # Create a Bowtie 2 index for your metagenome inside the 'bt2' directory:
