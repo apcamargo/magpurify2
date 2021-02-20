@@ -1,6 +1,6 @@
 # Composition module
 
-Contigs assembled from reads derived from the same genome or from genomes of closely related organisms tend to display a similar sequence composition profile, assessed as tetranucleotide frequencies and GC-content. MAGpurify2 exploits this property to find contigs with outlier sequence composition profiles in relation to the rest of the genome and flag them as putative contaminants.
+Contigs assembled from reads derived from the same genome or from genomes of closely related organisms tend to display a similar sequence composition profile, assessed as tetranucleotide frequencies and GC-content. MAGpurify2 exploits this property to find contigs with divergent sequence composition profiles relative to the rest of the genome and flag them as putative contaminants.
 
 ## Tetranucleotide frequencies
 
@@ -17,7 +17,7 @@ To find potential contaminants with respect to the TNF profile, MAGpurify2 proce
 The four DNA bases (A, T, C and G) can produce $4^4 = 256$ distinct 4-mers, however, in a strand-independent analysis, reverse complement k-mers (eg.: `TTAC` and `GTAA`) are redundant and should be counted as a single entity (a canonical k-mer) in order to reduce memory usage and data variance. Thus, MAGpurify2 counts the 136 canonical 4-mers ($k$) for each contig ($i$) within the bin and computes their relative frequencies as a maximum-likelihood estimation ($q$) of the underlying TNF profile of the sequence:
 
 $$
-q_{k,i} = \frac{\mathit{TNF}_{k,i}}{\sum _{k=1}^{136}\:\mathit{TNF}_{k,i}}
+q_{k,i} = \frac{\mathit{TNF}_{k,i}}{\sum_{k=1}^{136}\:\mathit{TNF}_{k,i}}
 $$
 
 ::: tip TNF profile of short contigs
