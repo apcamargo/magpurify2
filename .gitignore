@@ -1,3 +1,5 @@
+*.ipynb
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -149,3 +151,36 @@ Cargo.lock
 
 # Local History for Visual Studio Code
 .history/
+.vscode/settings.json
+ANGELO/codon_usage_example/contig_delta_cai_kde.svg
+ANGELO/codon_usage_example/contig_delta_cai_scores.svg
+ANGELO/codon_usage_example/contig_delta_cai.npy
+ANGELO/codon_usage_example/contig_scores.npy
+ANGELO/codon_usage_example/gene_cai.npy
+ANGELO/codon_usage_example/gene_cai.svg
+ANGELO/codon_usage_example/gene_delta_cai.npy
+ANGELO/codon_usage_example/gene_delta_cai.svg
+ANGELO/coverage_trimming_example/contig_cov.txt
+ANGELO/coverage_trimming_example/contig-coverage-trimming.svg
+ANGELO/gc_content_example/gc-content-hist.svg
+ANGELO/gc_content_example/gc-content-scores.svg
+ANGELO/single_sample_coverage_example/coverage-hist.svg
+ANGELO/single_sample_coverage_example/coverage-scores.svg
+ANGELO/single_sample_coverage_example/single_sample_coverage.txt
+test_data/bam_files/sample_1.bam
+test_data/bam_files/sample_2.bam
+test_data/bam_files/sample_3.bam
+test_data/bam_files/sample_4.bam
+test_data/bam_files/sample_5.bam
+test_data/bam_files/sample_6.bam
+test_data/bam_files/sample_7.bam
+test_data/bam_files/sample_8.bam
+test_data/bam_files/sample_9.bam
+test_data/bam_files/sample_10.bam
+test_data/bam_files/sample_11.bam
+test_data/genomes/genome_1.fa.gz
+test_data/genomes/genome_2.fa.gz
+test_data/genomes/genome_3.fa.gz
+test_data/genomes/genome_4.fa.gz
+test_data/genomes/genome_5.fa.gz
+test_data/genomes/genome_6.fa.gz

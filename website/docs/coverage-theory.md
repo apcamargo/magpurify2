@@ -21,7 +21,7 @@ When read mappings are supplied by the user, MAGpurify2 processes the alignments
 After performing read filtering, MAGpurify computes the absolute average coverage ($a$) of each contig ($i$) in each sample ($j$):
 
 $$
-a_{i,j} = \frac{\mathit{Read\:count}_i}{\mathit{Length}_i - 2 * 75}
+a_{i,j} = \frac{\mathit{Read\:count}_{\,i}}{\mathit{Length}_{\,i} - 2 * 75}
 $$
 
 To account for differences in sequence depth between different samples, the relative coverage ($c$) of each contig in each sample computed by dividing its absolute coverage by the sample's total coverage:

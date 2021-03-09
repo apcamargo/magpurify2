@@ -34,14 +34,14 @@ As UMAP is a non-deterministic algorithm, MAGpurify2 executes multiple iteration
 
 A simpler descriptor of sequence composition is the GC-content, which represents the relative amount of guanine (G) and cytosine (C) relative to the total amount of nucleotides in the sequence. In prokaryotes there is a large variability in genomic GC-content across different lineages, which is at least partially caused by evolutionary pressures. Despite the heterogeneity in GC-content even within genomes, this measure has been successfully used for contig binning and contamint identification in cases where the underlying genomes exhibited diverging GC-content levels [^2].
 
-MAGpurify2 processes each genomic bin and scores contigs according with their divergence from the bin's median GC, [weigthed](https://en.wikipedia.org/wiki/Weighted_median) by contig length. The larger the difference between the contig's GC content ($\mathit{GC}_i$) and the bin's weighted median ($m_{\mathit{GC}}$), the smaller the contig's score.
+MAGpurify2 processes each genomic bin and scores contigs according with their divergence from the bin's median GC, [weigthed](https://en.wikipedia.org/wiki/Weighted_median) by contig length. The larger the difference between the contig's GC content ($\mathit{GC}_{\,i}$) and the bin's weighted median ($m_{\mathit{GC}}$), the smaller the contig's score.
 
 ![gc-content-hist](./figures/gc-content-hist.svg)
 
 The score of each contig ($s_i$) is computed as follows:
 
 $$
-s_i = 1 - \left|\log_2\left(\frac{\mathit{GC}_i + 10^{-5}}{m_{\mathit{GC}} + 10^{-5}}\right)\right|
+s_i = 1 - \left|\log_2\left(\frac{\mathit{GC}_{\,i} + 10^{-5}}{m_{\mathit{GC}} + 10^{-5}}\right)\right|
 $$
 
 ![gc-content-scores](./figures/gc-content-scores.svg)
