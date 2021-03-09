@@ -18,7 +18,7 @@
 
 use lazy_static::lazy_static;
 use ndarray::{Array1, Array2};
-use numpy::convert::ToPyArray;
+use numpy::ToPyArray;
 use pyo3::{prelude::*, wrap_pyfunction};
 use std::collections::{HashMap, HashSet};
 use std::iter;

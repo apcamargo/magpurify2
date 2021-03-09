@@ -24,7 +24,7 @@ use coverm::{
     FlagFilter,
 };
 use ndarray::Array2;
-use numpy::convert::ToPyArray;
+use numpy::ToPyArray;
 use pyo3::{prelude::*, wrap_pyfunction};
 use std::collections::{HashMap, HashSet};
 

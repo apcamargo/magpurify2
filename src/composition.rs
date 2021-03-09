@@ -17,7 +17,7 @@
 // Contact: antoniop.camargo@gmail.com
 
 use ndarray::{Array, Array2, Axis};
-use numpy::convert::ToPyArray;
+use numpy::ToPyArray;
 use pyo3::{prelude::*, wrap_pyfunction};
 use rayon::{prelude::*, ThreadPoolBuilder};
 
