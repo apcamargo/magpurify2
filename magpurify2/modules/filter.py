@@ -34,14 +34,14 @@ def main(args):
     args.contig_min_fraction = tools.validade_input(
         args.probability_threshold, "probability_threshold", [0.0, 1.0]
     )
-    if not args.output_directory.exists():
+    if not args.output_directory.is_dir():
         logger.error(
             f"The directory '{args.output_directory}' was not found. Please sure you have provided "
             "the correct path and that MAGpurify2's modules have been executed."
         )
         sys.exit(1)
     scores_directory = args.output_directory.joinpath("scores")
-    if not scores_directory.exists():
+    if not scores_directory.is_dir():
         logger.error(
             f"The directory '{scores_directory}' was not found. Please sure you have executed "
             "MAGpurify2's modules."

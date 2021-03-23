@@ -79,7 +79,7 @@ def cli():
     end_to_end_parser(end_to_end_subcommand)
     composition_subcommand = subparsers.add_parser(
         "composition",
-        help="Identify putative contaminants using tetranucleotide frequences.",
+        help="Identify putative contaminants using tetranucleotide frequencies.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         add_help=False,
     )
