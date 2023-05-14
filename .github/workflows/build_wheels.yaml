@@ -26,6 +26,7 @@ jobs:
         python -m pip install cibuildwheel==2.12.3
     - name: Build wheel
       env:
+        CIBW_MANYLINUX_X86_64_IMAGE: manylinux2010
         CIBW_BEFORE_ALL: "bash .github/workflows/prepare_cibuildwheel.sh"
         CIBW_BEFORE_BUILD: "pip install setuptools-rust==0.10.6"
         CIBW_BUILD: "cp37-* cp38-*" #"cp36-* cp37-* cp38-*"
