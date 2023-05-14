@@ -4,7 +4,7 @@ set -e
 # If on Linux, install dependencies for rust-htslib
 case "$(uname -s)" in
     Linux)
-        apt-get install -y clang zlib-devel bzip2-devel xz-devel
+        yum install -y clang zlib-devel bzip2-devel xz-devel
     ;;
     *)
 esac
