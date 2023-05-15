@@ -379,8 +379,8 @@ class Taxonomy:
             self.scores = self.compute_gene_agreement()
             self.average_protein_identity = self.get_average_protein_identity()
         else:
-            self.contig_taxonomy = np.array([taxopy.Taxon("1", self.taxdb)] * len(self))
-            self.genome_taxonomy = taxopy.Taxon("1", self.taxdb)
+            self.contig_taxonomy = np.array([taxopy.Taxon(1, self.taxdb)] * len(self))
+            self.genome_taxonomy = taxopy.Taxon(1, self.taxdb)
             self.scores = np.zeros(len(self))
             self.average_protein_identity = np.zeros(len(self))
         self.genome_rank = len(self.genome_taxonomy.taxid_lineage) - 1
@@ -394,7 +394,10 @@ class Taxonomy:
             contig_taxa_list = []
             for j in range(len(self.taxid_array[i])):
                 identity = self.identity_array[i][j]
-                taxon = taxopy.Taxon(str(self.taxid_array[i][j]), self.taxdb)
+                taxid = self.taxid_array[i][j]
+                if taxid == 0:
+                    taxid = 1
+                taxon = taxopy.Taxon(taxid, self.taxdb)
                 if identity >= min_genus_identity and taxon.rank == "species":
                     taxon = taxopy.Taxon(taxon.taxid_lineage[1], self.taxdb)
                 elif identity >= min_genus_identity and taxon.rank == "genus":
@@ -437,7 +440,7 @@ class Taxonomy:
                 else:
                     contig_taxonomy = taxopy.Taxon(gene_taxonomy[0].taxid, self.taxdb)
             else:
-                contig_taxonomy = taxopy.Taxon("1", self.taxdb)
+                contig_taxonomy = taxopy.Taxon(1, self.taxdb)
             contig_taxonomy_array.append(contig_taxonomy)
         return np.array(contig_taxonomy_array)
 
@@ -466,7 +469,7 @@ class Taxonomy:
         elif len(self) == 1:
             genome_taxonomy = taxopy.Taxon(self.contig_taxonomy[0].taxid, self.taxdb)
         else:
-            genome_taxonomy = taxopy.Taxon("1", self.taxdb)
+            genome_taxonomy = taxopy.Taxon(1, self.taxdb)
         return genome_taxonomy
 
     def compute_gene_agreement(self):
