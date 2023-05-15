@@ -25,7 +25,7 @@ from setuptools_rust import RustExtension
 
 setup(
     name="magpurify2",
-    version="1.0.0",
+    version="1.0.1",
     packages=find_packages(),
     package_data={
         path.join("magpurify2", "models"): ["full_model.json", "reduced_model.json"]
