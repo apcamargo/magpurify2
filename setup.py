@@ -28,7 +28,7 @@ setup(
     version="1.0.1",
     packages=find_packages(),
     package_data={
-        path.join("magpurify2", "models"): ["full_model.json", "reduced_model.json"]
+        "magpurify2": ["models/*.json"]
     },
     rust_extensions=[
         RustExtension("magpurify2._codon", debug=False),
