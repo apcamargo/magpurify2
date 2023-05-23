@@ -11,6 +11,11 @@ You can find MAGpurify2's full documentation at its [website](https://apcamargo.
 
 ## Quick start
 
+Install MAGpurify2:
+
+```bash
+pip install magpurify2
+```
 
 Download test data:
 
