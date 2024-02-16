@@ -9,6 +9,12 @@ You can find MAGpurify2's full documentation at its [website](https://apcamargo.
 
 ---
 
+## Citation
+
+If you use MAGpurify2 in your work, please cite the manuscript where it was first described:
+
+> Camargo, Antonio P., et al. "[**Plant microbiomes harbor potential to promote nutrient turnover in impoverished substrates of a Brazilian biodiversity hotspot**](https://www.nature.com/articles/s41396-022-01345-1)" _The ISME Journal_ 17.3 (2023): 354-370.
+
 ## Quick start
 
 Install MAGpurify2:
